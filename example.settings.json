@@ -1,0 +1,10 @@
+{
+  "timelineResolution": "1h",
+  "cronDelayMinutes": 30,
+  "fetchDelayMs": 2000,
+  "discordWebhookEnabled": false,
+  "discordWebhookUrl": "",
+  "discordDevelopmentMode": true,
+  "schedulerEnabled": true,
+  "schedulerRunning": true
+}
