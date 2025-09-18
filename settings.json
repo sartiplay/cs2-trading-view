@@ -1,5 +1,5 @@
 {
-  "timelineResolution": "5min",
+  "timelineResolution": "1h",
   "cronDelayMinutes": 30,
   "fetchDelayMs": 2000,
   "discordWebhookEnabled": false,
