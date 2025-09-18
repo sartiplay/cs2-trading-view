@@ -133,157 +133,163 @@ export function ItemsTable() {
 
   return (
     <div className="space-y-4">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Item</TableHead>
-            <TableHead>Quantity</TableHead>
-            <TableHead>Purchase Price</TableHead>
-            <TableHead>Current Price</TableHead>
-            <TableHead>Total Value</TableHead>
-            <TableHead>Profit/Loss</TableHead>
-            <TableHead>Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {items.map((item) => {
-            const currencySymbol =
-              CURRENCY_SYMBOLS[item.purchase_currency] ||
-              item.purchase_currency;
-            return (
-              <TableRow key={item.market_hash_name}>
-                <TableCell>
-                  <div>
-                    <div className="font-medium">{item.label}</div>
-                    <div className="text-sm text-muted-foreground">
-                      {item.market_hash_name}
-                    </div>
-                    {item.description && (
-                      <div className="text-xs text-muted-foreground italic mt-1">
-                        {item.description}
-                      </div>
-                    )}
-                    {item.steam_url && (
-                      <div className="mt-1">
-                        <a
-                          href={item.steam_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-xs text-blue-500 hover:text-blue-700 hover:underline"
-                        >
-                          <ExternalLink className="h-3 w-3" />
-                          View on Steam Market
-                        </a>
-                      </div>
-                    )}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="font-medium">{item.quantity}x</div>
-                </TableCell>
-                <TableCell>
-                  <div className="font-medium">
-                    {currencySymbol}
-                    {item.purchase_price.toFixed(2)}
-                  </div>
-                  {item.purchase_currency !== "USD" && (
-                    <div className="text-sm text-muted-foreground">
-                      ≈ ${item.purchase_price_usd.toFixed(2)} USD
-                    </div>
-                  )}
-                  <div className="text-sm text-muted-foreground">
-                    Total: $
-                    {(item.purchase_price_usd * item.quantity).toFixed(2)}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  {item.latest_price ? (
-                    <div>
-                      <div className="font-medium">
-                        ${item.latest_price.toFixed(2)}
-                      </div>
-                      {item.last_updated && (
-                        <div className="text-sm text-muted-foreground">
-                          {new Date(item.last_updated).toLocaleDateString()}
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <span className="text-muted-foreground">No data</span>
-                  )}
-                </TableCell>
-                <TableCell>
-                  {item.latest_price ? (
-                    <div className="font-medium">
-                      ${(item.latest_price * item.quantity).toFixed(2)}
-                    </div>
-                  ) : (
-                    <span className="text-muted-foreground">No data</span>
-                  )}
-                </TableCell>
-                <TableCell>
-                  {item.profit_loss !== null &&
-                  item.profit_loss !== undefined ? (
-                    <div>
-                      <div
-                        className={`font-medium ${
-                          item.profit_loss >= 0
-                            ? "text-green-600"
-                            : "text-red-600"
-                        }`}
-                      >
-                        {item.profit_loss >= 0 ? "+" : ""}$
-                        {item.profit_loss.toFixed(2)}
-                      </div>
-                      {item.profit_loss_percentage !== null && (
-                        <div
-                          className={`text-sm ${
-                            (item.profit_loss_percentage ?? 0) >= 0
-                              ? "text-green-600"
-                              : "text-red-600"
-                          }`}
-                        >
-                          {(item.profit_loss_percentage ?? 0) >= 0 ? "+" : ""}
-                          {(item.profit_loss_percentage ?? 0).toFixed(1)}%
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <span className="text-muted-foreground">No data</span>
-                  )}
-                </TableCell>
-                <TableCell>
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="sm" asChild>
-                      <Link
-                        href={`/item/${encodeURIComponent(
-                          item.market_hash_name
-                        )}`}
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Link>
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleEditItem(item)}
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleDeleteItem(item)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </TableCell>
+      <div className="border rounded-md">
+        <div className="max-h-[600px] overflow-y-auto">
+          <Table>
+            <TableHeader className="sticky top-0 bg-background z-10">
+              <TableRow>
+                <TableHead>Item</TableHead>
+                <TableHead>Quantity</TableHead>
+                <TableHead>Purchase Price</TableHead>
+                <TableHead>Current Price</TableHead>
+                <TableHead>Total Value</TableHead>
+                <TableHead>Profit/Loss</TableHead>
+                <TableHead>Actions</TableHead>
               </TableRow>
-            );
-          })}
-        </TableBody>
-      </Table>
+            </TableHeader>
+            <TableBody>
+              {items.map((item) => {
+                const currencySymbol =
+                  CURRENCY_SYMBOLS[item.purchase_currency] ||
+                  item.purchase_currency;
+                return (
+                  <TableRow key={item.market_hash_name}>
+                    <TableCell>
+                      <div>
+                        <div className="font-medium">{item.label}</div>
+                        <div className="text-sm text-muted-foreground">
+                          {item.market_hash_name}
+                        </div>
+                        {item.description && (
+                          <div className="text-xs text-muted-foreground italic mt-1">
+                            {item.description}
+                          </div>
+                        )}
+                        {item.steam_url && (
+                          <div className="mt-1">
+                            <a
+                              href={item.steam_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 text-xs text-blue-500 hover:text-blue-700 hover:underline"
+                            >
+                              <ExternalLink className="h-3 w-3" />
+                              View on Steam Market
+                            </a>
+                          </div>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="font-medium">{item.quantity}x</div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="font-medium">
+                        {currencySymbol}
+                        {item.purchase_price.toFixed(2)}
+                      </div>
+                      {item.purchase_currency !== "USD" && (
+                        <div className="text-sm text-muted-foreground">
+                          ≈ ${item.purchase_price_usd.toFixed(2)} USD
+                        </div>
+                      )}
+                      <div className="text-sm text-muted-foreground">
+                        Total: $
+                        {(item.purchase_price_usd * item.quantity).toFixed(2)}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      {item.latest_price ? (
+                        <div>
+                          <div className="font-medium">
+                            ${item.latest_price.toFixed(2)}
+                          </div>
+                          {item.last_updated && (
+                            <div className="text-sm text-muted-foreground">
+                              {new Date(item.last_updated).toLocaleDateString()}
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="text-muted-foreground">No data</span>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {item.latest_price ? (
+                        <div className="font-medium">
+                          ${(item.latest_price * item.quantity).toFixed(2)}
+                        </div>
+                      ) : (
+                        <span className="text-muted-foreground">No data</span>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {item.profit_loss !== null &&
+                      item.profit_loss !== undefined ? (
+                        <div>
+                          <div
+                            className={`font-medium ${
+                              item.profit_loss >= 0
+                                ? "text-green-600"
+                                : "text-red-600"
+                            }`}
+                          >
+                            {item.profit_loss >= 0 ? "+" : ""}$
+                            {item.profit_loss.toFixed(2)}
+                          </div>
+                          {item.profit_loss_percentage !== null && (
+                            <div
+                              className={`text-sm ${
+                                (item.profit_loss_percentage ?? 0) >= 0
+                                  ? "text-green-600"
+                                  : "text-red-600"
+                              }`}
+                            >
+                              {(item.profit_loss_percentage ?? 0) >= 0
+                                ? "+"
+                                : ""}
+                              {(item.profit_loss_percentage ?? 0).toFixed(1)}%
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="text-muted-foreground">No data</span>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex gap-2">
+                        <Button variant="outline" size="sm" asChild>
+                          <Link
+                            href={`/item/${encodeURIComponent(
+                              item.market_hash_name
+                            )}`}
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Link>
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleEditItem(item)}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleDeleteItem(item)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </div>
+      </div>
       <EditItemDialog
         item={editingItem}
         open={editDialogOpen}

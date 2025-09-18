@@ -5,9 +5,9 @@
       "label": "Desert Eagle | Mecha Industries (Factory New)",
       "appid": 730,
       "steam_url": "https://steamcommunity.com/market/listings/730/Desert%20Eagle%20%7C%20Mecha%20Industries%20%28Factory%20New%29",
-      "purchase_price": 1,
+      "purchase_price": 24.45,
       "quantity": 1,
-      "purchase_currency": "CHF",
+      "purchase_currency": "USD",
       "price_history": [
         {
           "date": "2025-09-18T03:27:41.799Z",
@@ -120,6 +120,94 @@
         {
           "date": "2025-09-18T07:50:00.717Z",
           "median_price": 22.4
+        },
+        {
+          "date": "2025-09-18T09:15:02.090Z",
+          "median_price": 22.64
+        },
+        {
+          "date": "2025-09-18T09:20:01.847Z",
+          "median_price": 22.64
+        },
+        {
+          "date": "2025-09-18T09:25:01.838Z",
+          "median_price": 22.64
+        },
+        {
+          "date": "2025-09-18T09:30:01.853Z",
+          "median_price": 22.64
+        },
+        {
+          "date": "2025-09-18T09:35:01.813Z",
+          "median_price": 22.64
+        },
+        {
+          "date": "2025-09-18T09:40:01.949Z",
+          "median_price": 22.64
+        },
+        {
+          "date": "2025-09-18T09:45:01.866Z",
+          "median_price": 22.64
+        },
+        {
+          "date": "2025-09-18T09:50:01.780Z",
+          "median_price": 22.64
+        },
+        {
+          "date": "2025-09-18T09:55:01.814Z",
+          "median_price": 22.64
+        },
+        {
+          "date": "2025-09-18T10:00:01.800Z",
+          "median_price": 22.64
+        },
+        {
+          "date": "2025-09-18T10:05:01.894Z",
+          "median_price": 22.64
+        },
+        {
+          "date": "2025-09-18T10:10:01.798Z",
+          "median_price": 22.64
+        },
+        {
+          "date": "2025-09-18T10:15:01.883Z",
+          "median_price": 22.64
+        },
+        {
+          "date": "2025-09-18T10:20:01.793Z",
+          "median_price": 22.64
+        },
+        {
+          "date": "2025-09-18T10:25:01.809Z",
+          "median_price": 22.64
+        },
+        {
+          "date": "2025-09-18T10:30:01.827Z",
+          "median_price": 22.64
+        },
+        {
+          "date": "2025-09-18T10:35:01.839Z",
+          "median_price": 22.64
+        },
+        {
+          "date": "2025-09-18T10:40:01.798Z",
+          "median_price": 22.64
+        },
+        {
+          "date": "2025-09-18T10:45:01.899Z",
+          "median_price": 22.64
+        },
+        {
+          "date": "2025-09-18T10:50:01.949Z",
+          "median_price": 22.64
+        },
+        {
+          "date": "2025-09-18T10:55:01.951Z",
+          "median_price": 22.64
+        },
+        {
+          "date": "2025-09-18T11:00:01.894Z",
+          "median_price": 22.64
         }
       ]
     },
@@ -135,13 +223,101 @@
         {
           "date": "2025-09-18T07:51:38.962Z",
           "median_price": 180.98
+        },
+        {
+          "date": "2025-09-18T09:15:02.107Z",
+          "median_price": 180.98
+        },
+        {
+          "date": "2025-09-18T09:20:01.863Z",
+          "median_price": 180.98
+        },
+        {
+          "date": "2025-09-18T09:25:01.854Z",
+          "median_price": 180.98
+        },
+        {
+          "date": "2025-09-18T09:30:01.868Z",
+          "median_price": 180.98
+        },
+        {
+          "date": "2025-09-18T09:35:01.828Z",
+          "median_price": 180.98
+        },
+        {
+          "date": "2025-09-18T09:40:01.967Z",
+          "median_price": 180.98
+        },
+        {
+          "date": "2025-09-18T09:45:01.882Z",
+          "median_price": 180.98
+        },
+        {
+          "date": "2025-09-18T09:50:01.796Z",
+          "median_price": 180.98
+        },
+        {
+          "date": "2025-09-18T09:55:01.831Z",
+          "median_price": 180.98
+        },
+        {
+          "date": "2025-09-18T10:00:01.819Z",
+          "median_price": 180.98
+        },
+        {
+          "date": "2025-09-18T10:05:01.911Z",
+          "median_price": 180.98
+        },
+        {
+          "date": "2025-09-18T10:10:01.813Z",
+          "median_price": 180.98
+        },
+        {
+          "date": "2025-09-18T10:15:01.899Z",
+          "median_price": 180.98
+        },
+        {
+          "date": "2025-09-18T10:20:01.808Z",
+          "median_price": 180.98
+        },
+        {
+          "date": "2025-09-18T10:25:01.826Z",
+          "median_price": 180.98
+        },
+        {
+          "date": "2025-09-18T10:30:01.842Z",
+          "median_price": 180.98
+        },
+        {
+          "date": "2025-09-18T10:35:01.855Z",
+          "median_price": 180.98
+        },
+        {
+          "date": "2025-09-18T10:40:01.815Z",
+          "median_price": 180.98
+        },
+        {
+          "date": "2025-09-18T10:45:01.918Z",
+          "median_price": 180.98
+        },
+        {
+          "date": "2025-09-18T10:50:01.970Z",
+          "median_price": 180.98
+        },
+        {
+          "date": "2025-09-18T10:55:01.970Z",
+          "median_price": 180.98
+        },
+        {
+          "date": "2025-09-18T11:00:01.917Z",
+          "median_price": 180.98
         }
       ]
     }
   },
   "metadata": {
-    "last_capture": "2025-09-18T07:51:38.962Z",
-    "total_captures": 112,
+    "last_capture": "2025-09-18T11:00:01.917Z",
+    "total_captures": 156,
     "created_at": "2025-09-17T21:45:00.377Z"
   },
   "sold_items": []

@@ -1,8 +1,8 @@
 {
   "timelineResolution": "5min",
-  "cronDelayMinutes": 5,
+  "cronDelayMinutes": 30,
   "fetchDelayMs": 2000,
-  "discordWebhookEnabled": true,
+  "discordWebhookEnabled": false,
   "discordWebhookUrl": "https://discord.com/api/webhooks/1418078793330987038/P0AugQmP7zOFNTqxgaA5G8G_ByKfGE01uynkS9LeZxga7S-NakKaXvgvccYszNZOy82g",
   "discordDevelopmentMode": true,
   "schedulerEnabled": true,

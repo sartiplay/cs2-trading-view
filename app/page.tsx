@@ -32,8 +32,6 @@ export default function Dashboard() {
 
         <CaptureStats />
 
-        <SchedulerStatus />
-
         <div className="grid gap-8 lg:grid-cols-2">
           <Card>
             <CardHeader>
@@ -77,6 +75,8 @@ export default function Dashboard() {
         </Card>
 
         <SoldItemsDisplay />
+
+        <SchedulerStatus />
       </div>
     </div>
   );
