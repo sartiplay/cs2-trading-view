@@ -53,6 +53,30 @@ export interface SoldItem {
   sold_date: string;
   profit_loss: number;
   profit_loss_percentage: number;
+  stickers?: Array<{
+    name: string;
+    steam_url: string;
+    purchase_price: number;
+    current_price?: number;
+    currency: string;
+  }>;
+  charms?: Array<{
+    name: string;
+    steam_url: string;
+    purchase_price: number;
+    current_price?: number;
+    currency: string;
+  }>;
+  patches?: Array<{
+    name: string;
+    steam_url: string;
+    purchase_price: number;
+    current_price?: number;
+    currency: string;
+  }>;
+  customization_total_purchase_cost?: number;
+  customization_total_current_value?: number;
+  include_customizations_in_price?: boolean;
 }
 
 export interface DataStore {
@@ -387,8 +411,97 @@ export async function markItemAsSold(
     "USD"
   );
 
-  // Calculate profit/loss in USD
-  const totalPurchaseUsd = purchasePriceUsd * item.quantity;
+  let customizationPurchaseCost = 0;
+  let customizationCurrentValue = 0;
+
+  // Process stickers
+  const soldStickers = item.stickers
+    ? await Promise.all(
+        item.stickers.map(async (sticker) => {
+          const stickerPurchaseCostUsd = await convertCurrency(
+            sticker.price,
+            sticker.currency,
+            "USD"
+          );
+          const latestPrice =
+            sticker.price_history && sticker.price_history.length > 0
+              ? sticker.price_history[sticker.price_history.length - 1]
+                  .median_price
+              : null;
+
+          customizationPurchaseCost += stickerPurchaseCostUsd;
+          if (latestPrice) customizationCurrentValue += latestPrice;
+
+          return {
+            name: sticker.name,
+            steam_url: sticker.steam_url,
+            purchase_price: sticker.price,
+            current_price: latestPrice ?? undefined,
+            currency: sticker.currency,
+          };
+        })
+      )
+    : undefined;
+
+  // Process charms
+  const soldCharms = item.charms
+    ? await Promise.all(
+        item.charms.map(async (charm) => {
+          const charmPurchaseCostUsd = await convertCurrency(
+            charm.price,
+            charm.currency,
+            "USD"
+          );
+          const latestPrice =
+            charm.price_history && charm.price_history.length > 0
+              ? charm.price_history[charm.price_history.length - 1].median_price
+              : null;
+
+          customizationPurchaseCost += charmPurchaseCostUsd;
+          if (latestPrice) customizationCurrentValue += latestPrice;
+
+          return {
+            name: charm.name,
+            steam_url: charm.steam_url,
+            purchase_price: charm.price,
+            current_price: latestPrice ?? undefined,
+            currency: charm.currency,
+          };
+        })
+      )
+    : undefined;
+
+  // Process patches
+  const soldPatches = item.patches
+    ? await Promise.all(
+        item.patches.map(async (patch) => {
+          const patchPurchaseCostUsd = await convertCurrency(
+            patch.price,
+            patch.currency,
+            "USD"
+          );
+          const latestPrice =
+            patch.price_history && patch.price_history.length > 0
+              ? patch.price_history[patch.price_history.length - 1].median_price
+              : null;
+
+          customizationPurchaseCost += patchPurchaseCostUsd;
+          if (latestPrice) customizationCurrentValue += latestPrice;
+
+          return {
+            name: patch.name,
+            steam_url: patch.steam_url,
+            purchase_price: patch.price,
+            current_price: latestPrice ?? undefined,
+            currency: patch.currency,
+          };
+        })
+      )
+    : undefined;
+
+  const totalPurchaseUsd = item.include_customizations_in_price
+    ? (purchasePriceUsd + customizationPurchaseCost) * item.quantity
+    : purchasePriceUsd * item.quantity;
   const totalSoldUsd = soldPriceUsd * item.quantity;
   const profitLoss = totalSoldUsd - totalPurchaseUsd;
   const profitLossPercentage =
@@ -402,7 +515,7 @@ export async function markItemAsSold(
     appid: item.appid,
     steam_url: item.steam_url,
     purchase_price: item.purchase_price,
-    purchase_price_usd: purchasePriceUsd, // Store converted USD price
+    purchase_price_usd: purchasePriceUsd,
     purchase_currency: item.purchase_currency,
     quantity: item.quantity,
     sold_price: soldPrice,
@@ -411,6 +524,12 @@ export async function markItemAsSold(
     sold_date: new Date().toISOString(),
     profit_loss: profitLoss,
     profit_loss_percentage: profitLossPercentage,
+    stickers: soldStickers,
+    charms: soldCharms,
+    patches: soldPatches,
+    customization_total_purchase_cost: customizationPurchaseCost,
+    customization_total_current_value: customizationCurrentValue,
+    include_customizations_in_price: item.include_customizations_in_price,
   };
 
   // Add to sold items and remove from active items

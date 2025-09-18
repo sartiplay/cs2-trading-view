@@ -25,6 +25,12 @@ interface SoldItem {
   sold_date: string;
   profit_loss: number;
   profit_loss_percentage: number;
+  stickers?: { name: string; purchase_price: number; current_price?: number }[];
+  charms?: { name: string; purchase_price: number; current_price?: number }[];
+  patches?: { name: string; purchase_price: number; current_price?: number }[];
+  include_customizations_in_price: boolean;
+  customization_total_purchase_cost?: number;
+  customization_total_current_value?: number;
 }
 
 interface SoldItemsSummary {
@@ -212,6 +218,84 @@ export function SoldItemsDisplay() {
                             {item.description}
                           </div>
                         )}
+                        {(item.stickers?.length ||
+                          item.charms?.length ||
+                          item.patches?.length) && (
+                          <div className="mt-2 space-y-1">
+                            <div className="text-xs font-medium text-muted-foreground">
+                              Customizations:
+                            </div>
+                            {item.stickers?.map((sticker, index) => (
+                              <div
+                                key={index}
+                                className="text-xs text-blue-600"
+                              >
+                                • Sticker: {sticker.name}
+                                {item.include_customizations_in_price && (
+                                  <span className="text-muted-foreground">
+                                    {" "}
+                                    (${sticker.purchase_price.toFixed(2)}
+                                    {sticker.current_price &&
+                                      ` → $${sticker.current_price.toFixed(2)}`}
+                                    )
+                                  </span>
+                                )}
+                              </div>
+                            ))}
+                            {item.charms?.map((charm, index) => (
+                              <div
+                                key={index}
+                                className="text-xs text-green-600"
+                              >
+                                • Charm: {charm.name}
+                                {item.include_customizations_in_price && (
+                                  <span className="text-muted-foreground">
+                                    {" "}
+                                    (${charm.purchase_price.toFixed(2)}
+                                    {charm.current_price &&
+                                      ` → $${charm.current_price.toFixed(2)}`}
+                                    )
+                                  </span>
+                                )}
+                              </div>
+                            ))}
+                            {item.patches?.map((patch, index) => (
+                              <div
+                                key={index}
+                                className="text-xs text-purple-600"
+                              >
+                                • Patch: {patch.name}
+                                {item.include_customizations_in_price && (
+                                  <span className="text-muted-foreground">
+                                    {" "}
+                                    (${patch.purchase_price.toFixed(2)}
+                                    {patch.current_price &&
+                                      ` → $${patch.current_price.toFixed(2)}`}
+                                    )
+                                  </span>
+                                )}
+                              </div>
+                            ))}
+                            {item.include_customizations_in_price &&
+                              item.customization_total_purchase_cost && (
+                                <div className="text-xs font-medium text-muted-foreground border-t pt-1">
+                                  Total Customization Cost: $
+                                  {item.customization_total_purchase_cost.toFixed(
+                                    2
+                                  )}
+                                  {item.customization_total_current_value && (
+                                    <span>
+                                      {" "}
+                                      → $
+                                      {item.customization_total_current_value.toFixed(
+                                        2
+                                      )}
+                                    </span>
+                                  )}
+                                </div>
+                              )}
+                          </div>
+                        )}
                         {item.steam_url && (
                           <div className="mt-1">
                             <a
@@ -239,6 +323,13 @@ export function SoldItemsDisplay() {
                         Total: {purchaseCurrencySymbol}
                         {(item.purchase_price * item.quantity).toFixed(2)}
                       </div>
+                      {item.include_customizations_in_price &&
+                        item.customization_total_purchase_cost && (
+                          <div className="text-xs text-muted-foreground">
+                            + Customizations: $
+                            {item.customization_total_purchase_cost.toFixed(2)}
+                          </div>
+                        )}
                     </TableCell>
                     <TableCell>
                       <div className="font-medium">

@@ -9,6 +9,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { SchedulerStatus } from "@/components/scheduler-status";
 import { SoldItemsDisplay } from "@/components/sold-items-display";
 
@@ -32,25 +38,36 @@ export default function Dashboard() {
 
         <CaptureStats />
 
-        <div className="grid gap-8 lg:grid-cols-2">
-          <Card>
-            <CardHeader>
-              <CardTitle>Add New Item</CardTitle>
-              <CardDescription>
-                Add CS2 items to track their Steam Market prices
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ItemForm />
-            </CardContent>
-          </Card>
+        <Accordion type="multiple" className="w-full">
+          <AccordionItem value="add-item">
+            <AccordionTrigger className="text-lg font-semibold">
+              Add New Item
+            </AccordionTrigger>
+            <AccordionContent>
+              <Card className="border-0 shadow-none">
+                <CardContent className="pt-4">
+                  <p className="text-muted-foreground mb-4 text-pretty">
+                    Add CS2 items to track their Steam Market prices
+                  </p>
+                  <ItemForm />
+                </CardContent>
+              </Card>
+            </AccordionContent>
+          </AccordionItem>
 
-          <Card className="h-full">
-            <CardContent>
-              <SchedulerStatus />
-            </CardContent>
-          </Card>
-        </div>
+          <AccordionItem value="scheduler">
+            <AccordionTrigger className="text-lg font-semibold">
+              Price Capture Scheduler
+            </AccordionTrigger>
+            <AccordionContent>
+              <Card className="border-0 shadow-none">
+                <CardContent className="pt-4">
+                  <SchedulerStatus />
+                </CardContent>
+              </Card>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
 
         <Card>
           <CardHeader>
