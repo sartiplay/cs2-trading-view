@@ -45,19 +45,9 @@ export default function Dashboard() {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Quick Actions</CardTitle>
-              <CardDescription>Manage your price tracking</CardDescription>
-            </CardHeader>
+          <Card className="h-full">
             <CardContent>
-              <div className="space-y-4">
-                <div className="text-sm text-muted-foreground">
-                  Prices are automatically captured based on your configured
-                  schedule. You can also trigger manual captures for all items
-                  or individual items from their detail pages.
-                </div>
-              </div>
+              <SchedulerStatus />
             </CardContent>
           </Card>
         </div>
@@ -75,8 +65,6 @@ export default function Dashboard() {
         </Card>
 
         <SoldItemsDisplay />
-
-        <SchedulerStatus />
       </div>
     </div>
   );

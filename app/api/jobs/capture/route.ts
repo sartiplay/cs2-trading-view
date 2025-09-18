@@ -88,7 +88,6 @@ export async function POST(request: NextRequest) {
         console.log("[Capture Job] Sending Discord notification if enabled...");
         const discordSettings = await getDiscordSettings();
         console.log("[Capture Job] Discord Settings:", discordSettings);
-        // TODO: HERE
         if (discordSettings?.enabled && discordSettings.webhookUrl) {
           console.log("[Capture Job] Discord notifications are enabled.");
           const currentInventoryValue = await getInventoryValue();

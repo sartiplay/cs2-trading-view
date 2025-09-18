@@ -1,16 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { RefreshCw, Play, Square } from "lucide-react";
+import { RefreshCw, Play, Square, Clock, Timer } from "lucide-react";
 import { CountdownTimer } from "./countdown-timer";
 import { useScheduler } from "@/contexts/scheduler-context";
 
@@ -22,7 +16,7 @@ interface SchedulerStatus {
   cronExpression: string;
   nextExecution?: string;
 }
-
+// TODO: Cant stop scheduler if a job is currently running
 export function SchedulerStatus() {
   const {
     schedulerStatus,
@@ -60,111 +54,114 @@ export function SchedulerStatus() {
   if (!isInitialized || !schedulerStatus) {
     return (
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <RefreshCw className="h-4 w-4 animate-spin" />
-            Auto Scheduler
-          </CardTitle>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">Auto Scheduler</CardTitle>
+          <RefreshCw className="h-4 w-4 text-muted-foreground animate-spin" />
         </CardHeader>
         <CardContent>
-          <div className="text-sm text-muted-foreground">
-            Initializing scheduler...
-          </div>
+          <div className="text-2xl font-bold">Initializing...</div>
+          <p className="text-xs text-muted-foreground">
+            Loading scheduler status
+          </p>
         </CardContent>
       </Card>
     );
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center justify-between">
-          <span>Auto Scheduler</span>
-          <Badge variant={schedulerStatus.running ? "default" : "secondary"}>
-            {schedulerStatus.running ? "Active" : "Inactive"}
-          </Badge>
-        </CardTitle>
-        <CardDescription>
-          Automatic price capture every{" "}
-          {schedulerStatus.intervalMinutes || 1440} minutes
-        </CardDescription>
+    <Card className="h-full flex flex-col">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+        <CardTitle className="text-sm font-medium">Auto Scheduler</CardTitle>
+        <Timer className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
-      <CardContent className="space-y-4">
-        {schedulerStatus && (
-          <CountdownTimer
-            intervalMinutes={schedulerStatus.intervalMinutes}
-            isRunning={schedulerStatus.running}
-            nextExecution={schedulerStatus.nextExecution}
-            onTimeUp={refreshStatus}
-          />
-        )}
+      <CardContent className="flex-1 flex flex-col justify-between space-y-4">
+        {/* Status Section */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="text-lg font-bold">
+                {schedulerStatus.running ? "Active" : "Inactive"}
+              </div>
+              <Badge
+                variant={schedulerStatus.running ? "default" : "secondary"}
+                className="text-xs"
+              >
+                {schedulerStatus.running ? "Running" : "Stopped"}
+              </Badge>
+            </div>
+            <Button
+              onClick={refreshStatus}
+              disabled={loading}
+              size="sm"
+              variant="ghost"
+            >
+              <RefreshCw
+                className={`h-4 w-4 ${loading ? "animate-spin" : ""}`}
+              />
+            </Button>
+          </div>
 
-        <div className="grid grid-cols-2 gap-4 text-sm">
-          <div>
-            <div className="text-muted-foreground">Status</div>
-            <div className="font-medium">
-              {schedulerStatus?.running ? "Running" : "Stopped"}
+          {/* Next Execution */}
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <Clock className="h-3 w-3" />
+              <span>Next Execution</span>
+            </div>
+            <div className="text-sm font-medium">
+              {schedulerStatus.nextExecution
+                ? new Date(schedulerStatus.nextExecution).toLocaleString([], {
+                    month: "short",
+                    day: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })
+                : "Not scheduled"}
             </div>
           </div>
-          <div>
-            <div className="text-muted-foreground">Interval</div>
-            <div className="font-medium">
-              {schedulerStatus?.intervalMinutes
-                ? `${schedulerStatus.intervalMinutes} min`
-                : "N/A"}
-            </div>
-          </div>
-          <div>
-            <div className="text-muted-foreground">Request Delay</div>
-            <div className="font-medium">
-              {schedulerStatus?.fetchDelayMs
-                ? `${schedulerStatus.fetchDelayMs}ms`
-                : "N/A"}
-            </div>
-          </div>
-          <div>
-            <div className="text-muted-foreground">Timezone</div>
-            <div className="font-medium">
-              {schedulerStatus?.timezone || "N/A"}
-            </div>
-          </div>
-          <div>
-            <div className="text-muted-foreground">Next Execution</div>
-            <div className="font-medium">
-              {schedulerStatus?.nextExecution || "N/A"}
-            </div>
+
+          {/* Countdown Timer */}
+          <div className="space-y-2">
+            <div className="text-xs text-muted-foreground">Time Remaining</div>
+            {schedulerStatus && (
+              <CountdownTimer
+                intervalMinutes={schedulerStatus.intervalMinutes}
+                isRunning={schedulerStatus.running}
+                nextExecution={schedulerStatus.nextExecution}
+                onTimeUp={refreshStatus}
+              />
+            )}
           </div>
         </div>
 
-        <div className="flex gap-2">
+        <div className="space-y-3">
+          {/* Control Button */}
           <Button
             onClick={toggleScheduler}
             disabled={loading}
             size="sm"
             variant={schedulerStatus.running ? "destructive" : "default"}
+            className="w-full"
           >
             {loading ? (
               <RefreshCw className="h-4 w-4 animate-spin" />
             ) : schedulerStatus.running ? (
               <>
                 <Square className="h-4 w-4 mr-2" />
-                Stop
+                Stop Scheduler
               </>
             ) : (
               <>
                 <Play className="h-4 w-4 mr-2" />
-                Start
+                Start Scheduler
               </>
             )}
           </Button>
-          <Button
-            onClick={refreshStatus}
-            disabled={loading}
-            size="sm"
-            variant="outline"
-          >
-            <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
-          </Button>
+
+          {/* Configuration Info */}
+          <div className="text-xs text-muted-foreground pt-2 border-t">
+            Every {schedulerStatus.intervalMinutes || 1440}min •{" "}
+            {schedulerStatus.fetchDelayMs}ms delay
+          </div>
         </div>
       </CardContent>
     </Card>

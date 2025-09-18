@@ -3,7 +3,13 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { RefreshCw, TrendingUp, Clock, Database, Timer } from "lucide-react";
+import {
+  RefreshCw,
+  TrendingUp,
+  Clock,
+  Database,
+  DollarSign,
+} from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface CaptureStats {
@@ -12,9 +18,18 @@ interface CaptureStats {
   total_items: number;
 }
 
+interface InventoryData {
+  total_purchase_value: number;
+  total_current_value: number;
+  total_profit_loss: number;
+  total_profit_loss_percentage: number;
+}
+
 export function CaptureStats() {
   const [stats, setStats] = useState<CaptureStats | null>(null);
-
+  const [inventoryData, setInventoryData] = useState<InventoryData | null>(
+    null
+  );
   const [isCapturing, setIsCapturing] = useState(false);
   const { toast } = useToast();
 
@@ -27,6 +42,18 @@ export function CaptureStats() {
       }
     } catch (error) {
       console.error("Failed to fetch stats:", error);
+    }
+  };
+
+  const fetchInventoryData = async () => {
+    try {
+      const response = await fetch("/api/inventory-value");
+      if (response.ok) {
+        const data = await response.json();
+        setInventoryData(data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch inventory data:", error);
     }
   };
 
@@ -46,6 +73,7 @@ export function CaptureStats() {
           description: result.message,
         });
         await fetchStats();
+        await fetchInventoryData();
         window.dispatchEvent(new CustomEvent("refreshItems"));
       } else {
         throw new Error("Failed to capture prices");
@@ -63,6 +91,7 @@ export function CaptureStats() {
 
   useEffect(() => {
     fetchStats();
+    fetchInventoryData();
   }, []);
 
   if (!stats) {
@@ -70,7 +99,7 @@ export function CaptureStats() {
   }
 
   return (
-    <div className="grid gap-4 md:grid-cols-5">
+    <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 w-full">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Total Items</CardTitle>
@@ -90,6 +119,48 @@ export function CaptureStats() {
         <CardContent>
           <div className="text-2xl font-bold">{stats.total_captures}</div>
           <p className="text-xs text-muted-foreground">Price data points</p>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">Money Invested</CardTitle>
+          <DollarSign className="h-4 w-4 text-muted-foreground" />
+        </CardHeader>
+        <CardContent>
+          <div
+            className={`text-2xl font-bold ${
+              inventoryData && inventoryData.total_profit_loss >= 0
+                ? "text-green-600"
+                : "text-red-600"
+            }`}
+          >
+            $
+            {inventoryData
+              ? inventoryData.total_purchase_value.toFixed(2)
+              : "0.00"}
+          </div>
+          <p className="text-xs text-muted-foreground">
+            {inventoryData && inventoryData.total_profit_loss >= 0
+              ? "Positive returns"
+              : "Negative returns"}
+          </p>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">Current Value</CardTitle>
+          <TrendingUp className="h-4 w-4 text-muted-foreground" />
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold">
+            $
+            {inventoryData
+              ? inventoryData.total_current_value.toFixed(2)
+              : "0.00"}
+          </div>
+          <p className="text-xs text-muted-foreground">Market value today</p>
         </CardContent>
       </Card>
 
