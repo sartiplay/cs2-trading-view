@@ -31,6 +31,24 @@ interface Item {
   last_updated?: string;
   profit_loss?: number | null;
   profit_loss_percentage?: number | null;
+  stickers?: Array<{
+    name: string;
+    steam_url: string;
+    price: number;
+    currency: string;
+  }>;
+  charms?: Array<{
+    name: string;
+    steam_url: string;
+    price: number;
+    currency: string;
+  }>;
+  patches?: Array<{
+    name: string;
+    steam_url: string;
+    price: number;
+    currency: string;
+  }>;
 }
 
 const CURRENCY_SYMBOLS: Record<string, string> = {
@@ -101,6 +119,9 @@ export function ItemsTable() {
       purchase_price_usd: item.purchase_price_usd,
       purchase_currency: item.purchase_currency,
       quantity: item.quantity,
+      stickers: item.stickers,
+      charms: item.charms,
+      patches: item.patches,
     });
     setEditDialogOpen(true);
   };
@@ -163,6 +184,62 @@ export function ItemsTable() {
                         {item.description && (
                           <div className="text-xs text-muted-foreground italic mt-1">
                             {item.description}
+                          </div>
+                        )}
+                        {(item.stickers?.length !== 0 ||
+                          item.charms?.length !== 0 ||
+                          item.patches?.length !== 0) && (
+                          <div className="mt-2 space-y-1">
+                            {item.stickers && item.stickers.length > 0 && (
+                              <div className="text-xs">
+                                <span className="font-medium text-blue-400">
+                                  Stickers:
+                                </span>{" "}
+                                {item.stickers.map((sticker, idx) => (
+                                  <span
+                                    key={idx}
+                                    className="text-muted-foreground"
+                                  >
+                                    {sticker.name}
+                                    {idx < item.stickers!.length - 1
+                                      ? ", "
+                                      : ""}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                            {item.charms && item.charms.length > 0 && (
+                              <div className="text-xs">
+                                <span className="font-medium text-green-400">
+                                  Charms:
+                                </span>{" "}
+                                {item.charms.map((charm, idx) => (
+                                  <span
+                                    key={idx}
+                                    className="text-muted-foreground"
+                                  >
+                                    {charm.name}
+                                    {idx < item.charms!.length - 1 ? ", " : ""}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                            {item.patches && item.patches.length > 0 && (
+                              <div className="text-xs">
+                                <span className="font-medium text-purple-400">
+                                  Patches:
+                                </span>{" "}
+                                {item.patches.map((patch, idx) => (
+                                  <span
+                                    key={idx}
+                                    className="text-muted-foreground"
+                                  >
+                                    {patch.name}
+                                    {idx < item.patches!.length - 1 ? ", " : ""}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
                           </div>
                         )}
                         {item.steam_url && (

@@ -228,6 +228,22 @@
         {
           "date": "2025-09-18T18:00:07.155Z",
           "median_price": 22.4
+        },
+        {
+          "date": "2025-09-18T18:30:08.316Z",
+          "median_price": 22.36
+        },
+        {
+          "date": "2025-09-18T18:50:07.556Z",
+          "median_price": 22.36
+        },
+        {
+          "date": "2025-09-18T18:57:05.861Z",
+          "median_price": 22.36
+        },
+        {
+          "date": "2025-09-18T19:10:07.958Z",
+          "median_price": 22.36
         }
       ]
     },
@@ -351,6 +367,22 @@
         {
           "date": "2025-09-18T18:00:07.169Z",
           "median_price": 175.22
+        },
+        {
+          "date": "2025-09-18T18:30:08.350Z",
+          "median_price": 180.02
+        },
+        {
+          "date": "2025-09-18T18:50:07.577Z",
+          "median_price": 180.02
+        },
+        {
+          "date": "2025-09-18T18:57:05.880Z",
+          "median_price": 180.02
+        },
+        {
+          "date": "2025-09-18T19:10:07.978Z",
+          "median_price": 180.02
         }
       ]
     },
@@ -382,6 +414,22 @@
         {
           "date": "2025-09-18T18:00:07.186Z",
           "median_price": 0.99
+        },
+        {
+          "date": "2025-09-18T18:30:08.380Z",
+          "median_price": 1
+        },
+        {
+          "date": "2025-09-18T18:50:07.597Z",
+          "median_price": 1
+        },
+        {
+          "date": "2025-09-18T18:57:05.895Z",
+          "median_price": 1
+        },
+        {
+          "date": "2025-09-18T19:10:07.997Z",
+          "median_price": 1
         }
       ]
     },
@@ -409,6 +457,22 @@
         {
           "date": "2025-09-18T18:00:07.200Z",
           "median_price": 3.84
+        },
+        {
+          "date": "2025-09-18T18:30:08.402Z",
+          "median_price": 4.24
+        },
+        {
+          "date": "2025-09-18T18:50:07.617Z",
+          "median_price": 4.24
+        },
+        {
+          "date": "2025-09-18T18:57:05.914Z",
+          "median_price": 4.24
+        },
+        {
+          "date": "2025-09-18T19:10:08.016Z",
+          "median_price": 4.24
         }
       ]
     },
@@ -436,6 +500,22 @@
         {
           "date": "2025-09-18T18:00:07.216Z",
           "median_price": 13.2
+        },
+        {
+          "date": "2025-09-18T18:30:08.422Z",
+          "median_price": 13.37
+        },
+        {
+          "date": "2025-09-18T18:50:07.636Z",
+          "median_price": 13.37
+        },
+        {
+          "date": "2025-09-18T18:57:05.931Z",
+          "median_price": 13.37
+        },
+        {
+          "date": "2025-09-18T19:10:08.036Z",
+          "median_price": 13.37
         }
       ]
     },
@@ -463,13 +543,113 @@
         {
           "date": "2025-09-18T18:00:07.234Z",
           "median_price": 14.72
+        },
+        {
+          "date": "2025-09-18T18:30:08.440Z",
+          "median_price": 14.7
+        },
+        {
+          "date": "2025-09-18T18:50:07.657Z",
+          "median_price": 14.7
+        },
+        {
+          "date": "2025-09-18T18:57:05.950Z",
+          "median_price": 14.7
+        },
+        {
+          "date": "2025-09-18T19:10:08.056Z",
+          "median_price": 14.7
         }
       ]
+    },
+    "USP-S | Jawbreaker (Field-Tested)": {
+      "market_hash_name": "USP-S | Jawbreaker (Field-Tested)",
+      "label": "USP-S | Jawbreaker (Field-Tested)",
+      "appid": 730,
+      "steam_url": "https://steamcommunity.com/market/listings/730/USP-S%20%7C%20Jawbreaker%20(Field-Tested)",
+      "purchase_price": 4,
+      "quantity": 1,
+      "purchase_currency": "USD",
+      "price_history": [
+        {
+          "date": "2025-09-18T18:22:36.018Z",
+          "median_price": 6.82
+        },
+        {
+          "date": "2025-09-18T18:30:08.457Z",
+          "median_price": 6.82
+        },
+        {
+          "date": "2025-09-18T18:50:07.677Z",
+          "median_price": 6.82
+        },
+        {
+          "date": "2025-09-18T18:57:05.967Z",
+          "median_price": 6.82
+        },
+        {
+          "date": "2025-09-18T18:57:47.756Z",
+          "median_price": 6.82
+        },
+        {
+          "date": "2025-09-18T19:05:12.439Z",
+          "median_price": 6.82
+        },
+        {
+          "date": "2025-09-18T19:10:08.073Z",
+          "median_price": 6.82
+        }
+      ],
+      "stickers": [
+        {
+          "name": "Sticker | Flex",
+          "steam_url": "https://steamcommunity.com/market/listings/730/Sticker%20%7C%20Flex",
+          "price": 2,
+          "currency": "USD",
+          "price_history": [
+            {
+              "date": "2025-09-18T18:57:07.372Z",
+              "median_price": 1.08
+            },
+            {
+              "date": "2025-09-18T19:05:13.827Z",
+              "median_price": 1.08
+            },
+            {
+              "date": "2025-09-18T19:10:09.515Z",
+              "median_price": 1.08
+            }
+          ]
+        },
+        {
+          "name": "Sticker | Flex",
+          "steam_url": "https://steamcommunity.com/market/listings/730/Sticker%20%7C%20Flex",
+          "price": 3,
+          "currency": "USD",
+          "price_history": [
+            {
+              "date": "2025-09-18T18:57:07.387Z",
+              "median_price": 1.08
+            },
+            {
+              "date": "2025-09-18T19:05:13.843Z",
+              "median_price": 1.08
+            },
+            {
+              "date": "2025-09-18T19:10:09.535Z",
+              "median_price": 1.08
+            }
+          ]
+        }
+      ],
+      "charms": [],
+      "patches": [],
+      "include_customizations_in_price": false
     }
   },
   "metadata": {
-    "last_capture": "2025-09-18T18:00:07.234Z",
-    "total_captures": 184,
+    "last_capture": "2025-09-18T19:10:08.073Z",
+    "total_captures": 215,
     "created_at": "2025-09-17T21:45:00.377Z"
   },
   "sold_items": []

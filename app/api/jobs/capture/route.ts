@@ -4,6 +4,8 @@ import {
   addPriceEntry,
   getLatestPrices,
   getInventoryValue,
+  getAllCustomizations,
+  addCustomizationPriceEntry,
 } from "@/lib/data-storage.server";
 import { fetchSteamPrice, fetchMultiplePrices } from "@/lib/steam-api.server";
 import {
@@ -34,11 +36,58 @@ export async function POST(request: NextRequest) {
 
       if (price !== null) {
         await addPriceEntry(market_hash_name, price);
+
+        // Also capture prices for this item's customizations
+        const customizations = await getAllCustomizations();
+        const itemCustomizations = customizations.filter(
+          (c) => c.market_hash_name === market_hash_name
+        );
+
+        console.log(
+          `[Capture Job] Found ${itemCustomizations.length} customizations for ${market_hash_name}`
+        );
+
+        if (itemCustomizations.length > 0) {
+          const customizationResults = await fetchMultiplePrices(
+            itemCustomizations.map((customization) => ({
+              market_hash_name: customization.customization_hash,
+              appid: 730, // CS2 app ID
+            })),
+            1000 // 1 second delay between requests
+          );
+
+          // Save successful customization price captures
+          for (let i = 0; i < customizationResults.length; i++) {
+            const result = customizationResults[i];
+            const customization = itemCustomizations[i];
+
+            if (result.price !== null) {
+              await addCustomizationPriceEntry(
+                customization.market_hash_name,
+                customization.customization_type,
+                customization.customization_index,
+                result.price
+              );
+            }
+          }
+
+          const customizationSuccessCount = customizationResults.filter(
+            (r) => r.price !== null
+          ).length;
+          console.log(
+            `[Capture Job] Captured ${customizationSuccessCount}/${itemCustomizations.length} customizations for ${market_hash_name}`
+          );
+        }
+
         return NextResponse.json({
           success: true,
           message: `Price captured for ${market_hash_name}: $${price.toFixed(
             2
-          )}`,
+          )}${
+            itemCustomizations.length > 0
+              ? ` and ${itemCustomizations.length} customizations`
+              : ""
+          }`,
         });
       } else {
         return NextResponse.json(
@@ -51,10 +100,15 @@ export async function POST(request: NextRequest) {
       const items = await getAllItems();
       console.log(`[Capture Job] Capturing prices for ${items.length} items`);
 
-      if (items.length === 0) {
+      const customizations = await getAllCustomizations();
+      console.log(
+        `[Capture Job] Found ${customizations.length} customizations to capture`
+      );
+
+      if (items.length === 0 && customizations.length === 0) {
         return NextResponse.json({
           success: true,
-          message: "No items to capture prices for",
+          message: "No items or customizations to capture prices for",
           results: [],
         });
       }
@@ -62,6 +116,7 @@ export async function POST(request: NextRequest) {
       const previousPrices = await getLatestPrices();
       const previousInventoryValue = await getInventoryValue();
 
+      // Capture main item prices
       const results = await fetchMultiplePrices(
         items.map((item) => ({
           market_hash_name: item.market_hash_name,
@@ -70,18 +125,48 @@ export async function POST(request: NextRequest) {
         1000 // 1 second delay between requests
       );
 
-      // Save successful price captures
+      // Save successful price captures for main items
       for (const result of results) {
         if (result.price !== null) {
           await addPriceEntry(result.market_hash_name, result.price);
         }
       }
 
+      const customizationResults = await fetchMultiplePrices(
+        customizations.map((customization) => ({
+          market_hash_name: customization.customization_hash,
+          appid: 730, // CS2 app ID
+        })),
+        1000 // 1 second delay between requests
+      );
+
+      // Save successful customization price captures
+      for (let i = 0; i < customizationResults.length; i++) {
+        const result = customizationResults[i];
+        const customization = customizations[i];
+
+        if (result.price !== null) {
+          await addCustomizationPriceEntry(
+            customization.market_hash_name,
+            customization.customization_type,
+            customization.customization_index,
+            result.price
+          );
+        }
+      }
+
       const successCount = results.filter((r) => r.price !== null).length;
       const totalCount = results.length;
+      const customizationSuccessCount = customizationResults.filter(
+        (r) => r.price !== null
+      ).length;
+      const customizationTotalCount = customizationResults.length;
 
       console.log(
         `[Capture Job] Completed: ${successCount}/${totalCount} items captured successfully`
+      );
+      console.log(
+        `[Capture Job] Completed: ${customizationSuccessCount}/${customizationTotalCount} customizations captured successfully`
       );
 
       try {
@@ -137,13 +222,23 @@ export async function POST(request: NextRequest) {
 
       return NextResponse.json({
         success: true,
-        message: `Captured prices for ${successCount}/${totalCount} items`,
-        results: results.map((r) => ({
-          item: r.market_hash_name,
-          price: r.price,
-          success: r.price !== null,
-          error: r.error,
-        })),
+        message: `Captured prices for ${successCount}/${totalCount} items and ${customizationSuccessCount}/${customizationTotalCount} customizations`,
+        results: [
+          ...results.map((r) => ({
+            item: r.market_hash_name,
+            price: r.price,
+            success: r.price !== null,
+            error: r.error,
+            type: "item",
+          })),
+          ...customizationResults.map((r, i) => ({
+            item: customizations[i].customization_hash,
+            price: r.price,
+            success: r.price !== null,
+            error: r.error,
+            type: "customization",
+          })),
+        ],
       });
     }
   } catch (error) {

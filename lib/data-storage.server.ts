@@ -2,6 +2,22 @@ import { promises as fs } from "fs";
 import path from "path";
 import { convertCurrency } from "./currency-converter.server";
 
+interface PriceEntry {
+  date: string;
+  median_price: number;
+}
+
+export interface Customization {
+  name: string;
+  steam_url: string;
+  price: number;
+  currency: string;
+}
+
+export interface CustomizationWithHistory extends Customization {
+  price_history: PriceEntry[];
+}
+
 export interface Item {
   market_hash_name: string;
   label: string;
@@ -11,11 +27,10 @@ export interface Item {
   purchase_price: number;
   quantity: number;
   purchase_currency: string;
-}
-
-export interface PriceEntry {
-  date: string;
-  median_price: number;
+  stickers?: CustomizationWithHistory[]; // Max 6 for weapons
+  charms?: CustomizationWithHistory[]; // Max 1 for weapons
+  patches?: CustomizationWithHistory[]; // For character skins
+  include_customizations_in_price?: boolean; // Whether to include customization costs in selling price
 }
 
 export interface ItemWithHistory extends Item {
@@ -99,20 +114,50 @@ export async function addOrUpdateItem(item: Item): Promise<void> {
   const data = await readData();
 
   if (!data.items[item.market_hash_name]) {
-    data.items[item.market_hash_name] = {
+    // Initialize new item with price history for customizations
+    const itemWithHistory: ItemWithHistory = {
       ...item,
       price_history: [],
+      stickers: item.stickers?.map((sticker) => ({
+        ...sticker,
+        price_history: [],
+      })),
+      charms: item.charms?.map((charm) => ({ ...charm, price_history: [] })),
+      patches: item.patches?.map((patch) => ({ ...patch, price_history: [] })),
     };
+    data.items[item.market_hash_name] = itemWithHistory;
   } else {
     // Update existing item info but keep price history
-    data.items[item.market_hash_name].label = item.label;
-    data.items[item.market_hash_name].description = item.description;
-    data.items[item.market_hash_name].appid = item.appid;
-    data.items[item.market_hash_name].steam_url = item.steam_url;
-    data.items[item.market_hash_name].purchase_price = item.purchase_price;
-    data.items[item.market_hash_name].quantity = item.quantity;
-    data.items[item.market_hash_name].purchase_currency =
-      item.purchase_currency;
+    const existingItem = data.items[item.market_hash_name];
+    existingItem.label = item.label;
+    existingItem.description = item.description;
+    existingItem.appid = item.appid;
+    existingItem.steam_url = item.steam_url;
+    existingItem.purchase_price = item.purchase_price;
+    existingItem.quantity = item.quantity;
+    existingItem.purchase_currency = item.purchase_currency;
+    existingItem.include_customizations_in_price =
+      item.include_customizations_in_price;
+
+    // Update customizations while preserving price history
+    existingItem.stickers = item.stickers?.map((sticker, index) => ({
+      ...sticker,
+      price_history:
+        (existingItem.stickers?.[index] as CustomizationWithHistory)
+          ?.price_history || [],
+    }));
+    existingItem.charms = item.charms?.map((charm, index) => ({
+      ...charm,
+      price_history:
+        (existingItem.charms?.[index] as CustomizationWithHistory)
+          ?.price_history || [],
+    }));
+    existingItem.patches = item.patches?.map((patch, index) => ({
+      ...patch,
+      price_history:
+        (existingItem.patches?.[index] as CustomizationWithHistory)
+          ?.price_history || [],
+    }));
   }
 
   await writeData(data);
@@ -426,4 +471,137 @@ export async function getSoldItemsSummary(): Promise<{
     total_profit_loss: totalProfitLoss,
     total_profit_loss_percentage: totalProfitLossPercentage,
   };
+}
+
+export async function addCustomizationPriceEntry(
+  marketHashName: string,
+  customizationType: "stickers" | "charms" | "patches",
+  customizationIndex: number,
+  price: number
+): Promise<void> {
+  const data = await readData();
+
+  if (data.items[marketHashName]) {
+    const item = data.items[marketHashName];
+    const customizations = item[customizationType] as
+      | CustomizationWithHistory[]
+      | undefined;
+
+    if (customizations && customizations[customizationIndex]) {
+      const now = new Date().toISOString();
+
+      if (!customizations[customizationIndex].price_history) {
+        customizations[customizationIndex].price_history = [];
+      }
+
+      customizations[customizationIndex].price_history.push({
+        date: now,
+        median_price: price,
+      });
+
+      // Sort by date
+      customizations[customizationIndex].price_history.sort(
+        (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+      );
+
+      console.log(
+        `[Data Storage] Added customization price entry for ${marketHashName} ${customizationType}[${customizationIndex}]: $${price.toFixed(
+          2
+        )}`
+      );
+    }
+  }
+
+  await writeData(data);
+}
+
+export async function getAllCustomizations(): Promise<
+  Array<{
+    market_hash_name: string;
+    customization_type: "stickers" | "charms" | "patches";
+    customization_index: number;
+    customization_hash: string;
+    steam_url: string;
+  }>
+> {
+  const data = await readData();
+  const customizations: Array<{
+    market_hash_name: string;
+    customization_type: "stickers" | "charms" | "patches";
+    customization_index: number;
+    customization_hash: string;
+    steam_url: string;
+  }> = [];
+
+  for (const [marketHashName, item] of Object.entries(data.items)) {
+    // Process stickers
+    if (item.stickers) {
+      item.stickers.forEach((sticker, index) => {
+        if (sticker.steam_url) {
+          const hash = extractHashFromSteamUrl(sticker.steam_url);
+          if (hash) {
+            customizations.push({
+              market_hash_name: marketHashName,
+              customization_type: "stickers",
+              customization_index: index,
+              customization_hash: hash,
+              steam_url: sticker.steam_url,
+            });
+          }
+        }
+      });
+    }
+
+    // Process charms
+    if (item.charms) {
+      item.charms.forEach((charm, index) => {
+        if (charm.steam_url) {
+          const hash = extractHashFromSteamUrl(charm.steam_url);
+          if (hash) {
+            customizations.push({
+              market_hash_name: marketHashName,
+              customization_type: "charms",
+              customization_index: index,
+              customization_hash: hash,
+              steam_url: charm.steam_url,
+            });
+          }
+        }
+      });
+    }
+
+    // Process patches
+    if (item.patches) {
+      item.patches.forEach((patch, index) => {
+        if (patch.steam_url) {
+          const hash = extractHashFromSteamUrl(patch.steam_url);
+          if (hash) {
+            customizations.push({
+              market_hash_name: marketHashName,
+              customization_type: "patches",
+              customization_index: index,
+              customization_hash: hash,
+              steam_url: patch.steam_url,
+            });
+          }
+        }
+      });
+    }
+  }
+
+  return customizations;
+}
+
+function extractHashFromSteamUrl(url: string): string | null {
+  try {
+    const urlObj = new URL(url);
+    const pathParts = urlObj.pathname.split("/");
+    const hashIndex = pathParts.findIndex((part) => part === "listings") + 2;
+    if (hashIndex > 1 && pathParts[hashIndex]) {
+      return decodeURIComponent(pathParts[hashIndex]);
+    }
+    return null;
+  } catch {
+    return null;
+  }
 }

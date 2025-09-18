@@ -1,6 +1,7 @@
 let schedulerStarted = false;
 let cronTimer: NodeJS.Timeout | null = null;
 let nextExecutionTime: Date | null = null;
+let isExecuting = false;
 
 async function getSettings() {
   try {
@@ -74,6 +75,13 @@ function calculateNextExecution(intervalMinutes: number): Date {
 }
 
 async function executePriceCaptureJob() {
+  if (isExecuting) {
+    console.log("[v0] CRON JOB already executing, skipping...");
+    return;
+  }
+
+  isExecuting = true;
+
   try {
     console.log("[v0] CRON JOB EXECUTING at:", new Date().toISOString());
 
@@ -103,18 +111,25 @@ async function executePriceCaptureJob() {
       nextExecutionTime.toISOString()
     );
 
-    // Schedule the next job
-    if (schedulerStarted) {
+    if (schedulerStarted && !cronTimer) {
       scheduleNextJob(intervalMinutes);
     }
   } catch (error) {
     console.error("[v0] CRON JOB ERROR:", error);
+  } finally {
+    isExecuting = false;
   }
 }
 
 function scheduleNextJob(intervalMinutes: number) {
   if (cronTimer) {
     clearTimeout(cronTimer);
+    cronTimer = null;
+  }
+
+  if (!schedulerStarted) {
+    console.log("[v0] DEBUG: Scheduler stopped, not scheduling next job");
+    return;
   }
 
   const now = new Date();
@@ -124,7 +139,9 @@ function scheduleNextJob(intervalMinutes: number) {
   console.log("[v0] DEBUG: Scheduling next job in", delay, "ms");
 
   cronTimer = setTimeout(() => {
-    executePriceCaptureJob();
+    if (schedulerStarted) {
+      executePriceCaptureJob();
+    }
   }, delay);
 }
 
@@ -179,13 +196,15 @@ export function stopScheduler() {
   try {
     console.log("[v0] DEBUG: stopScheduler() called");
 
+    schedulerStarted = false;
+
     if (cronTimer) {
       console.log("[v0] DEBUG: Clearing scheduled timer");
       clearTimeout(cronTimer);
       cronTimer = null;
     }
 
-    schedulerStarted = false;
+    isExecuting = false;
     nextExecutionTime = null;
     console.log("[v0] DEBUG: Scheduler stopped");
   } catch (error) {

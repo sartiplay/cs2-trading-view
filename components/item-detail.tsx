@@ -9,6 +9,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   ArrowLeft,
   RefreshCw,
@@ -16,15 +25,50 @@ import {
   TrendingDown,
   Minus,
   ExternalLink,
+  Plus,
+  Trash2,
+  Edit,
+  Save,
+  X,
 } from "lucide-react";
 import Link from "next/link";
 import { PriceChart } from "@/components/price-chart";
 import { SettingsDialog } from "@/components/settings-dialog";
 import { useToast } from "@/hooks/use-toast";
 
+const CURRENCIES = [
+  { code: "USD", name: "US Dollar", symbol: "$" },
+  { code: "EUR", name: "Euro", symbol: "€" },
+  { code: "GBP", name: "British Pound", symbol: "£" },
+  { code: "JPY", name: "Japanese Yen", symbol: "¥" },
+  { code: "CAD", name: "Canadian Dollar", symbol: "C$" },
+  { code: "AUD", name: "Australian Dollar", symbol: "A$" },
+  { code: "CHF", name: "Swiss Franc", symbol: "CHF" },
+  { code: "CNY", name: "Chinese Yuan", symbol: "¥" },
+  { code: "SEK", name: "Swedish Krona", symbol: "kr" },
+  { code: "NOK", name: "Norwegian Krone", symbol: "kr" },
+  { code: "DKK", name: "Danish Krone", symbol: "kr" },
+  { code: "PLN", name: "Polish Zloty", symbol: "zł" },
+  { code: "CZK", name: "Czech Koruna", symbol: "Kč" },
+  { code: "HUF", name: "Hungarian Forint", symbol: "Ft" },
+  { code: "RUB", name: "Russian Ruble", symbol: "₽" },
+  { code: "BRL", name: "Brazilian Real", symbol: "R$" },
+  { code: "MXN", name: "Mexican Peso", symbol: "$" },
+  { code: "INR", name: "Indian Rupee", symbol: "₹" },
+  { code: "KRW", name: "South Korean Won", symbol: "₩" },
+  { code: "SGD", name: "Singapore Dollar", symbol: "S$" },
+];
+
 interface PriceEntry {
   date: string;
   median_price: number;
+}
+
+interface Customization {
+  name: string;
+  steam_url: string;
+  price: number;
+  currency: string;
 }
 
 interface ItemData {
@@ -34,6 +78,9 @@ interface ItemData {
   description?: string;
   steam_url?: string;
   price_history: PriceEntry[];
+  stickers?: Customization[];
+  charms?: Customization[];
+  patches?: Customization[];
 }
 
 interface ItemDetailProps {
@@ -44,7 +91,42 @@ export function ItemDetail({ hash }: ItemDetailProps) {
   const [item, setItem] = useState<ItemData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isCapturing, setIsCapturing] = useState(false);
+  const [isEditingCustomizations, setIsEditingCustomizations] = useState(false);
+  const [editingStickers, setEditingStickers] = useState<Customization[]>([]);
+  const [editingCharms, setEditingCharms] = useState<Customization[]>([]);
+  const [editingPatches, setEditingPatches] = useState<Customization[]>([]);
+  const [isSaving, setIsSaving] = useState(false);
   const { toast } = useToast();
+
+  function extractHashFromSteamUrl(url: string): string | null {
+    try {
+      const urlObj = new URL(url);
+      const pathParts = urlObj.pathname.split("/");
+      const hashIndex = pathParts.findIndex((part) => part === "listings") + 2;
+      if (hashIndex > 1 && pathParts[hashIndex]) {
+        return decodeURIComponent(pathParts[hashIndex]);
+      }
+      return null;
+    } catch {
+      return null;
+    }
+  }
+
+  function formatDisplayName(marketHashName: string): string {
+    return marketHashName
+      .replace(/\|/g, "|") // Keep pipe symbols
+      .replace(/\s*$$([^)]+)$$\s*/g, " $1") // Remove parentheses but keep content
+      .replace(/\s+/g, " ") // Normalize spaces
+      .trim();
+  }
+
+  function extractNameFromSteamUrl(url: string): string {
+    const marketHashName = extractHashFromSteamUrl(url);
+    if (marketHashName) {
+      return formatDisplayName(marketHashName);
+    }
+    return "";
+  }
 
   const fetchItem = async () => {
     try {
@@ -75,8 +157,7 @@ export function ItemDetail({ hash }: ItemDetailProps) {
           title: "Success",
           description: result.message,
         });
-        // Refresh the item data
-        await fetchItem();
+        await fetchItem(); // Refresh the item data
       } else {
         throw new Error("Failed to capture price");
       }
@@ -89,6 +170,162 @@ export function ItemDetail({ hash }: ItemDetailProps) {
     } finally {
       setIsCapturing(false);
     }
+  };
+
+  const startEditingCustomizations = () => {
+    setEditingStickers(item?.stickers || []);
+    setEditingCharms(item?.charms || []);
+    setEditingPatches(item?.patches || []);
+    setIsEditingCustomizations(true);
+  };
+
+  const cancelEditingCustomizations = () => {
+    setIsEditingCustomizations(false);
+    setEditingStickers([]);
+    setEditingCharms([]);
+    setEditingPatches([]);
+  };
+
+  const saveCustomizations = async () => {
+    if (!item) return;
+
+    setIsSaving(true);
+    try {
+      const response = await fetch(`/api/items/${encodeURIComponent(hash)}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          stickers: editingStickers.filter((s) => s.name.trim()),
+          charms: editingCharms.filter((c) => c.name.trim()),
+          patches: editingPatches.filter((p) => p.name.trim()),
+        }),
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Success",
+          description: "Customizations updated successfully",
+        });
+        await fetchItem(); // Refresh item data
+        setIsEditingCustomizations(false);
+      } else {
+        throw new Error("Failed to update customizations");
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update customizations",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const addSticker = () => {
+    if (editingStickers.length < 6) {
+      setEditingStickers([
+        ...editingStickers,
+        { name: "", steam_url: "", price: 0, currency: "USD" },
+      ]);
+    }
+  };
+
+  const addCharm = () => {
+    if (editingCharms.length < 1) {
+      setEditingCharms([
+        ...editingCharms,
+        { name: "", steam_url: "", price: 0, currency: "USD" },
+      ]);
+    }
+  };
+
+  const addPatch = () => {
+    setEditingPatches([
+      ...editingPatches,
+      { name: "", steam_url: "", price: 0, currency: "USD" },
+    ]);
+  };
+
+  const removeSticker = (index: number) => {
+    setEditingStickers(editingStickers.filter((_, i) => i !== index));
+  };
+
+  const removeCharm = (index: number) => {
+    setEditingCharms(editingCharms.filter((_, i) => i !== index));
+  };
+
+  const removePatch = (index: number) => {
+    setEditingPatches(editingPatches.filter((_, i) => i !== index));
+  };
+
+  const updateSticker = (
+    index: number,
+    field: keyof Customization,
+    value: string | number
+  ) => {
+    const updated = [...editingStickers];
+    updated[index] = { ...updated[index], [field]: value };
+
+    if (
+      field === "steam_url" &&
+      typeof value === "string" &&
+      value.trim() &&
+      !updated[index].name.trim()
+    ) {
+      const extractedName = extractNameFromSteamUrl(value.trim());
+      if (extractedName) {
+        updated[index].name = extractedName;
+      }
+    }
+
+    setEditingStickers(updated);
+  };
+
+  const updateCharm = (
+    index: number,
+    field: keyof Customization,
+    value: string | number
+  ) => {
+    const updated = [...editingCharms];
+    updated[index] = { ...updated[index], [field]: value };
+
+    if (
+      field === "steam_url" &&
+      typeof value === "string" &&
+      value.trim() &&
+      !updated[index].name.trim()
+    ) {
+      const extractedName = extractNameFromSteamUrl(value.trim());
+      if (extractedName) {
+        updated[index].name = extractedName;
+      }
+    }
+
+    setEditingCharms(updated);
+  };
+
+  const updatePatch = (
+    index: number,
+    field: keyof Customization,
+    value: string | number
+  ) => {
+    const updated = [...editingPatches];
+    updated[index] = { ...updated[index], [field]: value };
+
+    if (
+      field === "steam_url" &&
+      typeof value === "string" &&
+      value.trim() &&
+      !updated[index].name.trim()
+    ) {
+      const extractedName = extractNameFromSteamUrl(value.trim());
+      if (extractedName) {
+        updated[index].name = extractedName;
+      }
+    }
+
+    setEditingPatches(updated);
   };
 
   useEffect(() => {
@@ -300,6 +537,448 @@ export function ItemDetail({ hash }: ItemDetailProps) {
           <PriceChart data={item.price_history.slice(-200)} />
         </CardContent>
       </Card>
+
+      {(item.stickers?.length ||
+        item.charms?.length ||
+        item.patches?.length ||
+        isEditingCustomizations) && (
+        <Card className="bg-card/50 backdrop-blur-sm border-border/50">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-card-foreground">
+                  CS2 Customizations
+                </CardTitle>
+                <CardDescription>
+                  Stickers, charms, and patches applied to this item
+                </CardDescription>
+              </div>
+              <div className="flex gap-2">
+                {!isEditingCustomizations ? (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={startEditingCustomizations}
+                  >
+                    <Edit className="h-4 w-4 mr-2" />
+                    Edit
+                  </Button>
+                ) : (
+                  <>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={cancelEditingCustomizations}
+                    >
+                      <X className="h-4 w-4 mr-2" />
+                      Cancel
+                    </Button>
+                    <Button
+                      size="sm"
+                      onClick={saveCustomizations}
+                      disabled={isSaving}
+                    >
+                      <Save className="h-4 w-4 mr-2" />
+                      {isSaving ? "Saving..." : "Save"}
+                    </Button>
+                  </>
+                )}
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* Stickers Section */}
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="font-medium text-blue-400">
+                  Stickers (
+                  {isEditingCustomizations
+                    ? editingStickers.length
+                    : item.stickers?.length || 0}
+                  /6)
+                </h4>
+                {isEditingCustomizations && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={addSticker}
+                    disabled={editingStickers.length >= 6}
+                  >
+                    <Plus className="h-4 w-4 mr-1" />
+                    Add Sticker
+                  </Button>
+                )}
+              </div>
+
+              {isEditingCustomizations ? (
+                <div className="space-y-3">
+                  {editingStickers.map((sticker, index) => (
+                    <div
+                      key={index}
+                      className="flex gap-2 items-end p-3 border rounded-lg bg-background/50"
+                    >
+                      <div className="flex-1 space-y-2">
+                        <Label className="text-xs">Name</Label>
+                        <Input
+                          placeholder="Sticker name"
+                          value={sticker.name}
+                          onChange={(e) =>
+                            updateSticker(index, "name", e.target.value)
+                          }
+                        />
+                      </div>
+                      <div className="flex-1 space-y-2">
+                        <Label className="text-xs">Steam URL</Label>
+                        <Input
+                          placeholder="Steam Market URL"
+                          value={sticker.steam_url}
+                          onChange={(e) =>
+                            updateSticker(index, "steam_url", e.target.value)
+                          }
+                        />
+                      </div>
+                      <div className="w-24 space-y-2">
+                        <Label className="text-xs">Price</Label>
+                        <Input
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          placeholder="0"
+                          value={sticker.price}
+                          onChange={(e) =>
+                            updateSticker(
+                              index,
+                              "price",
+                              Number.parseFloat(e.target.value) || 0
+                            )
+                          }
+                        />
+                      </div>
+                      <div className="w-20 space-y-2">
+                        <Label className="text-xs">Currency</Label>
+                        <Select
+                          value={sticker.currency}
+                          onValueChange={(value) =>
+                            updateSticker(index, "currency", value)
+                          }
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {CURRENCIES.map((currency) => (
+                              <SelectItem
+                                key={currency.code}
+                                value={currency.code}
+                              >
+                                {currency.symbol}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => removeSticker(index)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                item.stickers &&
+                item.stickers.length > 0 && (
+                  <div className="grid gap-3 md:grid-cols-2">
+                    {item.stickers.map((sticker, index) => (
+                      <div
+                        key={index}
+                        className="p-3 border rounded-lg bg-background/50"
+                      >
+                        <div className="font-medium text-sm">
+                          {sticker.name}
+                        </div>
+                        <div className="text-xs text-muted-foreground mt-1">
+                          ${sticker.price.toFixed(2)} {sticker.currency}
+                        </div>
+                        {sticker.steam_url && (
+                          <a
+                            href={sticker.steam_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 text-xs text-blue-400 hover:text-blue-300 hover:underline mt-2"
+                          >
+                            <ExternalLink className="h-3 w-3" />
+                            View on Steam
+                          </a>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )
+              )}
+            </div>
+
+            {/* Charms Section */}
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="font-medium text-green-400">
+                  Charms (
+                  {isEditingCustomizations
+                    ? editingCharms.length
+                    : item.charms?.length || 0}
+                  /1)
+                </h4>
+                {isEditingCustomizations && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={addCharm}
+                    disabled={editingCharms.length >= 1}
+                  >
+                    <Plus className="h-4 w-4 mr-1" />
+                    Add Charm
+                  </Button>
+                )}
+              </div>
+
+              {isEditingCustomizations ? (
+                <div className="space-y-3">
+                  {editingCharms.map((charm, index) => (
+                    <div
+                      key={index}
+                      className="flex gap-2 items-end p-3 border rounded-lg bg-background/50"
+                    >
+                      <div className="flex-1 space-y-2">
+                        <Label className="text-xs">Name</Label>
+                        <Input
+                          placeholder="Charm name"
+                          value={charm.name}
+                          onChange={(e) =>
+                            updateCharm(index, "name", e.target.value)
+                          }
+                        />
+                      </div>
+                      <div className="flex-1 space-y-2">
+                        <Label className="text-xs">Steam URL</Label>
+                        <Input
+                          placeholder="Steam Market URL"
+                          value={charm.steam_url}
+                          onChange={(e) =>
+                            updateCharm(index, "steam_url", e.target.value)
+                          }
+                        />
+                      </div>
+                      <div className="w-24 space-y-2">
+                        <Label className="text-xs">Price</Label>
+                        <Input
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          placeholder="0"
+                          value={charm.price}
+                          onChange={(e) =>
+                            updateCharm(
+                              index,
+                              "price",
+                              Number.parseFloat(e.target.value) || 0
+                            )
+                          }
+                        />
+                      </div>
+                      <div className="w-20 space-y-2">
+                        <Label className="text-xs">Currency</Label>
+                        <Select
+                          value={charm.currency}
+                          onValueChange={(value) =>
+                            updateCharm(index, "currency", value)
+                          }
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {CURRENCIES.map((currency) => (
+                              <SelectItem
+                                key={currency.code}
+                                value={currency.code}
+                              >
+                                {currency.symbol}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => removeCharm(index)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                item.charms &&
+                item.charms.length > 0 && (
+                  <div className="grid gap-3 md:grid-cols-2">
+                    {item.charms.map((charm, index) => (
+                      <div
+                        key={index}
+                        className="p-3 border rounded-lg bg-background/50"
+                      >
+                        <div className="font-medium text-sm">{charm.name}</div>
+                        <div className="text-xs text-muted-foreground mt-1">
+                          ${charm.price.toFixed(2)} {charm.currency}
+                        </div>
+                        {charm.steam_url && (
+                          <a
+                            href={charm.steam_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 text-xs text-green-400 hover:text-green-300 hover:underline mt-2"
+                          >
+                            <ExternalLink className="h-3 w-3" />
+                            View on Steam
+                          </a>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )
+              )}
+            </div>
+
+            {/* Patches Section */}
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="font-medium text-purple-400">
+                  Patches (
+                  {isEditingCustomizations
+                    ? editingPatches.length
+                    : item.patches?.length || 0}
+                  )
+                </h4>
+                {isEditingCustomizations && (
+                  <Button variant="outline" size="sm" onClick={addPatch}>
+                    <Plus className="h-4 w-4 mr-1" />
+                    Add Patch
+                  </Button>
+                )}
+              </div>
+
+              {isEditingCustomizations ? (
+                <div className="space-y-3">
+                  {editingPatches.map((patch, index) => (
+                    <div
+                      key={index}
+                      className="flex gap-2 items-end p-3 border rounded-lg bg-background/50"
+                    >
+                      <div className="flex-1 space-y-2">
+                        <Label className="text-xs">Name</Label>
+                        <Input
+                          placeholder="Patch name"
+                          value={patch.name}
+                          onChange={(e) =>
+                            updatePatch(index, "name", e.target.value)
+                          }
+                        />
+                      </div>
+                      <div className="flex-1 space-y-2">
+                        <Label className="text-xs">Steam URL</Label>
+                        <Input
+                          placeholder="Steam Market URL"
+                          value={patch.steam_url}
+                          onChange={(e) =>
+                            updatePatch(index, "steam_url", e.target.value)
+                          }
+                        />
+                      </div>
+                      <div className="w-24 space-y-2">
+                        <Label className="text-xs">Price</Label>
+                        <Input
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          placeholder="0"
+                          value={patch.price}
+                          onChange={(e) =>
+                            updatePatch(
+                              index,
+                              "price",
+                              Number.parseFloat(e.target.value) || 0
+                            )
+                          }
+                        />
+                      </div>
+                      <div className="w-20 space-y-2">
+                        <Label className="text-xs">Currency</Label>
+                        <Select
+                          value={patch.currency}
+                          onValueChange={(value) =>
+                            updatePatch(index, "currency", value)
+                          }
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {CURRENCIES.map((currency) => (
+                              <SelectItem
+                                key={currency.code}
+                                value={currency.code}
+                              >
+                                {currency.symbol}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => removePatch(index)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                item.patches &&
+                item.patches.length > 0 && (
+                  <div className="grid gap-3 md:grid-cols-2">
+                    {item.patches.map((patch, index) => (
+                      <div
+                        key={index}
+                        className="p-3 border rounded-lg bg-background/50"
+                      >
+                        <div className="font-medium text-sm">{patch.name}</div>
+                        <div className="text-xs text-muted-foreground mt-1">
+                          ${patch.price.toFixed(2)} {patch.currency}
+                        </div>
+                        {patch.steam_url && (
+                          <a
+                            href={patch.steam_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 text-xs text-purple-400 hover:text-purple-300 hover:underline mt-2"
+                          >
+                            <ExternalLink className="h-3 w-3" />
+                            View on Steam
+                          </a>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

@@ -45,6 +45,7 @@ export function SchedulerProvider({ children }: SchedulerProviderProps) {
   const [isInitialized, setIsInitialized] = useState(false);
   const [schedulerStatus, setSchedulerStatus] =
     useState<SchedulerContextType["schedulerStatus"]>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const initializeScheduler = async () => {
     if (isInitialized) {
@@ -80,6 +81,13 @@ export function SchedulerProvider({ children }: SchedulerProviderProps) {
   };
 
   const refreshStatus = async () => {
+    if (isRefreshing) {
+      console.log("[v0] Status refresh already in progress, skipping...");
+      return;
+    }
+
+    setIsRefreshing(true);
+
     try {
       console.log("[v0] Refreshing scheduler status...");
       const response = await fetch("/api/scheduler/status");
@@ -94,6 +102,8 @@ export function SchedulerProvider({ children }: SchedulerProviderProps) {
       setSchedulerStatus(status);
     } catch (error) {
       console.error("[v0] Error fetching scheduler status:", error);
+    } finally {
+      setIsRefreshing(false);
     }
   };
 
@@ -157,13 +167,13 @@ export function SchedulerProvider({ children }: SchedulerProviderProps) {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      if (schedulerStatus?.running) {
+      if (schedulerStatus?.running && !isRefreshing) {
         refreshStatus();
       }
-    }, 30000);
+    }, 60000); // Changed from 30 seconds to 60 seconds
 
     return () => clearInterval(interval);
-  }, [schedulerStatus?.running]);
+  }, [schedulerStatus?.running, isRefreshing]);
 
   return (
     <SchedulerContext.Provider

@@ -14,6 +14,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Trash2, Plus } from "lucide-react";
 
 const CURRENCIES = [
   { code: "USD", name: "US Dollar", symbol: "$" },
@@ -60,6 +63,21 @@ function formatDisplayName(marketHashName: string): string {
     .trim();
 }
 
+function extractNameFromSteamUrl(url: string): string {
+  const marketHashName = extractHashFromSteamUrl(url);
+  if (marketHashName) {
+    return formatDisplayName(marketHashName);
+  }
+  return "";
+}
+
+interface Customization {
+  name: string;
+  steam_url: string;
+  price: number;
+  currency: string;
+}
+
 export function ItemForm() {
   const [label, setLabel] = useState("");
   const [description, setDescription] = useState("");
@@ -67,8 +85,13 @@ export function ItemForm() {
   const [purchasePrice, setPurchasePrice] = useState("");
   const [quantity, setQuantity] = useState("1");
   const [purchaseCurrency, setPurchaseCurrency] = useState("USD");
-  const [isLoading, setIsLoading] = useState(false);
+  const [stickers, setStickers] = useState<Customization[]>([]);
+  const [charms, setCharms] = useState<Customization[]>([]);
+  const [patches, setPatches] = useState<Customization[]>([]);
+  const [includeCustomizationsInPrice, setIncludeCustomizationsInPrice] =
+    useState(false);
   const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleUrlChange = (url: string) => {
     setSteamUrl(url);
@@ -138,6 +161,10 @@ export function ItemForm() {
           purchase_price: price,
           quantity: qty,
           purchase_currency: purchaseCurrency,
+          stickers: stickers.filter((s) => s.name.trim() && s.steam_url.trim()),
+          charms: charms.filter((c) => c.name.trim() && c.steam_url.trim()),
+          patches: patches.filter((p) => p.name.trim() && p.steam_url.trim()),
+          include_customizations_in_price: includeCustomizationsInPrice,
         }),
       });
 
@@ -183,6 +210,10 @@ export function ItemForm() {
         setPurchasePrice("");
         setQuantity("1");
         setPurchaseCurrency("USD");
+        setStickers([]);
+        setCharms([]);
+        setPatches([]);
+        setIncludeCustomizationsInPrice(false);
         window.location.reload();
       } else {
         throw new Error("Failed to add item");
@@ -199,10 +230,113 @@ export function ItemForm() {
     }
   };
 
+  const addSticker = () => {
+    if (stickers.length < 6) {
+      setStickers([
+        ...stickers,
+        { name: "", steam_url: "", price: 0, currency: "USD" },
+      ]);
+    }
+  };
+
+  const addCharm = () => {
+    if (charms.length < 1) {
+      setCharms([{ name: "", steam_url: "", price: 0, currency: "USD" }]);
+    }
+  };
+
+  const addPatch = () => {
+    setPatches([
+      ...patches,
+      { name: "", steam_url: "", price: 0, currency: "USD" },
+    ]);
+  };
+
+  const removeSticker = (index: number) => {
+    setStickers(stickers.filter((_, i) => i !== index));
+  };
+
+  const removeCharm = (index: number) => {
+    setCharms(charms.filter((_, i) => i !== index));
+  };
+
+  const removePatch = (index: number) => {
+    setPatches(patches.filter((_, i) => i !== index));
+  };
+
+  const updateSticker = (
+    index: number,
+    field: keyof Customization,
+    value: string | number
+  ) => {
+    const updated = [...stickers];
+    updated[index] = { ...updated[index], [field]: value };
+
+    if (
+      field === "steam_url" &&
+      typeof value === "string" &&
+      value.trim() &&
+      !updated[index].name.trim()
+    ) {
+      const extractedName = extractNameFromSteamUrl(value.trim());
+      if (extractedName) {
+        updated[index].name = extractedName;
+      }
+    }
+
+    setStickers(updated);
+  };
+
+  const updateCharm = (
+    index: number,
+    field: keyof Customization,
+    value: string | number
+  ) => {
+    const updated = [...charms];
+    updated[index] = { ...updated[index], [field]: value };
+
+    if (
+      field === "steam_url" &&
+      typeof value === "string" &&
+      value.trim() &&
+      !updated[index].name.trim()
+    ) {
+      const extractedName = extractNameFromSteamUrl(value.trim());
+      if (extractedName) {
+        updated[index].name = extractedName;
+      }
+    }
+
+    setCharms(updated);
+  };
+
+  const updatePatch = (
+    index: number,
+    field: keyof Customization,
+    value: string | number
+  ) => {
+    const updated = [...patches];
+    updated[index] = { ...updated[index], [field]: value };
+
+    if (
+      field === "steam_url" &&
+      typeof value === "string" &&
+      value.trim() &&
+      !updated[index].name.trim()
+    ) {
+      const extractedName = extractNameFromSteamUrl(value.trim());
+      if (extractedName) {
+        updated[index].name = extractedName;
+      }
+    }
+
+    setPatches(updated);
+  };
+
   const selectedCurrency = CURRENCIES.find((c) => c.code === purchaseCurrency);
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-6">
       <div className="space-y-2">
         <Label htmlFor="steam-url">Steam Market URL *</Label>
         <Input
@@ -287,6 +421,309 @@ export function ItemForm() {
           <p className="text-sm text-muted-foreground">How many units</p>
         </div>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">
+            CS2 Customizations (Optional)
+          </CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Add stickers, charms, or patches applied to this item
+          </p>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <Label className="text-base font-medium">Stickers (Max 6)</Label>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={addSticker}
+                disabled={stickers.length >= 6}
+              >
+                <Plus className="h-4 w-4 mr-1" />
+                Add Sticker
+              </Button>
+            </div>
+            {stickers.map((sticker, index) => (
+              <div key={index} className="space-y-2 p-3 border rounded-lg">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div>
+                    <Label className="text-xs">Name</Label>
+                    <Input
+                      placeholder="e.g., Katowice 2014"
+                      value={sticker.name}
+                      onChange={(e) =>
+                        updateSticker(index, "name", e.target.value)
+                      }
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs">Steam URL</Label>
+                    <Input
+                      placeholder="Steam Market URL"
+                      value={sticker.steam_url}
+                      onChange={(e) =>
+                        updateSticker(index, "steam_url", e.target.value)
+                      }
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 items-end">
+                  <div>
+                    <Label className="text-xs">Price</Label>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      value={sticker.price}
+                      onChange={(e) =>
+                        updateSticker(
+                          index,
+                          "price",
+                          Number.parseFloat(e.target.value) || 0
+                        )
+                      }
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs">Currency</Label>
+                    <Select
+                      value={sticker.currency}
+                      onValueChange={(value) =>
+                        updateSticker(index, "currency", value)
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {CURRENCIES.map((currency) => (
+                          <SelectItem key={currency.code} value={currency.code}>
+                            {currency.symbol}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="col-span-2 md:col-span-1">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => removeSticker(index)}
+                      className="w-full"
+                    >
+                      <Trash2 className="h-4 w-4 mr-1" />
+                      Remove
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <Label className="text-base font-medium">Charms (Max 1)</Label>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={addCharm}
+                disabled={charms.length >= 1}
+              >
+                <Plus className="h-4 w-4 mr-1" />
+                Add Charm
+              </Button>
+            </div>
+            {charms.map((charm, index) => (
+              <div key={index} className="space-y-2 p-3 border rounded-lg">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div>
+                    <Label className="text-xs">Name</Label>
+                    <Input
+                      placeholder="e.g., Dust II Pin"
+                      value={charm.name}
+                      onChange={(e) =>
+                        updateCharm(index, "name", e.target.value)
+                      }
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs">Steam URL</Label>
+                    <Input
+                      placeholder="Steam Market URL"
+                      value={charm.steam_url}
+                      onChange={(e) =>
+                        updateCharm(index, "steam_url", e.target.value)
+                      }
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 items-end">
+                  <div>
+                    <Label className="text-xs">Price</Label>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      value={charm.price}
+                      onChange={(e) =>
+                        updateCharm(
+                          index,
+                          "price",
+                          Number.parseFloat(e.target.value) || 0
+                        )
+                      }
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs">Currency</Label>
+                    <Select
+                      value={charm.currency}
+                      onValueChange={(value) =>
+                        updateCharm(index, "currency", value)
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {CURRENCIES.map((currency) => (
+                          <SelectItem key={currency.code} value={currency.code}>
+                            {currency.symbol}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="col-span-2 md:col-span-1">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => removeCharm(index)}
+                      className="w-full"
+                    >
+                      <Trash2 className="h-4 w-4 mr-1" />
+                      Remove
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <Label className="text-base font-medium">
+                Patches (Character Skins)
+              </Label>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={addPatch}
+              >
+                <Plus className="h-4 w-4 mr-1" />
+                Add Patch
+              </Button>
+            </div>
+            {patches.map((patch, index) => (
+              <div key={index} className="space-y-2 p-3 border rounded-lg">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div>
+                    <Label className="text-xs">Name</Label>
+                    <Input
+                      placeholder="e.g., Team Liquid"
+                      value={patch.name}
+                      onChange={(e) =>
+                        updatePatch(index, "name", e.target.value)
+                      }
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs">Steam URL</Label>
+                    <Input
+                      placeholder="Steam Market URL"
+                      value={patch.steam_url}
+                      onChange={(e) =>
+                        updatePatch(index, "steam_url", e.target.value)
+                      }
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 items-end">
+                  <div>
+                    <Label className="text-xs">Price</Label>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      value={patch.price}
+                      onChange={(e) =>
+                        updatePatch(
+                          index,
+                          "price",
+                          Number.parseFloat(e.target.value) || 0
+                        )
+                      }
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs">Currency</Label>
+                    <Select
+                      value={patch.currency}
+                      onValueChange={(value) =>
+                        updatePatch(index, "currency", value)
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {CURRENCIES.map((currency) => (
+                          <SelectItem key={currency.code} value={currency.code}>
+                            {currency.symbol}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="col-span-2 md:col-span-1">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => removePatch(index)}
+                      className="w-full"
+                    >
+                      <Trash2 className="h-4 w-4 mr-1" />
+                      Remove
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="include-customizations"
+              checked={includeCustomizationsInPrice}
+              onCheckedChange={(checked) =>
+                setIncludeCustomizationsInPrice(checked === true)
+              }
+            />
+            <Label htmlFor="include-customizations" className="text-sm">
+              Include customization costs in selling price calculations
+            </Label>
+          </div>
+        </CardContent>
+      </Card>
+
       <Button type="submit" disabled={isLoading} className="w-full">
         {isLoading ? "Adding..." : "Add Item"}
       </Button>
