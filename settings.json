@@ -3,8 +3,8 @@
   "cronDelayMinutes": 30,
   "fetchDelayMs": 2000,
   "discordWebhookEnabled": false,
-  "discordWebhookUrl": "https://discord.com/api/webhooks/1418078793330987038/P0AugQmP7zOFNTqxgaA5G8G_ByKfGE01uynkS9LeZxga7S-NakKaXvgvccYszNZOy82g",
+  "discordWebhookUrl": "",
   "discordDevelopmentMode": true,
   "schedulerEnabled": true,
-  "schedulerRunning": true
+  "schedulerRunning": false
 }
