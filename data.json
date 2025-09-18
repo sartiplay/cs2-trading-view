@@ -1,0 +1,148 @@
+{
+  "items": {
+    "Desert Eagle | Mecha Industries (Factory New)": {
+      "market_hash_name": "Desert Eagle | Mecha Industries (Factory New)",
+      "label": "Desert Eagle | Mecha Industries (Factory New)",
+      "appid": 730,
+      "steam_url": "https://steamcommunity.com/market/listings/730/Desert%20Eagle%20%7C%20Mecha%20Industries%20%28Factory%20New%29",
+      "purchase_price": 1,
+      "quantity": 1,
+      "purchase_currency": "CHF",
+      "price_history": [
+        {
+          "date": "2025-09-18T03:27:41.799Z",
+          "median_price": 22.4
+        },
+        {
+          "date": "2025-09-18T03:32:39.707Z",
+          "median_price": 22.4
+        },
+        {
+          "date": "2025-09-18T03:39:26.916Z",
+          "median_price": 22.4
+        },
+        {
+          "date": "2025-09-18T03:39:38.978Z",
+          "median_price": 22.4
+        },
+        {
+          "date": "2025-09-18T03:39:46.535Z",
+          "median_price": 22.4
+        },
+        {
+          "date": "2025-09-18T03:47:11.258Z",
+          "median_price": 22.4
+        },
+        {
+          "date": "2025-09-18T03:57:30.819Z",
+          "median_price": 22.4
+        },
+        {
+          "date": "2025-09-18T04:01:30.712Z",
+          "median_price": 22.4
+        },
+        {
+          "date": "2025-09-18T04:02:56.580Z",
+          "median_price": 22.4
+        },
+        {
+          "date": "2025-09-18T05:25:22.081Z",
+          "median_price": 22.4
+        },
+        {
+          "date": "2025-09-18T05:33:28.461Z",
+          "median_price": 22.4
+        },
+        {
+          "date": "2025-09-18T05:34:43.953Z",
+          "median_price": 22.4
+        },
+        {
+          "date": "2025-09-18T05:38:58.934Z",
+          "median_price": 22.4
+        },
+        {
+          "date": "2025-09-18T05:42:18.488Z",
+          "median_price": 22.4
+        },
+        {
+          "date": "2025-09-18T05:44:48.635Z",
+          "median_price": 22.4
+        },
+        {
+          "date": "2025-09-18T05:47:23.213Z",
+          "median_price": 22.4
+        },
+        {
+          "date": "2025-09-18T05:48:19.020Z",
+          "median_price": 22.4
+        },
+        {
+          "date": "2025-09-18T05:50:07.239Z",
+          "median_price": 22.4
+        },
+        {
+          "date": "2025-09-18T05:52:15.552Z",
+          "median_price": 22.4
+        },
+        {
+          "date": "2025-09-18T05:52:59.872Z",
+          "median_price": 22.4
+        },
+        {
+          "date": "2025-09-18T07:13:50.366Z",
+          "median_price": 22.4
+        },
+        {
+          "date": "2025-09-18T07:20:03.172Z",
+          "median_price": 22.4
+        },
+        {
+          "date": "2025-09-18T07:25:03.034Z",
+          "median_price": 22.4
+        },
+        {
+          "date": "2025-09-18T07:30:03.078Z",
+          "median_price": 22.4
+        },
+        {
+          "date": "2025-09-18T07:40:03.107Z",
+          "median_price": 22.4
+        },
+        {
+          "date": "2025-09-18T07:40:37.651Z",
+          "median_price": 22.4
+        },
+        {
+          "date": "2025-09-18T07:45:00.630Z",
+          "median_price": 22.4
+        },
+        {
+          "date": "2025-09-18T07:50:00.717Z",
+          "median_price": 22.4
+        }
+      ]
+    },
+    "★ Survival Knife": {
+      "market_hash_name": "★ Survival Knife",
+      "label": "★ Survival Knife",
+      "appid": 730,
+      "steam_url": "https://steamcommunity.com/market/listings/730/%E2%98%85%20Survival%20Knife",
+      "purchase_price": 175.21,
+      "quantity": 1,
+      "purchase_currency": "USD",
+      "price_history": [
+        {
+          "date": "2025-09-18T07:51:38.962Z",
+          "median_price": 180.98
+        }
+      ]
+    }
+  },
+  "metadata": {
+    "last_capture": "2025-09-18T07:51:38.962Z",
+    "total_captures": 112,
+    "created_at": "2025-09-17T21:45:00.377Z"
+  },
+  "sold_items": []
+}
