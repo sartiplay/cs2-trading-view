@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/accordion";
 import { SchedulerStatus } from "@/components/scheduler-status";
 import { SoldItemsDisplay } from "@/components/sold-items-display";
+import { SchedulerAccordionTrigger } from "@/components/scheduer-accordion-trigger";
 
 export default function Dashboard() {
   return (
@@ -56,9 +57,7 @@ export default function Dashboard() {
           </AccordionItem>
 
           <AccordionItem value="scheduler">
-            <AccordionTrigger className="text-lg font-semibold">
-              Price Capture Scheduler
-            </AccordionTrigger>
+            <SchedulerAccordionTrigger />
             <AccordionContent>
               <Card className="border-0 shadow-none">
                 <CardContent className="pt-4">
