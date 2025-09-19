@@ -170,7 +170,7 @@ export function SchedulerProvider({ children }: SchedulerProviderProps) {
       if (schedulerStatus?.running && !isRefreshing) {
         refreshStatus();
       }
-    }, 60000); // Changed from 30 seconds to 60 seconds
+    }, 30000); // Changed back to 30 seconds for better responsiveness
 
     return () => clearInterval(interval);
   }, [schedulerStatus?.running, isRefreshing]);

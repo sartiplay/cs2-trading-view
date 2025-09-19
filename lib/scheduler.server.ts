@@ -111,11 +111,23 @@ async function executePriceCaptureJob() {
       nextExecutionTime.toISOString()
     );
 
-    if (schedulerStarted && !cronTimer) {
+    if (cronTimer) {
+      clearTimeout(cronTimer);
+      cronTimer = null;
+    }
+
+    if (schedulerStarted) {
+      console.log("[v0] DEBUG: Scheduling next job after completion");
       scheduleNextJob(intervalMinutes);
     }
   } catch (error) {
     console.error("[v0] CRON JOB ERROR:", error);
+    if (schedulerStarted) {
+      const settings = await getSettings();
+      const intervalMinutes = settings?.cronDelayMinutes || 5;
+      console.log("[v0] DEBUG: Scheduling next job after error");
+      scheduleNextJob(intervalMinutes);
+    }
   } finally {
     isExecuting = false;
   }
@@ -136,13 +148,25 @@ function scheduleNextJob(intervalMinutes: number) {
   const next = calculateNextExecution(intervalMinutes);
   const delay = next.getTime() - now.getTime();
 
-  console.log("[v0] DEBUG: Scheduling next job in", delay, "ms");
+  console.log(
+    "[v0] DEBUG: Scheduling next job in",
+    delay,
+    "ms at",
+    next.toISOString()
+  );
 
   cronTimer = setTimeout(() => {
     if (schedulerStarted) {
+      console.log("[v0] DEBUG: Timer fired, executing job...");
       executePriceCaptureJob();
+    } else {
+      console.log(
+        "[v0] DEBUG: Timer fired but scheduler stopped, skipping execution"
+      );
     }
   }, delay);
+
+  console.log("[v0] DEBUG: Timer scheduled successfully");
 }
 
 export async function startScheduler() {
