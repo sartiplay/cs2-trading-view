@@ -23,7 +23,15 @@ import { Settings, Save } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 export interface AppSettings {
-  timelineResolution: "5min" | "30min" | "1h" | "4h" | "1d";
+  timelineResolution:
+    | "5s"
+    | "30s"
+    | "1m"
+    | "5min"
+    | "30min"
+    | "1h"
+    | "4h"
+    | "1d";
   cronDelayMinutes: number;
   fetchDelayMs: number;
   discordWebhookEnabled: boolean;
@@ -128,6 +136,12 @@ export function SettingsDialog() {
 
   const getTimelineLabel = (resolution: string) => {
     switch (resolution) {
+      case "5s":
+        return "5 Seconds";
+      case "30s":
+        return "30 Seconds";
+      case "1m":
+        return "1 Minute";
       case "5min":
         return "5 Minutes";
       case "30min":
@@ -189,6 +203,9 @@ export function SettingsDialog() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="5s">5 Seconds</SelectItem>
+                <SelectItem value="30s">30 Seconds</SelectItem>
+                <SelectItem value="1m">1 Minute</SelectItem>
                 <SelectItem value="5min">5 Minutes</SelectItem>
                 <SelectItem value="30min">30 Minutes</SelectItem>
                 <SelectItem value="1h">1 Hour</SelectItem>

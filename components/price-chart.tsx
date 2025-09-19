@@ -13,6 +13,7 @@ import {
   Filler,
   type ChartOptions,
 } from "chart.js";
+import zoomPlugin from "chartjs-plugin-zoom";
 import { useSettings } from "./settings-dialog";
 
 ChartJS.register(
@@ -23,7 +24,8 @@ ChartJS.register(
   Title,
   Tooltip,
   Legend,
-  Filler
+  Filler,
+  zoomPlugin
 );
 
 interface PriceEntry {
@@ -48,48 +50,77 @@ export function PriceChart({ data }: PriceChartProps) {
 
   const generateChartData = (data: PriceEntry[], resolution: string) => {
     const now = new Date();
-    let timeSpan: number;
+    let defaultViewSpan: number;
     let timeUnit: string;
     let labelFormat: Intl.DateTimeFormatOptions;
     let tickInterval: number;
 
-    // Determine time span and formatting based on resolution
     switch (resolution) {
+      case "5s":
+        defaultViewSpan = 10 * 60 * 1000; // 10 minutes in view
+        timeUnit = "5s";
+        labelFormat = { hour: "2-digit", minute: "2-digit", second: "2-digit" };
+        tickInterval = 5 * 1000; // 5 seconds
+        break;
+      case "30s":
+        defaultViewSpan = 30 * 60 * 1000; // 30 minutes in view
+        timeUnit = "30s";
+        labelFormat = { hour: "2-digit", minute: "2-digit", second: "2-digit" };
+        tickInterval = 30 * 1000; // 30 seconds
+        break;
+      case "1m":
+        defaultViewSpan = 2 * 60 * 60 * 1000; // 2 hours in view
+        timeUnit = "1m";
+        labelFormat = { hour: "2-digit", minute: "2-digit" };
+        tickInterval = 60 * 1000; // 1 minute
+        break;
       case "5min":
-        timeSpan = 24 * 60 * 60 * 1000; // Full day
+        defaultViewSpan = 24 * 60 * 60 * 1000; // 24 hours in view
         timeUnit = "5min";
         labelFormat = { hour: "2-digit", minute: "2-digit" };
         tickInterval = 5 * 60 * 1000; // 5 minutes
         break;
       case "30min":
-        timeSpan = 24 * 60 * 60 * 1000; // Full day
+        defaultViewSpan = 24 * 60 * 60 * 1000; // 24 hours in view
         timeUnit = "30min";
         labelFormat = { hour: "2-digit", minute: "2-digit" };
         tickInterval = 30 * 60 * 1000; // 30 minutes
         break;
       case "1h":
-        timeSpan = 24 * 60 * 60 * 1000; // Full day
+        defaultViewSpan = 24 * 60 * 60 * 1000; // 24 hours in view
         timeUnit = "1h";
         labelFormat = { hour: "2-digit", minute: "2-digit" };
         tickInterval = 60 * 60 * 1000; // 1 hour
         break;
       case "4h":
-        timeSpan = 7 * 24 * 60 * 60 * 1000; // Full week
+        defaultViewSpan = 7 * 24 * 60 * 60 * 1000; // 1 week in view
         timeUnit = "4h";
         labelFormat = { month: "short", day: "numeric", hour: "2-digit" };
         tickInterval = 4 * 60 * 60 * 1000; // 4 hours
         break;
       case "1d":
       default:
-        timeSpan = 30 * 24 * 60 * 60 * 1000; // Full month
+        defaultViewSpan = 30 * 24 * 60 * 60 * 1000; // 30 days in view
         timeUnit = "1d";
         labelFormat = { month: "short", day: "numeric" };
         tickInterval = 24 * 60 * 60 * 1000; // 1 day
         break;
     }
 
-    const startTime = now.getTime() - timeSpan;
+    const earliestDataTime =
+      data.length > 0 ? new Date(data[0].date).getTime() : now.getTime();
+    const latestDataTime =
+      data.length > 0
+        ? new Date(data[data.length - 1].date).getTime()
+        : now.getTime();
+
+    const startTime = Math.min(
+      earliestDataTime,
+      now.getTime() - defaultViewSpan
+    );
     const endTime = now.getTime();
+
+    const defaultViewStart = now.getTime() - defaultViewSpan;
 
     // Generate time slots for the entire time span
     const timeSlots: Date[] = [];
@@ -97,14 +128,15 @@ export function PriceChart({ data }: PriceChartProps) {
       timeSlots.push(new Date(time));
     }
 
-    // Filter data within the time span
     const relevantData = data.filter((entry) => {
       const entryTime = new Date(entry.date).getTime();
       return entryTime >= startTime && entryTime <= endTime;
     });
 
     console.log(
-      `[v0] Chart data - Resolution: ${resolution}, Time span: ${timeUnit}, Data points: ${relevantData.length}`
+      `[v0] Chart data - Resolution: ${resolution}, Full range: ${timeUnit}, Data points: ${
+        relevantData.length
+      }, Default view: ${getTimeSpanLabel(resolution)}`
     );
 
     // Special handling for single data point
@@ -121,17 +153,14 @@ export function PriceChart({ data }: PriceChartProps) {
       // Data with null at start and actual value at the positioned point
       const chartData = [null, singlePoint.median_price];
 
-      console.log(
-        `[v0] Single data point positioned at: ${new Date(
-          singlePointTime
-        ).toLocaleString()}`
-      );
-
       return {
         labels,
         data: chartData,
         rawData: relevantData,
         timeSpanLabel: getTimeSpanLabel(resolution),
+        defaultViewStart,
+        defaultViewEnd: now.getTime(),
+        fullTimeRange: { start: startTime, end: endTime },
       };
     }
 
@@ -192,11 +221,20 @@ export function PriceChart({ data }: PriceChartProps) {
       data: cleanedData,
       rawData: relevantData,
       timeSpanLabel: getTimeSpanLabel(resolution),
+      defaultViewStart,
+      defaultViewEnd: now.getTime(),
+      fullTimeRange: { start: startTime, end: endTime },
     };
   };
 
   const getTimeSpanLabel = (resolution: string): string => {
     switch (resolution) {
+      case "5s":
+        return "10 minutes";
+      case "30s":
+        return "30 minutes";
+      case "1m":
+        return "2 hours";
       case "5min":
       case "30min":
       case "1h":
@@ -214,6 +252,9 @@ export function PriceChart({ data }: PriceChartProps) {
     data: chartDataPoints,
     rawData,
     timeSpanLabel,
+    defaultViewStart,
+    defaultViewEnd,
+    fullTimeRange,
   } = generateChartData(data, settings.timelineResolution);
 
   const chartData = {
@@ -239,6 +280,16 @@ export function PriceChart({ data }: PriceChartProps) {
     ],
   };
 
+  const totalDataPoints = labels.length;
+  const defaultViewRatio =
+    (defaultViewEnd - defaultViewStart) /
+    (fullTimeRange.end - fullTimeRange.start);
+  const defaultViewEndIndex = Math.floor(totalDataPoints * defaultViewRatio);
+  const defaultViewStartIndex = Math.max(
+    0,
+    totalDataPoints - defaultViewEndIndex
+  );
+
   const options: ChartOptions<"line"> = {
     responsive: true,
     maintainAspectRatio: false,
@@ -256,7 +307,7 @@ export function PriceChart({ data }: PriceChartProps) {
         borderWidth: 1,
         cornerRadius: 8,
         displayColors: false,
-        filter: (tooltipItem) => tooltipItem.parsed.y !== null, // Only show tooltips for actual data points
+        filter: (tooltipItem) => tooltipItem.parsed.y !== null,
         callbacks: {
           title: (context) => {
             const index = context[0].dataIndex;
@@ -278,17 +329,43 @@ export function PriceChart({ data }: PriceChartProps) {
           },
         },
       },
+      zoom: {
+        zoom: {
+          wheel: {
+            enabled: true,
+          },
+          pinch: {
+            enabled: true,
+          },
+          mode: "x",
+        },
+        pan: {
+          enabled: true,
+          mode: "x",
+        },
+        limits: {
+          x: {
+            min: 0,
+            max: totalDataPoints - 1,
+          },
+        },
+      },
     },
     scales: {
       x: {
         display: true,
+        min: Math.max(
+          0,
+          totalDataPoints - Math.floor(totalDataPoints * defaultViewRatio)
+        ),
+        max: totalDataPoints - 1,
         grid: {
           color: "rgba(255, 255, 255, 0.1)",
           drawOnChartArea: true,
         },
         ticks: {
           color: "rgb(156, 163, 175)",
-          maxTicksLimit: 12, // Increased for better resolution display
+          maxTicksLimit: 12,
           callback: function (value, index) {
             const totalTicks = this.getLabelForValue(Number(value))
               ? labels.length
@@ -332,13 +409,17 @@ export function PriceChart({ data }: PriceChartProps) {
     <div className="space-y-2">
       <div className="flex justify-between items-center text-sm text-muted-foreground">
         <span>
-          Showing last {timeSpanLabel} ({settings.timelineResolution}{" "}
-          resolution)
+          Default view: {timeSpanLabel} ({settings.timelineResolution}{" "}
+          resolution) • Scroll left for history
         </span>
         <span>{rawData.length} data points</span>
       </div>
       <div className="h-80">
         <Line data={chartData} options={options} />
+      </div>
+      <div className="text-xs text-muted-foreground text-center">
+        Use mouse wheel to zoom • Click and drag to pan • Double-click to reset
+        view
       </div>
     </div>
   );
