@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -42,6 +42,8 @@ interface PortfolioData {
   total_inventory_value: number;
   total_money_invested: number;
 }
+
+const MAX_PORTFOLIO_POINTS = 4000;
 
 interface GeneratedChartData {
   labels: string[];
@@ -165,6 +167,25 @@ const parsePortfolioDate = (value: string): Date => {
 const getEntryTime = (entry: PortfolioData): number => {
   const value = entry.timestamp ?? entry.date;
   return parsePortfolioDate(value).getTime();
+};
+
+const trimPortfolioPoints = (entries: PortfolioData[]): PortfolioData[] => {
+  if (entries.length <= MAX_PORTFOLIO_POINTS) {
+    return entries;
+  }
+  const step = Math.ceil(entries.length / MAX_PORTFOLIO_POINTS);
+  const trimmed: PortfolioData[] = [];
+  for (let i = 0; i < entries.length; i += step) {
+    trimmed.push(entries[i]);
+  }
+  if (
+    trimmed[trimmed.length - 1]?.timestamp !==
+      entries[entries.length - 1]?.timestamp ||
+    trimmed[trimmed.length - 1]?.date !== entries[entries.length - 1]?.date
+  ) {
+    trimmed.push(entries[entries.length - 1]);
+  }
+  return trimmed;
 };
 
 const generateChartData = (
@@ -301,6 +322,10 @@ export function PortfolioChart() {
   const [updating, setUpdating] = useState(false);
   const settings = useSettings();
   const chartRef = useRef<ChartJS<"line"> | null>(null);
+  const [chartDataState, setChartDataState] =
+    useState<GeneratedChartData | null>(null);
+  const [isChartPending, startChartTransition] = useTransition();
+  const [visibleCount, setVisibleCount] = useState(15);
   const [zoomPluginReady, setZoomPluginReady] = useState(() => {
     if (typeof window === "undefined") {
       return false;
@@ -380,13 +405,43 @@ export function PortfolioChart() {
   useEffect(() => {
     fetchData();
   }, []);
-  const chartData = useMemo(() => {
-    if (data.length === 0) {
-      return null;
+  const trimmedData = useMemo(() => trimPortfolioPoints(data), [data]);
+
+  useEffect(() => {
+    setVisibleCount((count) =>
+      Math.min(Math.max(count, 15), Math.max(15, trimmedData.length))
+    );
+  }, [trimmedData]);
+
+  const visibleData = useMemo(() => {
+    const count = Math.min(visibleCount, trimmedData.length);
+    const start = Math.max(trimmedData.length - count, 0);
+    return trimmedData.slice(start);
+  }, [trimmedData, visibleCount]);
+
+  useEffect(() => {
+    if (visibleData.length === 0) {
+      setChartDataState(null);
+      return;
     }
 
-    return generateChartData(data, settings.timelineResolution);
-  }, [data, settings.timelineResolution]);
+    let cancelled = false;
+    startChartTransition(() => {
+      const generated = generateChartData(
+        visibleData,
+        settings.timelineResolution
+      );
+      if (!cancelled) {
+        setChartDataState(generated);
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [visibleData, settings.timelineResolution]);
+
+  const chartData = chartDataState;
 
   // Calculate current values for display
   const currentData =
@@ -456,7 +511,24 @@ export function PortfolioChart() {
     );
   }
 
-  if (!chartData || chartData.rawData.length === 0) {
+  if (!chartData) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Portfolio Value Timeline</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-8 text-muted-foreground">
+            {isChartPending
+              ? "Preparing portfolio chart…"
+              : "No portfolio history data available"}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (chartData.rawData.length === 0) {
     return (
       <Card>
         <CardHeader>
@@ -743,7 +815,9 @@ export function PortfolioChart() {
                   Default view: {timeSpanLabel} ({settings.timelineResolution}{" "}
                   resolution) • Scroll left for history
                 </span>
-                <span>{rawData.length} data points</span>
+                <span>
+                  Showing {visibleData.length} of {trimmedData.length} data points
+                </span>
               </div>
             </CardDescription>
           </div>
@@ -763,11 +837,16 @@ export function PortfolioChart() {
       <CardContent>
         <div className="space-y-3">
           <div
-            className="h-80"
+            className="relative h-80"
             onDoubleClick={() => {
               chartRef.current?.resetZoom();
             }}
           >
+            {isChartPending && (
+              <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/80 backdrop-blur-sm">
+                <div className="h-10 w-10 rounded-full border-4 border-primary/30 border-t-primary animate-spin" />
+              </div>
+            )}
             <Line
               key={zoomPluginReady ? "chartjs-with-zoom" : "chartjs-no-zoom"}
               data={lineChartData}
@@ -777,6 +856,22 @@ export function PortfolioChart() {
               }}
             />
           </div>
+          {visibleData.length < trimmedData.length && (
+            <div className="flex justify-center">
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={isChartPending}
+                onClick={() =>
+                  setVisibleCount((count) =>
+                    Math.min(count + 15, trimmedData.length)
+                  )
+                }
+              >
+                {isChartPending ? "Loading…" : "Load older data"}
+              </Button>
+            </div>
+          )}
           <div className="text-xs text-muted-foreground text-center">
             Use mouse wheel to zoom • Click and drag to pan • Double-click to
             reset view
