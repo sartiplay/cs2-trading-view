@@ -37,6 +37,14 @@ import { PriceChart } from "@/components/price-chart";
 import { SettingsDialog, useSettings } from "@/components/settings-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 const CURRENCIES = [
   { code: "USD", name: "US Dollar", symbol: "$" },
@@ -108,6 +116,29 @@ type PriceStats = {
   totalDataPoints: number;
 };
 
+interface TradeListing {
+  site: string;
+  price: number;
+  currency: string;
+  float?: number | null;
+  condition: string;
+  url?: string;
+}
+
+const CONDITION_COLORS: Record<string, string> = {
+  "Factory New": "bg-emerald-500/20 text-emerald-400",
+  "Minimal Wear": "bg-sky-500/20 text-sky-400",
+  "Field-Tested": "bg-amber-500/20 text-amber-400",
+  "Well-Worn": "bg-orange-500/20 text-orange-400",
+  "Battle-Scarred": "bg-rose-600/20 text-rose-400",
+};
+
+const getConditionBadgeClass = (condition: string): string => {
+  return (
+    CONDITION_COLORS[condition] ?? "bg-muted text-muted-foreground"
+  );
+};
+
 export function ItemDetail({ hash }: ItemDetailProps) {
   const settings = useSettings();
   const [item, setItem] = useState<ItemData | null>(null);
@@ -128,6 +159,10 @@ export function ItemDetail({ hash }: ItemDetailProps) {
   const [customDirection, setCustomDirection] = useState<"up" | "down">("up");
   const [isSendingDevNotification, setIsSendingDevNotification] =
     useState(false);
+  const [marketListings, setMarketListings] = useState<TradeListing[]>([]);
+  const [listingsLoading, setListingsLoading] = useState(false);
+  const [listingsError, setListingsError] = useState<string | null>(null);
+  const [listingsLoaded, setListingsLoaded] = useState(false);
   const { toast } = useToast();
 
   const priceHistory = item?.price_history ?? EMPTY_PRICE_HISTORY;
@@ -205,6 +240,19 @@ export function ItemDetail({ hash }: ItemDetailProps) {
     uniqueDays,
     totalDataPoints,
   } = priceStats;
+
+  const groupedListings = useMemo(() => {
+    const map = new Map<string, TradeListing[]>();
+    marketListings.forEach((listing) => {
+      const bucket = map.get(listing.site) ?? [];
+      bucket.push(listing);
+      map.set(listing.site, bucket);
+    });
+    return Array.from(map.entries()).map(([site, listings]) => ({
+      site,
+      listings,
+    }));
+  }, [marketListings]);
 
   function extractHashFromSteamUrl(url: string): string | null {
     try {
@@ -529,6 +577,38 @@ export function ItemDetail({ hash }: ItemDetailProps) {
     }
   };
 
+  const loadMarketListings = async () => {
+    if (!item) {
+      return;
+    }
+
+    setListingsError(null);
+    setListingsLoading(true);
+
+    try {
+      const response = await fetch(
+        `/api/item-listings?market_hash_name=${encodeURIComponent(
+          item.market_hash_name
+        )}`
+      );
+      if (!response.ok) {
+        const error = await response.json().catch(() => null);
+        throw new Error(error?.error || "Failed to fetch listings");
+      }
+
+      const result: { listings: TradeListing[] } = await response.json();
+      setMarketListings(result.listings);
+      setListingsLoaded(true);
+    } catch (error) {
+      console.error("Failed to load market listings:", error);
+      setListingsError(
+        error instanceof Error ? error.message : "Unexpected error occurred"
+      );
+    } finally {
+      setListingsLoading(false);
+    }
+  };
+
   const addSticker = () => {
     if (editingStickers.length < 6) {
       setEditingStickers([
@@ -638,6 +718,13 @@ export function ItemDetail({ hash }: ItemDetailProps) {
   useEffect(() => {
     fetchItem();
   }, [hash]);
+
+  useEffect(() => {
+    setMarketListings([]);
+    setListingsLoaded(false);
+    setListingsError(null);
+    setListingsLoading(false);
+  }, [item?.market_hash_name]);
 
   if (isLoading) {
     return <div className="text-center py-8">Loading item details...</div>;
@@ -969,6 +1056,117 @@ export function ItemDetail({ hash }: ItemDetailProps) {
           {priceChartElement}
         </CardContent>
       </Card>
+
+      <Card className="bg-card/50 backdrop-blur-sm border-border/50">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-card-foreground">
+                Market Listings Snapshot
+              </CardTitle>
+              <CardDescription>
+                Fetch up to five live offers from each supported marketplace.
+              </CardDescription>
+            </div>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={loadMarketListings}
+              disabled={listingsLoading}
+            >
+              {listingsLoading ? "Loading…" : listingsLoaded ? "Refresh" : "Load"}
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {listingsError && (
+            <div className="text-sm text-red-500">{listingsError}</div>
+          )}
+
+          {!listingsLoading && listingsLoaded && marketListings.length === 0 && (
+            <div className="text-sm text-muted-foreground">
+              No listings found for this item across the configured providers.
+            </div>
+          )}
+
+          {listingsLoading && (
+            <div className="flex items-center justify-center py-6">
+              <div className="h-10 w-10 rounded-full border-4 border-primary/30 border-t-primary animate-spin" />
+            </div>
+          )}
+
+          {marketListings.length > 0 && (
+            <div className="space-y-6">
+              {groupedListings.map(({ site, listings }) => (
+                <div key={site} className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-card-foreground">
+                      {site}
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      {Math.min(listings.length, 5)} offers
+                    </span>
+                  </div>
+                  <div className="overflow-hidden rounded-md border border-border/60">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="w-40">Condition</TableHead>
+                          <TableHead className="w-24">Float</TableHead>
+                          <TableHead className="w-28 text-right">Price</TableHead>
+                          <TableHead className="w-24 text-right">Currency</TableHead>
+                          <TableHead className="w-32 text-right">Listing</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {listings.slice(0, 5).map((listing, index) => (
+                          <TableRow key={`${site}-${index}`}>
+                            <TableCell>
+                              <span
+                                className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${getConditionBadgeClass(
+                                  listing.condition
+                                )}`}
+                              >
+                                {listing.condition}
+                              </span>
+                            </TableCell>
+                            <TableCell>
+                              {listing.float != null
+                                ? listing.float.toFixed(3)
+                                : "—"}
+                            </TableCell>
+                            <TableCell className="text-right font-medium">
+                              ${listing.price.toFixed(2)}
+                            </TableCell>
+                            <TableCell className="text-right text-muted-foreground">
+                              {listing.currency}
+                            </TableCell>
+                            <TableCell className="text-right">
+                              {listing.url ? (
+                                <a
+                                  href={listing.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-primary hover:underline"
+                                >
+                                  View offer
+                                </a>
+                              ) : (
+                                "—"
+                              )}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
 
       {(item.stickers?.length ||
         item.charms?.length ||

@@ -1,6 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useState, useTransition } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useTransition,
+} from "react";
 import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -14,9 +21,15 @@ import {
   Filler,
   type ChartOptions,
 } from "chart.js";
-import zoomPlugin from "chartjs-plugin-zoom";
 import { Button } from "@/components/ui/button";
 import { useSettings } from "./settings-dialog";
+
+const registerChart = async () => {
+  const { default: zoomPlugin } = await import("chartjs-plugin-zoom");
+  if (!ChartJS.registry.plugins.get("zoom")) {
+    ChartJS.register(zoomPlugin);
+  }
+};
 
 ChartJS.register(
   CategoryScale,
@@ -26,8 +39,7 @@ ChartJS.register(
   Title,
   Tooltip,
   Legend,
-  Filler,
-  zoomPlugin
+  Filler
 );
 
 interface PriceEntry {
@@ -43,6 +55,7 @@ interface GeneratedChartData {
   labels: string[];
   dataset: (number | null)[];
   rawData: PriceEntry[];
+  slotTimestamps: number[];
   timeSpanLabel: string;
   defaultViewStart: number;
   defaultViewEnd: number;
@@ -167,17 +180,31 @@ function generateChartData(
 
     // Create labels with start point and end point
     const labels = [
-      new Date(startTime).toLocaleTimeString("en-US", labelFormat),
-      new Date(singlePointTime).toLocaleTimeString("en-US", labelFormat),
+      new Date(startTime).toLocaleString("en-US", {
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      }),
+      new Date(singlePointTime).toLocaleString("en-US", {
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      }),
     ];
 
     // Data with null at start and actual value at the positioned point
     const chartData = [null, singlePoint.median_price];
+    const slotTimestamps = [startTime, singlePointTime];
 
     return {
       labels,
       dataset: chartData,
       rawData: relevantData,
+      slotTimestamps,
       timeSpanLabel: getTimeSpanLabel(resolution),
       defaultViewStart,
       defaultViewEnd: now.getTime(),
@@ -188,6 +215,7 @@ function generateChartData(
   // For multiple data points, create high-resolution positioning
   const labels: string[] = [];
   const chartData: (number | null)[] = [];
+  const slotTimestamps: number[] = [];
   const dataMap = new Map<number, PriceEntry>();
 
   // Map data points to their closest time slots
@@ -210,7 +238,16 @@ function generateChartData(
 
   // Generate labels and data arrays
   timeSlots.forEach((slot, index) => {
-    labels.push(slot.toLocaleTimeString("en-US", labelFormat));
+    const labelOptions: Intl.DateTimeFormatOptions = {
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      ...labelFormat,
+    };
+    labels.push(slot.toLocaleString("en-US", labelOptions));
+    slotTimestamps.push(slot.getTime());
     chartData.push(
       dataMap.has(index) ? dataMap.get(index)!.median_price : null
     );
@@ -219,6 +256,7 @@ function generateChartData(
   // Remove consecutive null values to clean up the chart
   const cleanedLabels: string[] = [];
   const cleanedData: (number | null)[] = [];
+  const cleanedTimestamps: number[] = [];
 
   for (let i = 0; i < labels.length; i++) {
     if (
@@ -228,6 +266,7 @@ function generateChartData(
     ) {
       cleanedLabels.push(labels[i]);
       cleanedData.push(chartData[i]);
+      cleanedTimestamps.push(slotTimestamps[i]);
     }
   }
 
@@ -241,6 +280,7 @@ function generateChartData(
     labels: cleanedLabels,
     dataset: cleanedData,
     rawData: relevantData,
+    slotTimestamps: cleanedTimestamps,
     timeSpanLabel: getTimeSpanLabel(resolution),
     defaultViewStart,
     defaultViewEnd: now.getTime(),
@@ -273,10 +313,30 @@ export function PriceChart({ data }: PriceChartProps) {
   const [chartState, setChartState] = useState<GeneratedChartData | null>(null);
   const [isPending, startTransition] = useTransition();
   const [visibleCount, setVisibleCount] = useState(15);
+  const [zoomReady, setZoomReady] = useState(() =>
+    typeof window === "undefined"
+      ? false
+      : !!ChartJS.registry.plugins.get("zoom")
+  );
+  const loadingMoreRef = useRef(false);
 
   const trimmedData = useMemo(() => trimDataPoints(data), [data]);
 
   useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    if (!zoomReady) {
+      registerChart()
+        .then(() => {
+          setZoomReady(true);
+        })
+        .catch((error) => {
+          console.error("Failed to load chart zoom plugin", error);
+        });
+    }
+
     setVisibleCount((current) =>
       Math.min(Math.max(current, 15), Math.max(15, trimmedData.length))
     );
@@ -288,6 +348,23 @@ export function PriceChart({ data }: PriceChartProps) {
     return trimmedData.slice(start);
   }, [trimmedData, visibleCount]);
 
+  const requestMoreData = useCallback(() => {
+    if (loadingMoreRef.current) {
+      return;
+    }
+    if (visibleCount >= trimmedData.length) {
+      return;
+    }
+    loadingMoreRef.current = true;
+    setVisibleCount((count) => Math.min(count + 15, trimmedData.length));
+  }, [trimmedData.length, visibleCount]);
+
+  useEffect(() => {
+    if (!isPending) {
+      loadingMoreRef.current = false;
+    }
+  }, [isPending]);
+
   useEffect(() => {
     if (visibleData.length === 0) {
       setChartState(null);
@@ -296,13 +373,19 @@ export function PriceChart({ data }: PriceChartProps) {
 
     let cancelled = false;
     startTransition(() => {
-      const generated = generateChartData(
-        visibleData,
-        settings.timelineResolution
-      );
-      if (!cancelled) {
-        setChartState(generated);
-      }
+      (async () => {
+        await new Promise<void>((resolve) => setTimeout(resolve, 0));
+        if (cancelled) {
+          return;
+        }
+        const generated = generateChartData(
+          visibleData,
+          settings.timelineResolution
+        );
+        if (!cancelled) {
+          setChartState(generated);
+        }
+      })();
     });
 
     return () => {
@@ -322,6 +405,7 @@ export function PriceChart({ data }: PriceChartProps) {
     labels,
     dataset,
     rawData,
+    slotTimestamps,
     timeSpanLabel,
     defaultViewStart,
     defaultViewEnd,
@@ -376,22 +460,34 @@ export function PriceChart({ data }: PriceChartProps) {
         filter: (tooltipItem) => tooltipItem.parsed.y !== null,
         callbacks: {
           title: (context) => {
-            const index = context[0].dataIndex;
-            if (rawData[0]) {
-              const date = new Date(rawData[0].date);
-              return date.toLocaleDateString("en-US", {
-                weekday: "long",
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-              });
+            const index = context[0]?.dataIndex ?? 0;
+            const timestamp = slotTimestamps[index];
+            if (!timestamp) {
+              return "";
             }
-            return "";
+            const date = new Date(timestamp);
+            return date.toLocaleString("en-US", {
+              weekday: "long",
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+              second: "2-digit",
+              timeZoneName: "short",
+            });
           },
           label: (context) => {
             return `Price: $${Number(context.parsed.y).toFixed(2)}`;
+          },
+          footer: (context) => {
+            const index = context[0]?.dataIndex ?? 0;
+            const timestamp = slotTimestamps[index];
+            if (!timestamp) {
+              return "";
+            }
+            const iso = new Date(timestamp).toISOString();
+            return `Exact timestamp: ${iso}`;
           },
         },
       },
@@ -433,11 +529,21 @@ export function PriceChart({ data }: PriceChartProps) {
           color: "rgb(156, 163, 175)",
           maxTicksLimit: 12,
           callback: function (value, index) {
-            const totalTicks = this.getLabelForValue(Number(value))
-              ? labels.length
-              : 0;
-            const step = Math.ceil(totalTicks / 8);
-            return index % step === 0 ? labels[index] : "";
+            const total = labels.length;
+            const step = Math.max(1, Math.ceil(total / 8));
+            if (index % step !== 0) {
+              return "";
+            }
+            const timestamp = slotTimestamps[index];
+            if (!timestamp) {
+              return labels[index] ?? "";
+            }
+            return new Date(timestamp).toLocaleString("en-US", {
+              month: "short",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            });
           },
         },
         border: {
@@ -490,17 +596,18 @@ export function PriceChart({ data }: PriceChartProps) {
         )}
         <Line data={chartData} options={options} />
       </div>
+      {!zoomReady && (
+        <div className="text-xs text-muted-foreground text-center">
+          Zoom plugin loading…
+        </div>
+      )}
       {visibleData.length < trimmedData.length && (
         <div className="flex justify-center">
           <Button
             size="sm"
             variant="outline"
             disabled={isPending}
-            onClick={() =>
-              setVisibleCount((count) =>
-                Math.min(count + 15, trimmedData.length)
-              )
-            }
+            onClick={requestMoreData}
           >
             {isPending ? "Loading…" : "Load older data"}
           </Button>

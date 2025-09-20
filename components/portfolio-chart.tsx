@@ -1,6 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useTransition,
+} from "react";
 import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -253,7 +260,15 @@ const generateChartData = (
   const slotTimestamps: number[] = [];
 
   timeSlots.forEach((slot, index) => {
-    labels.push(slot.toLocaleString("en-US", labelFormat));
+    const labelOptions: Intl.DateTimeFormatOptions = {
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      ...labelFormat,
+    };
+    labels.push(slot.toLocaleString("en-US", labelOptions));
     slotTimestamps.push(slot.getTime());
 
     if (dataMap.has(index)) {
@@ -326,6 +341,7 @@ export function PortfolioChart() {
     useState<GeneratedChartData | null>(null);
   const [isChartPending, startChartTransition] = useTransition();
   const [visibleCount, setVisibleCount] = useState(15);
+  const loadingMoreRef = useRef(false);
   const [zoomPluginReady, setZoomPluginReady] = useState(() => {
     if (typeof window === "undefined") {
       return false;
@@ -419,6 +435,23 @@ export function PortfolioChart() {
     return trimmedData.slice(start);
   }, [trimmedData, visibleCount]);
 
+  const requestMoreData = useCallback(() => {
+    if (loadingMoreRef.current) {
+      return;
+    }
+    if (visibleCount >= trimmedData.length) {
+      return;
+    }
+    loadingMoreRef.current = true;
+    setVisibleCount((count) => Math.min(count + 15, trimmedData.length));
+  }, [trimmedData.length, visibleCount]);
+
+  useEffect(() => {
+    if (!isChartPending) {
+      loadingMoreRef.current = false;
+    }
+  }, [isChartPending]);
+
   useEffect(() => {
     if (visibleData.length === 0) {
       setChartDataState(null);
@@ -427,13 +460,19 @@ export function PortfolioChart() {
 
     let cancelled = false;
     startChartTransition(() => {
-      const generated = generateChartData(
-        visibleData,
-        settings.timelineResolution
-      );
-      if (!cancelled) {
-        setChartDataState(generated);
-      }
+      (async () => {
+        await new Promise<void>((resolve) => setTimeout(resolve, 0));
+        if (cancelled) {
+          return;
+        }
+        const generated = generateChartData(
+          visibleData,
+          settings.timelineResolution
+        );
+        if (!cancelled) {
+          setChartDataState(generated);
+        }
+      })();
     });
 
     return () => {
@@ -669,13 +708,15 @@ export function PortfolioChart() {
               return "";
             }
             const date = new Date(timestamp);
-            return date.toLocaleDateString("en-US", {
+            return date.toLocaleString("en-US", {
               weekday: "long",
               year: "numeric",
               month: "long",
               day: "numeric",
               hour: "2-digit",
               minute: "2-digit",
+              second: "2-digit",
+              timeZoneName: "short",
             });
           },
           label: (context) => {
@@ -685,6 +726,14 @@ export function PortfolioChart() {
               return label;
             }
             return `${label}: $${Number(value).toFixed(2)}`;
+          },
+          footer: (context) => {
+            const index = context[0]?.dataIndex ?? 0;
+            const timestamp = slotTimestamps[index];
+            if (!timestamp) {
+              return "";
+            }
+            return `Exact timestamp: ${new Date(timestamp).toISOString()}`;
           },
         },
       },
