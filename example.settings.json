@@ -5,6 +5,7 @@
   "discordWebhookEnabled": false,
   "discordWebhookUrl": "",
   "discordDevelopmentMode": true,
+  "discordPriceSpikeEnabled": false,
   "schedulerEnabled": true,
   "schedulerRunning": true
 }

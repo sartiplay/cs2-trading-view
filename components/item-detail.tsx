@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -29,12 +29,14 @@ import {
   Trash2,
   Edit,
   Save,
+  Send,
   X,
 } from "lucide-react";
 import Link from "next/link";
 import { PriceChart } from "@/components/price-chart";
-import { SettingsDialog } from "@/components/settings-dialog";
+import { SettingsDialog, useSettings } from "@/components/settings-dialog";
 import { useToast } from "@/hooks/use-toast";
+import { Textarea } from "@/components/ui/textarea";
 
 const CURRENCIES = [
   { code: "USD", name: "US Dollar", symbol: "$" },
@@ -64,6 +66,8 @@ interface PriceEntry {
   median_price: number;
 }
 
+const EMPTY_PRICE_HISTORY: PriceEntry[] = [];
+
 interface Customization {
   name: string;
   steam_url: string;
@@ -87,7 +91,25 @@ interface ItemDetailProps {
   hash: string;
 }
 
+interface ItemOption {
+  market_hash_name: string;
+  label: string;
+}
+
+type PriceStats = {
+  latestPrice?: PriceEntry;
+  previousPrice?: PriceEntry;
+  priceChange: number;
+  priceChangePercent: number;
+  minPrice: number;
+  maxPrice: number;
+  avgPrice: number;
+  uniqueDays: number;
+  totalDataPoints: number;
+};
+
 export function ItemDetail({ hash }: ItemDetailProps) {
+  const settings = useSettings();
   const [item, setItem] = useState<ItemData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isCapturing, setIsCapturing] = useState(false);
@@ -96,7 +118,93 @@ export function ItemDetail({ hash }: ItemDetailProps) {
   const [editingCharms, setEditingCharms] = useState<Customization[]>([]);
   const [editingPatches, setEditingPatches] = useState<Customization[]>([]);
   const [isSaving, setIsSaving] = useState(false);
+  const [availableItems, setAvailableItems] = useState<ItemOption[]>([]);
+  const [selectedItemHash, setSelectedItemHash] = useState<string>(hash);
+  const [customCurrentPrice, setCustomCurrentPrice] = useState<string>("");
+  const [customPreviousPrice, setCustomPreviousPrice] = useState<string>("");
+  const [customChangePercent, setCustomChangePercent] = useState<string>("");
+  const [customTimeWindow, setCustomTimeWindow] = useState<string>("5");
+  const [customNote, setCustomNote] = useState<string>("");
+  const [customDirection, setCustomDirection] = useState<"up" | "down">("up");
+  const [isSendingDevNotification, setIsSendingDevNotification] =
+    useState(false);
   const { toast } = useToast();
+
+  const priceHistory = item?.price_history ?? EMPTY_PRICE_HISTORY;
+
+  const priceStats = useMemo<PriceStats>(() => {
+    if (priceHistory.length === 0) {
+      return {
+        priceChange: 0,
+        priceChangePercent: 0,
+        minPrice: 0,
+        maxPrice: 0,
+        avgPrice: 0,
+        uniqueDays: 0,
+        totalDataPoints: 0,
+      };
+    }
+
+    const latest = priceHistory[priceHistory.length - 1];
+    const previous =
+      priceHistory.length > 1
+        ? priceHistory[priceHistory.length - 2]
+        : undefined;
+
+    let change = 0;
+    let changePercent = 0;
+    if (latest && previous) {
+      change = latest.median_price - previous.median_price;
+      changePercent =
+        previous.median_price !== 0
+          ? (change / previous.median_price) * 100
+          : 0;
+    }
+
+    const prices = priceHistory.map((entry) => entry.median_price);
+    const min = Math.min(...prices);
+    const max = Math.max(...prices);
+    const avg = prices.reduce((sum, price) => sum + price, 0) / prices.length;
+
+    const dayCount = new Set(
+      priceHistory.map((entry) => entry.date.split("T")[0])
+    ).size;
+
+    return {
+      latestPrice: latest,
+      previousPrice: previous,
+      priceChange: change,
+      priceChangePercent: changePercent,
+      minPrice: min,
+      maxPrice: max,
+      avgPrice: avg,
+      uniqueDays: dayCount,
+      totalDataPoints: priceHistory.length,
+    };
+  }, [priceHistory]);
+
+  const priceHistoryData = useMemo(() => {
+    if (priceHistory.length === 0) {
+      return EMPTY_PRICE_HISTORY;
+    }
+    return priceHistory.length > 200 ? priceHistory.slice(-200) : priceHistory;
+  }, [priceHistory]);
+
+  const priceChartElement = useMemo(() => {
+    return <PriceChart data={priceHistoryData} />;
+  }, [priceHistoryData]);
+
+  const {
+    latestPrice,
+    previousPrice,
+    priceChange,
+    priceChangePercent,
+    minPrice,
+    maxPrice,
+    avgPrice,
+    uniqueDays,
+    totalDataPoints,
+  } = priceStats;
 
   function extractHashFromSteamUrl(url: string): string | null {
     try {
@@ -222,6 +330,205 @@ export function ItemDetail({ hash }: ItemDetailProps) {
     }
   };
 
+  useEffect(() => {
+    if (!settings.discordWebhookEnabled || !settings.discordDevelopmentMode) {
+      setAvailableItems([]);
+      return;
+    }
+
+    let isMounted = true;
+
+    const loadItems = async () => {
+      try {
+        const response = await fetch("/api/items");
+        if (!response.ok) {
+          throw new Error("Failed to load items list");
+        }
+        const data = await response.json();
+        if (!isMounted) {
+          return;
+        }
+        const options: ItemOption[] = data
+          .map((entry: any) => ({
+            market_hash_name: entry.market_hash_name,
+            label: entry.label ?? entry.market_hash_name,
+          }))
+          .sort((a: ItemOption, b: ItemOption) =>
+            a.label.localeCompare(b.label)
+          );
+
+        setAvailableItems((prev) => {
+          const map = new Map<string, ItemOption>();
+          [...prev, ...options].forEach((opt) => {
+            map.set(opt.market_hash_name, opt);
+          });
+          return Array.from(map.values());
+        });
+      } catch (error) {
+        console.error("Failed to load items for development webhook:", error);
+      }
+    };
+
+    loadItems();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [settings.discordWebhookEnabled, settings.discordDevelopmentMode]);
+
+  useEffect(() => {
+    if (!item) {
+      return;
+    }
+
+    setSelectedItemHash(item.market_hash_name);
+    setAvailableItems((prev) => {
+      if (prev.some((opt) => opt.market_hash_name === item.market_hash_name)) {
+        return prev;
+      }
+      return [
+        ...prev,
+        { market_hash_name: item.market_hash_name, label: item.label },
+      ];
+    });
+
+    const latest =
+      item.price_history.length > 0
+        ? item.price_history[item.price_history.length - 1]
+        : null;
+    const previous =
+      item.price_history.length > 1
+        ? item.price_history[item.price_history.length - 2]
+        : null;
+
+    if (latest) {
+      setCustomCurrentPrice(latest.median_price.toFixed(2));
+    }
+    if (previous) {
+      setCustomPreviousPrice(previous.median_price.toFixed(2));
+      const diff = latest ? latest.median_price - previous.median_price : 0;
+      setCustomChangePercent(
+        previous.median_price !== 0
+          ? ((diff / previous.median_price) * 100).toFixed(2)
+          : ""
+      );
+      setCustomDirection(diff < 0 ? "down" : "up");
+    }
+  }, [item]);
+
+  const sendDevelopmentWebhook = async () => {
+    if (!settings.discordWebhookEnabled || !settings.discordDevelopmentMode) {
+      toast({
+        title: "Development mode disabled",
+        description: "Enable Discord development mode in settings first.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!selectedItemHash) {
+      toast({
+        title: "Select an item",
+        description: "Choose which item to reference in the Discord message.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const priceValue = Number.parseFloat(customCurrentPrice);
+    if (Number.isNaN(priceValue)) {
+      toast({
+        title: "Invalid current price",
+        description: "Enter a valid numeric current price.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const previousValue = customPreviousPrice.trim()
+      ? Number.parseFloat(customPreviousPrice)
+      : undefined;
+    if (
+      previousValue !== undefined &&
+      (Number.isNaN(previousValue) || previousValue < 0)
+    ) {
+      toast({
+        title: "Invalid previous price",
+        description: "Previous price must be a positive number.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const changePercentValue = customChangePercent.trim()
+      ? Number.parseFloat(customChangePercent)
+      : undefined;
+    if (changePercentValue !== undefined && Number.isNaN(changePercentValue)) {
+      toast({
+        title: "Invalid percentage",
+        description: "Change percentage must be numeric.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const timeWindowValue = customTimeWindow.trim()
+      ? Number.parseFloat(customTimeWindow)
+      : undefined;
+    if (
+      timeWindowValue !== undefined &&
+      (Number.isNaN(timeWindowValue) || timeWindowValue < 0)
+    ) {
+      toast({
+        title: "Invalid time window",
+        description: "Time window must be zero or greater.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSendingDevNotification(true);
+    try {
+      const changeAmountValue =
+        previousValue !== undefined ? priceValue - previousValue : undefined;
+
+      const response = await fetch("/api/discord/test", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          market_hash_name: selectedItemHash,
+          current_price: priceValue,
+          previous_price: previousValue,
+          change_amount: changeAmountValue,
+          change_percentage: changePercentValue,
+          direction: customDirection,
+          note: customNote.trim() || undefined,
+          time_window_minutes: timeWindowValue,
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json().catch(() => null);
+        throw new Error(error?.error || "Failed to send Discord notification");
+      }
+
+      toast({
+        title: "Discord notification sent",
+        description: "Development webhook dispatched successfully.",
+      });
+    } catch (error) {
+      console.error("Failed to send development webhook:", error);
+      toast({
+        title: "Failed to send notification",
+        description:
+          error instanceof Error ? error.message : "Unexpected error occurred.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSendingDevNotification(false);
+    }
+  };
+
   const addSticker = () => {
     if (editingStickers.length < 6) {
       setEditingStickers([
@@ -340,30 +647,18 @@ export function ItemDetail({ hash }: ItemDetailProps) {
     return <div className="text-center py-8">Item not found</div>;
   }
 
-  const latestPrice = item.price_history[item.price_history.length - 1];
-  const previousPrice = item.price_history[item.price_history.length - 2];
-
-  // Calculate price change
-  let priceChange = 0;
-  let priceChangePercent = 0;
-  if (latestPrice && previousPrice) {
-    priceChange = latestPrice.median_price - previousPrice.median_price;
-    priceChangePercent = (priceChange / previousPrice.median_price) * 100;
-  }
-
-  // Calculate statistics
-  const prices = item.price_history.map((entry) => entry.median_price);
-  const minPrice = prices.length > 0 ? Math.min(...prices) : 0;
-  const maxPrice = prices.length > 0 ? Math.max(...prices) : 0;
-  const avgPrice =
-    prices.length > 0
-      ? prices.reduce((sum, price) => sum + price, 0) / prices.length
-      : 0;
-
-  const uniqueDays = new Set(
-    item.price_history.map((entry) => entry.date.split("T")[0])
-  ).size;
-  const totalDataPoints = item.price_history.length;
+  const showDevWebhookTools =
+    settings.discordWebhookEnabled && settings.discordDevelopmentMode;
+  const devItemOptions: ItemOption[] = showDevWebhookTools
+    ? availableItems.length > 0
+      ? availableItems
+      : [
+          {
+            market_hash_name: item.market_hash_name,
+            label: item.label,
+          },
+        ]
+    : [];
 
   return (
     <div className="space-y-6">
@@ -525,6 +820,143 @@ export function ItemDetail({ hash }: ItemDetailProps) {
         </Card>
       </div>
 
+      {showDevWebhookTools && (
+        <Card className="bg-card/50 backdrop-blur-sm border-border/50">
+          <CardHeader>
+            <CardTitle className="text-card-foreground">
+              Development Webhook Tester
+            </CardTitle>
+            <CardDescription>
+              Send a manual Discord notification while development mode is
+              active.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="dev-item">Item</Label>
+                <Select
+                  value={selectedItemHash}
+                  onValueChange={setSelectedItemHash}
+                >
+                  <SelectTrigger id="dev-item">
+                    <SelectValue placeholder="Choose an item" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {devItemOptions.map((option) => (
+                      <SelectItem
+                        key={option.market_hash_name}
+                        value={option.market_hash_name}
+                      >
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="dev-current-price">Current price (USD)</Label>
+                <Input
+                  id="dev-current-price"
+                  type="number"
+                  step="0.01"
+                  value={customCurrentPrice}
+                  onChange={(event) =>
+                    setCustomCurrentPrice(event.target.value)
+                  }
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="dev-previous-price">Previous price</Label>
+                <Input
+                  id="dev-previous-price"
+                  type="number"
+                  step="0.01"
+                  value={customPreviousPrice}
+                  onChange={(event) =>
+                    setCustomPreviousPrice(event.target.value)
+                  }
+                  placeholder="Optional"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="dev-change-percent">Change percentage</Label>
+                <Input
+                  id="dev-change-percent"
+                  type="number"
+                  step="0.01"
+                  value={customChangePercent}
+                  onChange={(event) =>
+                    setCustomChangePercent(event.target.value)
+                  }
+                  placeholder="Optional"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="dev-direction">Direction</Label>
+                <Select
+                  value={customDirection}
+                  onValueChange={(value) =>
+                    setCustomDirection(value as "up" | "down")
+                  }
+                >
+                  <SelectTrigger id="dev-direction">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="up">Price increase</SelectItem>
+                    <SelectItem value="down">Price decrease</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="dev-window">Time window (minutes)</Label>
+                <Input
+                  id="dev-window"
+                  type="number"
+                  step="0.5"
+                  value={customTimeWindow}
+                  onChange={(event) => setCustomTimeWindow(event.target.value)}
+                  placeholder="Optional"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="dev-note">Notes</Label>
+              <Textarea
+                id="dev-note"
+                value={customNote}
+                onChange={(event) => setCustomNote(event.target.value)}
+                placeholder="Context for this manual notification"
+                rows={3}
+              />
+            </div>
+
+            <div className="flex justify-end">
+              <Button
+                onClick={sendDevelopmentWebhook}
+                disabled={isSendingDevNotification}
+              >
+                <Send
+                  className={`h-4 w-4 mr-2 ${
+                    isSendingDevNotification ? "animate-pulse" : ""
+                  }`}
+                />
+                {isSendingDevNotification
+                  ? "Sending..."
+                  : "Send Test Notification"}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       <Card className="bg-card/50 backdrop-blur-sm border-border/50">
         <CardHeader>
           <CardTitle className="text-card-foreground">Price History</CardTitle>
@@ -534,7 +966,7 @@ export function ItemDetail({ hash }: ItemDetailProps) {
           </CardDescription>
         </CardHeader>
         <CardContent className="bg-background/20 rounded-lg p-4">
-          <PriceChart data={item.price_history.slice(-200)} />
+          {priceChartElement}
         </CardContent>
       </Card>
 

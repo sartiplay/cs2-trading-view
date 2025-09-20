@@ -9,6 +9,7 @@ export interface Settings {
   discordWebhookEnabled: boolean
   discordWebhookUrl: string
   discordDevelopmentMode: boolean
+  discordPriceSpikeEnabled: boolean
   schedulerEnabled: boolean
   schedulerRunning: boolean
 }
@@ -22,6 +23,7 @@ const DEFAULT_SETTINGS: Settings = {
   discordWebhookEnabled: false,
   discordWebhookUrl: "",
   discordDevelopmentMode: false,
+  discordPriceSpikeEnabled: false,
   schedulerEnabled: true,
   schedulerRunning: false,
 }
@@ -71,6 +73,7 @@ export async function POST(request: NextRequest) {
     if (
       typeof newSettings.discordWebhookEnabled !== "boolean" ||
       typeof newSettings.discordDevelopmentMode !== "boolean" ||
+      typeof newSettings.discordPriceSpikeEnabled !== "boolean" ||
       typeof newSettings.schedulerEnabled !== "boolean" ||
       typeof newSettings.schedulerRunning !== "boolean"
     ) {

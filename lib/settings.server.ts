@@ -15,7 +15,17 @@ export async function getSettings() {
   } catch (error) {
     console.error("[Scheduler] Error fetching settings:", error);
   }
-  return { schedulerEnabled: true, cronDelayMinutes: 1440, fetchDelayMs: 2000 };
+  return {
+    timelineResolution: "1d",
+    cronDelayMinutes: 1440,
+    fetchDelayMs: 2000,
+    discordWebhookEnabled: false,
+    discordWebhookUrl: "",
+    discordDevelopmentMode: false,
+    discordPriceSpikeEnabled: false,
+    schedulerEnabled: true,
+    schedulerRunning: false,
+  };
 }
 
 export async function startScheduler() {

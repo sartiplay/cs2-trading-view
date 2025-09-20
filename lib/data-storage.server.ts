@@ -1,6 +1,10 @@
 import { promises as fs } from "fs";
 import path from "path";
 import { convertCurrency } from "./currency-converter.server";
+import {
+  sendPriceSpikeNotification,
+  type PriceSpikeNotificationPayload,
+} from "./discord-webhook.server";
 
 interface PriceEntry {
   date: string;
@@ -97,7 +101,11 @@ export interface DataStore {
 
 const DATA_FILE = path.join(process.cwd(), "data.json");
 
-export async function readData(): Promise<DataStore> {
+const PRICE_SPIKE_PERCENT_THRESHOLD = 15; // percent change
+const PRICE_SPIKE_MIN_ABSOLUTE = 1; // USD difference
+const PRICE_SPIKE_TIME_WINDOW_MS = 30 * 60 * 1000; // 30 minutes
+
+async function readDataFile(): Promise<DataStore> {
   try {
     const data = await fs.readFile(DATA_FILE, "utf-8");
     const parsed = JSON.parse(data);
@@ -134,7 +142,7 @@ export async function readData(): Promise<DataStore> {
   }
 }
 
-export async function writeData(data: DataStore): Promise<void> {
+async function writeDataFile(data: DataStore): Promise<void> {
   try {
     await fs.writeFile(DATA_FILE, JSON.stringify(data, null, 2));
     console.log("[Data Storage] Data saved successfully");
@@ -144,22 +152,56 @@ export async function writeData(data: DataStore): Promise<void> {
   }
 }
 
-export async function addOrUpdateItem(item: Item): Promise<void> {
-  const data = await readData();
+let dataUpdateQueue: Promise<void> = Promise.resolve();
 
-  if (!data.items[item.market_hash_name]) {
-    const itemWithHistory: ItemWithHistory = {
-      ...item,
-      price_history: [],
-      stickers: item.stickers?.map((sticker) => ({
-        ...sticker,
+function queueUpdate<T>(task: () => Promise<T>): Promise<T> {
+  const run = dataUpdateQueue.then(task);
+  dataUpdateQueue = run.then(
+    () => undefined,
+    () => undefined
+  );
+  return run;
+}
+
+async function updateData<T>(
+  mutator: (data: DataStore) => T | Promise<T>
+): Promise<T> {
+  return queueUpdate(async () => {
+    const data = await readDataFile();
+    const result = await mutator(data);
+    await writeDataFile(data);
+    return result;
+  });
+}
+
+export async function readData(): Promise<DataStore> {
+  return readDataFile();
+}
+
+export async function writeData(data: DataStore): Promise<void> {
+  await queueUpdate(() => writeDataFile(data));
+}
+
+export async function addOrUpdateItem(item: Item): Promise<void> {
+  await updateData((data) => {
+    if (!data.items[item.market_hash_name]) {
+      const itemWithHistory: ItemWithHistory = {
+        ...item,
         price_history: [],
-      })),
-      charms: item.charms?.map((charm) => ({ ...charm, price_history: [] })),
-      patches: item.patches?.map((patch) => ({ ...patch, price_history: [] })),
-    };
-    data.items[item.market_hash_name] = itemWithHistory;
-  } else {
+        stickers: item.stickers?.map((sticker) => ({
+          ...sticker,
+          price_history: [],
+        })),
+        charms: item.charms?.map((charm) => ({ ...charm, price_history: [] })),
+        patches: item.patches?.map((patch) => ({
+          ...patch,
+          price_history: [],
+        })),
+      };
+      data.items[item.market_hash_name] = itemWithHistory;
+      return;
+    }
+
     const existingItem = data.items[item.market_hash_name];
     existingItem.label = item.label;
     existingItem.description = item.description;
@@ -189,36 +231,89 @@ export async function addOrUpdateItem(item: Item): Promise<void> {
         (existingItem.patches?.[index] as CustomizationWithHistory)
           ?.price_history || [],
     }));
-  }
-
-  await writeData(data);
+  });
 }
 
 export async function removeItem(marketHashName: string): Promise<void> {
-  const data = await readData();
-  delete data.items[marketHashName];
-  await writeData(data);
+  await updateData((data) => {
+    delete data.items[marketHashName];
+  });
 }
 
 export async function addPriceEntry(
   marketHashName: string,
   price: number
 ): Promise<void> {
-  const data = await readData();
+  let spikeNotification: PriceSpikeNotificationPayload | null = null;
 
-  if (data.items[marketHashName]) {
-    const now = new Date().toISOString();
+  await updateData((data) => {
+    const item = data.items[marketHashName];
+    if (!item) {
+      return;
+    }
 
-    data.items[marketHashName].price_history.push({
-      date: now,
+    const now = new Date();
+    const nowIso = now.toISOString();
+    const history = item.price_history;
+    const previousEntry =
+      history.length > 0 ? history[history.length - 1] : null;
+
+    if (previousEntry) {
+      const previousTime = new Date(previousEntry.date).getTime();
+      const currentTime = now.getTime();
+      const timeDiffMs = currentTime - previousTime;
+
+      if (timeDiffMs >= 0) {
+        const previousPrice = previousEntry.median_price;
+        const priceDiff = price - previousPrice;
+        const absDiff = Math.abs(priceDiff);
+        const percentChange =
+          previousPrice > 0 ? (absDiff / previousPrice) * 100 : 0;
+
+        if (
+          timeDiffMs <= PRICE_SPIKE_TIME_WINDOW_MS &&
+          (absDiff >= PRICE_SPIKE_MIN_ABSOLUTE ||
+            percentChange >= PRICE_SPIKE_PERCENT_THRESHOLD)
+        ) {
+          const direction: PriceSpikeNotificationPayload["direction"] =
+            priceDiff >= 0 ? "up" : "down";
+          const minutes = timeDiffMs / (60 * 1000);
+
+          spikeNotification = {
+            marketHashName,
+            label: item.label,
+            steamUrl: item.steam_url,
+            previousPrice,
+            newPrice: price,
+            changeAmount: priceDiff,
+            changePercentage: percentChange,
+            direction,
+            previousTimestamp: previousEntry.date,
+            currentTimestamp: nowIso,
+            timeWindowMinutes: minutes,
+          };
+
+          console.log(
+            `[Data Storage] Price spike detected for ${item.label}: ${
+              direction === "up" ? "UP" : "DOWN"
+            } $${absDiff.toFixed(2)} (${percentChange.toFixed(
+              1
+            )}%) over ${minutes.toFixed(1)} minutes`
+          );
+        }
+      }
+    }
+
+    history.push({
+      date: nowIso,
       median_price: price,
     });
 
-    data.items[marketHashName].price_history.sort(
+    history.sort(
       (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
     );
 
-    data.metadata.last_capture = new Date().toISOString();
+    data.metadata.last_capture = nowIso;
     data.metadata.total_captures += 1;
 
     console.log(
@@ -226,9 +321,18 @@ export async function addPriceEntry(
         2
       )}`
     );
-  }
+  });
 
-  await writeData(data);
+  if (spikeNotification) {
+    try {
+      await sendPriceSpikeNotification(spikeNotification);
+    } catch (error) {
+      console.error(
+        `[Data Storage] Failed to send price spike notification for ${marketHashName}:`,
+        error
+      );
+    }
+  }
 }
 
 export async function getAllItems(): Promise<ItemWithHistory[]> {
@@ -293,14 +397,13 @@ export async function getItemWithProfitLoss(marketHashName: string): Promise<
   };
 }
 
-export async function getInventoryValue(): Promise<{
+async function calculateInventoryValue(data: DataStore): Promise<{
   total_purchase_value: number;
   total_current_value: number;
   total_profit_loss: number;
   total_profit_loss_percentage: number;
   timeline: Array<{ date: string; total_value: number }>;
 }> {
-  const data = await readData();
   const items = Object.values(data.items);
 
   let totalPurchaseValue = 0;
@@ -313,24 +416,103 @@ export async function getInventoryValue(): Promise<{
       item.purchase_currency,
       "USD"
     );
-    totalPurchaseValue += purchasePriceUsd * item.quantity;
 
-    const latestPrice =
+    const includeCustomizations = Boolean(item.include_customizations_in_price);
+
+    let customizationPurchaseCostUsd = 0;
+    let customizationCurrentValueUsd = 0;
+    const customizationData: Array<{
+      purchaseCostUsd: number;
+      priceHistory: PriceEntry[];
+    }> = [];
+
+    const collectCustomizationData = async (
+      customizations?: CustomizationWithHistory[]
+    ) => {
+      if (!includeCustomizations || !customizations) {
+        return;
+      }
+
+      for (const customization of customizations) {
+        const purchaseCostUsd = await convertCurrency(
+          customization.price,
+          customization.currency,
+          "USD"
+        );
+        customizationPurchaseCostUsd += purchaseCostUsd;
+
+        const history = (customization.price_history ?? [])
+          .slice()
+          .sort(
+            (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+          );
+
+        const latestValue =
+          history.length > 0
+            ? history[history.length - 1].median_price
+            : purchaseCostUsd;
+
+        customizationCurrentValueUsd += latestValue;
+        customizationData.push({
+          purchaseCostUsd,
+          priceHistory: history,
+        });
+      }
+    };
+
+    await collectCustomizationData(item.stickers);
+    await collectCustomizationData(item.charms);
+    await collectCustomizationData(item.patches);
+
+    const perUnitPurchaseUsd = includeCustomizations
+      ? purchasePriceUsd + customizationPurchaseCostUsd
+      : purchasePriceUsd;
+    totalPurchaseValue += perUnitPurchaseUsd * item.quantity;
+
+    const latestItemPrice =
       item.price_history.length > 0
         ? item.price_history[item.price_history.length - 1].median_price
         : purchasePriceUsd;
 
-    totalCurrentValue += latestPrice * item.quantity;
+    const perUnitCurrentValue = includeCustomizations
+      ? latestItemPrice + customizationCurrentValueUsd
+      : latestItemPrice;
 
+    totalCurrentValue += perUnitCurrentValue * item.quantity;
+
+    const customizationValueAt = (timestamp: number): number => {
+      if (!includeCustomizations || customizationData.length === 0) {
+        return 0;
+      }
+
+      let total = 0;
+      for (const customization of customizationData) {
+        let value = customization.purchaseCostUsd;
+        for (const entry of customization.priceHistory) {
+          if (new Date(entry.date).getTime() <= timestamp) {
+            value = entry.median_price;
+          } else {
+            break;
+          }
+        }
+        total += value;
+      }
+      return total;
+    };
+
+    const perItemDailyValues = new Map<string, number>();
     for (const entry of item.price_history) {
       const dateOnly = entry.date.split("T")[0];
-      if (!dateValueMap[dateOnly]) {
-        dateValueMap[dateOnly] = 0;
+      const timestamp = new Date(entry.date).getTime();
+      let entryValue = entry.median_price;
+      if (includeCustomizations) {
+        entryValue += customizationValueAt(timestamp);
       }
-      dateValueMap[dateOnly] = Math.max(
-        dateValueMap[dateOnly],
-        entry.median_price * item.quantity
-      );
+      perItemDailyValues.set(dateOnly, entryValue * item.quantity);
+    }
+
+    for (const [date, value] of perItemDailyValues) {
+      dateValueMap[date] = (dateValueMap[date] ?? 0) + value;
     }
   }
 
@@ -349,6 +531,17 @@ export async function getInventoryValue(): Promise<{
     total_profit_loss_percentage: totalProfitLossPercentage,
     timeline,
   };
+}
+
+export async function getInventoryValue(): Promise<{
+  total_purchase_value: number;
+  total_current_value: number;
+  total_profit_loss: number;
+  total_profit_loss_percentage: number;
+  timeline: Array<{ date: string; total_value: number }>;
+}> {
+  const data = await readData();
+  return calculateInventoryValue(data);
 }
 
 export async function getLatestPrices(): Promise<
@@ -403,143 +596,145 @@ export async function markItemAsSold(
   soldCurrency: string,
   soldPriceUsd: number
 ): Promise<void> {
-  const data = await readData();
-  const item = data.items[marketHashName];
+  await updateData(async (data) => {
+    const item = data.items[marketHashName];
 
-  if (!item) {
-    throw new Error("Item not found");
-  }
+    if (!item) {
+      throw new Error("Item not found");
+    }
 
-  const purchasePriceUsd = await convertCurrency(
-    item.purchase_price,
-    item.purchase_currency,
-    "USD"
-  );
+    const purchasePriceUsd = await convertCurrency(
+      item.purchase_price,
+      item.purchase_currency,
+      "USD"
+    );
 
-  let customizationPurchaseCost = 0;
-  let customizationCurrentValue = 0;
+    let customizationPurchaseCost = 0;
+    let customizationCurrentValue = 0;
 
-  const soldStickers = item.stickers
-    ? await Promise.all(
-        item.stickers.map(async (sticker) => {
-          const stickerPurchaseCostUsd = await convertCurrency(
-            sticker.price,
-            sticker.currency,
-            "USD"
-          );
-          const latestPrice =
-            sticker.price_history && sticker.price_history.length > 0
-              ? sticker.price_history[sticker.price_history.length - 1]
-                  .median_price
-              : null;
+    const soldStickers = item.stickers
+      ? await Promise.all(
+          item.stickers.map(async (sticker) => {
+            const stickerPurchaseCostUsd = await convertCurrency(
+              sticker.price,
+              sticker.currency,
+              "USD"
+            );
+            const latestPrice =
+              sticker.price_history && sticker.price_history.length > 0
+                ? sticker.price_history[sticker.price_history.length - 1]
+                    .median_price
+                : null;
 
-          customizationPurchaseCost += stickerPurchaseCostUsd;
-          if (latestPrice) customizationCurrentValue += latestPrice;
+            customizationPurchaseCost += stickerPurchaseCostUsd;
+            if (latestPrice) customizationCurrentValue += latestPrice;
 
-          return {
-            name: sticker.name,
-            steam_url: sticker.steam_url,
-            purchase_price: sticker.price,
-            current_price: latestPrice ?? undefined,
-            currency: sticker.currency,
-          };
-        })
-      )
-    : undefined;
+            return {
+              name: sticker.name,
+              steam_url: sticker.steam_url,
+              purchase_price: sticker.price,
+              current_price: latestPrice ?? undefined,
+              currency: sticker.currency,
+            };
+          })
+        )
+      : undefined;
 
-  const soldCharms = item.charms
-    ? await Promise.all(
-        item.charms.map(async (charm) => {
-          const charmPurchaseCostUsd = await convertCurrency(
-            charm.price,
-            charm.currency,
-            "USD"
-          );
-          const latestPrice =
-            charm.price_history && charm.price_history.length > 0
-              ? charm.price_history[charm.price_history.length - 1].median_price
-              : null;
+    const soldCharms = item.charms
+      ? await Promise.all(
+          item.charms.map(async (charm) => {
+            const charmPurchaseCostUsd = await convertCurrency(
+              charm.price,
+              charm.currency,
+              "USD"
+            );
+            const latestPrice =
+              charm.price_history && charm.price_history.length > 0
+                ? charm.price_history[charm.price_history.length - 1]
+                    .median_price
+                : null;
 
-          customizationPurchaseCost += charmPurchaseCostUsd;
-          if (latestPrice) customizationCurrentValue += latestPrice;
+            customizationPurchaseCost += charmPurchaseCostUsd;
+            if (latestPrice) customizationCurrentValue += latestPrice;
 
-          return {
-            name: charm.name,
-            steam_url: charm.steam_url,
-            purchase_price: charm.price,
-            current_price: latestPrice ?? undefined,
-            currency: charm.currency,
-          };
-        })
-      )
-    : undefined;
+            return {
+              name: charm.name,
+              steam_url: charm.steam_url,
+              purchase_price: charm.price,
+              current_price: latestPrice ?? undefined,
+              currency: charm.currency,
+            };
+          })
+        )
+      : undefined;
 
-  const soldPatches = item.patches
-    ? await Promise.all(
-        item.patches.map(async (patch) => {
-          const patchPurchaseCostUsd = await convertCurrency(
-            patch.price,
-            patch.currency,
-            "USD"
-          );
-          const latestPrice =
-            patch.price_history && patch.price_history.length > 0
-              ? patch.price_history[patch.price_history.length - 1].median_price
-              : null;
+    const soldPatches = item.patches
+      ? await Promise.all(
+          item.patches.map(async (patch) => {
+            const patchPurchaseCostUsd = await convertCurrency(
+              patch.price,
+              patch.currency,
+              "USD"
+            );
+            const latestPrice =
+              patch.price_history && patch.price_history.length > 0
+                ? patch.price_history[patch.price_history.length - 1]
+                    .median_price
+                : null;
 
-          customizationPurchaseCost += patchPurchaseCostUsd;
-          if (latestPrice) customizationCurrentValue += latestPrice;
+            customizationPurchaseCost += patchPurchaseCostUsd;
+            if (latestPrice) customizationCurrentValue += latestPrice;
 
-          return {
-            name: patch.name,
-            steam_url: patch.steam_url,
-            purchase_price: patch.price,
-            current_price: latestPrice ?? undefined,
-            currency: patch.currency,
-          };
-        })
-      )
-    : undefined;
+            return {
+              name: patch.name,
+              steam_url: patch.steam_url,
+              purchase_price: patch.price,
+              current_price: latestPrice ?? undefined,
+              currency: patch.currency,
+            };
+          })
+        )
+      : undefined;
 
-  const totalPurchaseUsd = item.include_customizations_in_price
-    ? (purchasePriceUsd + customizationPurchaseCost) * item.quantity
-    : purchasePriceUsd * item.quantity;
-  const totalSoldUsd = soldPriceUsd * item.quantity;
-  const profitLoss = totalSoldUsd - totalPurchaseUsd;
-  const profitLossPercentage =
-    totalPurchaseUsd > 0 ? (profitLoss / totalPurchaseUsd) * 100 : 0;
+    const totalPurchaseUsd = item.include_customizations_in_price
+      ? (purchasePriceUsd + customizationPurchaseCost) * item.quantity
+      : purchasePriceUsd * item.quantity;
+    const totalSoldUsd = soldPriceUsd * item.quantity;
+    const profitLoss = totalSoldUsd - totalPurchaseUsd;
+    const profitLossPercentage =
+      totalPurchaseUsd > 0 ? (profitLoss / totalPurchaseUsd) * 100 : 0;
 
-  const soldItem: SoldItem = {
-    market_hash_name: item.market_hash_name,
-    label: item.label,
-    description: item.description,
-    appid: item.appid,
-    steam_url: item.steam_url,
-    purchase_price: item.purchase_price,
-    purchase_price_usd: purchasePriceUsd,
-    purchase_currency: item.purchase_currency,
-    quantity: item.quantity,
-    sold_price: soldPrice,
-    sold_price_usd: soldPriceUsd,
-    sold_currency: soldCurrency,
-    sold_date: new Date().toISOString(),
-    profit_loss: profitLoss,
-    profit_loss_percentage: profitLossPercentage,
-    stickers: soldStickers,
-    charms: soldCharms,
-    patches: soldPatches,
-    customization_total_purchase_cost: customizationPurchaseCost,
-    customization_total_current_value: customizationCurrentValue,
-    include_customizations_in_price: item.include_customizations_in_price,
-  };
+    const soldItem: SoldItem = {
+      market_hash_name: item.market_hash_name,
+      label: item.label,
+      description: item.description,
+      appid: item.appid,
+      steam_url: item.steam_url,
+      purchase_price: item.purchase_price,
+      purchase_price_usd: purchasePriceUsd,
+      purchase_currency: item.purchase_currency,
+      quantity: item.quantity,
+      sold_price: soldPrice,
+      sold_price_usd: soldPriceUsd,
+      sold_currency: soldCurrency,
+      sold_date: new Date().toISOString(),
+      profit_loss: profitLoss,
+      profit_loss_percentage: profitLossPercentage,
+      stickers: soldStickers,
+      charms: soldCharms,
+      patches: soldPatches,
+      customization_total_purchase_cost: customizationPurchaseCost,
+      customization_total_current_value: customizationCurrentValue,
+      include_customizations_in_price: item.include_customizations_in_price,
+    };
 
-  data.sold_items.push(soldItem);
-  delete data.items[marketHashName];
+    data.sold_items.push(soldItem);
+    delete data.items[marketHashName];
 
-  await writeData(data);
-  console.log(
-    `[Data Storage] Marked item as sold: ${marketHashName} for ${soldCurrency}${soldPrice}`
-  );
+    console.log(
+      `[Data Storage] Marked item as sold: ${marketHashName} for ${soldCurrency}${soldPrice}`
+    );
+  });
 }
 
 export async function getSoldItems(): Promise<SoldItem[]> {
@@ -575,10 +770,13 @@ export async function getSoldItemsSummary(): Promise<{
     (sum, item) => sum + item.profit_loss,
     0
   );
-  const totalPurchaseValueUsd = soldItems.reduce(
-    (sum, item) => sum + item.purchase_price_usd * item.quantity,
-    0
-  );
+  const totalPurchaseValueUsd = soldItems.reduce((sum, item) => {
+    const customizationCost = item.include_customizations_in_price
+      ? item.customization_total_purchase_cost ?? 0
+      : 0;
+    const perUnitPurchaseUsd = item.purchase_price_usd + customizationCost;
+    return sum + perUnitPurchaseUsd * item.quantity;
+  }, 0);
   const totalProfitLossPercentage =
     totalPurchaseValueUsd > 0
       ? (totalProfitLoss / totalPurchaseValueUsd) * 100
@@ -598,39 +796,41 @@ export async function addCustomizationPriceEntry(
   customizationIndex: number,
   price: number
 ): Promise<void> {
-  const data = await readData();
+  await updateData((data) => {
+    if (!data.items[marketHashName]) {
+      return;
+    }
 
-  if (data.items[marketHashName]) {
     const item = data.items[marketHashName];
     const customizations = item[customizationType] as
       | CustomizationWithHistory[]
       | undefined;
 
-    if (customizations && customizations[customizationIndex]) {
-      const now = new Date().toISOString();
-
-      if (!customizations[customizationIndex].price_history) {
-        customizations[customizationIndex].price_history = [];
-      }
-
-      customizations[customizationIndex].price_history.push({
-        date: now,
-        median_price: price,
-      });
-
-      customizations[customizationIndex].price_history.sort(
-        (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-      );
-
-      console.log(
-        `[Data Storage] Added customization price entry for ${marketHashName} ${customizationType}[${customizationIndex}]: $${price.toFixed(
-          2
-        )}`
-      );
+    if (!customizations || !customizations[customizationIndex]) {
+      return;
     }
-  }
 
-  await writeData(data);
+    const now = new Date().toISOString();
+
+    if (!customizations[customizationIndex].price_history) {
+      customizations[customizationIndex].price_history = [];
+    }
+
+    customizations[customizationIndex].price_history.push({
+      date: now,
+      median_price: price,
+    });
+
+    customizations[customizationIndex].price_history.sort(
+      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+    );
+
+    console.log(
+      `[Data Storage] Added customization price entry for ${marketHashName} ${customizationType}[${customizationIndex}]: $${price.toFixed(
+        2
+      )}`
+    );
+  });
 }
 
 export async function getAllCustomizations(): Promise<
@@ -708,33 +908,34 @@ export async function getAllCustomizations(): Promise<
 }
 
 export async function addPortfolioSnapshot(): Promise<void> {
-  const data = await readData();
-  const inventoryValue = await getInventoryValue();
+  await updateData(async (data) => {
+    const inventoryValue = await calculateInventoryValue(data);
 
-  const now = new Date().toISOString();
-  const dateOnly = now.split("T")[0];
+    const now = new Date().toISOString();
+    const dateOnly = now.split("T")[0];
 
-  const snapshot = {
-    timestamp: now,
-    date: dateOnly,
-    total_inventory_value: inventoryValue.total_current_value,
-    total_money_invested: inventoryValue.total_purchase_value,
-  };
+    const snapshot = {
+      timestamp: now,
+      date: dateOnly,
+      total_inventory_value: inventoryValue.total_current_value,
+      total_money_invested: inventoryValue.total_purchase_value,
+    };
 
-  data.portfolio_history.push(snapshot);
+    data.portfolio_history.push(snapshot);
 
-  data.portfolio_history.sort(
-    (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
-  );
+    data.portfolio_history.sort(
+      (a, b) =>
+        new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+    );
 
-  const oneYearAgo = new Date();
-  oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
-  data.portfolio_history = data.portfolio_history.filter(
-    (entry) => new Date(entry.timestamp) >= oneYearAgo
-  );
+    const oneYearAgo = new Date();
+    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+    data.portfolio_history = data.portfolio_history.filter(
+      (entry) => new Date(entry.timestamp) >= oneYearAgo
+    );
 
-  await writeData(data);
-  console.log(`[Data Storage] Added portfolio snapshot for ${now}`);
+    console.log(`[Data Storage] Added portfolio snapshot for ${now}`);
+  });
 }
 
 export async function getPortfolioHistory(): Promise<

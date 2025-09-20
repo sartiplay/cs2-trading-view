@@ -41,6 +41,42 @@ interface PriceChangeData {
   change_percentage?: number;
 }
 
+export interface PriceSpikeNotificationPayload {
+  marketHashName: string;
+  label: string;
+  steamUrl?: string;
+  previousPrice: number;
+  newPrice: number;
+  changeAmount: number;
+  changePercentage: number;
+  direction: "up" | "down";
+  previousTimestamp: string;
+  currentTimestamp: string;
+  timeWindowMinutes: number;
+}
+
+export interface DiscordSettings {
+  enabled: boolean;
+  webhookUrl: string;
+  developmentMode: boolean;
+  priceSpikeEnabled: boolean;
+}
+
+export interface DevelopmentWebhookPayload {
+  item: {
+    marketHashName: string;
+    label: string;
+    steamUrl?: string;
+  };
+  currentPrice: number;
+  previousPrice?: number;
+  changeAmount?: number;
+  changePercentage?: number;
+  direction?: "up" | "down";
+  note?: string;
+  timeWindowMinutes?: number;
+}
+
 export async function sendDiscordNotification(
   webhookUrl: string,
   captureData: {
@@ -252,11 +288,218 @@ export async function sendDiscordNotification(
   }
 }
 
-export async function getDiscordSettings(): Promise<{
-  enabled: boolean;
-  webhookUrl: string;
-  developmentMode: boolean;
-} | null> {
+export async function sendPriceSpikeNotification(
+  payload: PriceSpikeNotificationPayload
+) {
+  try {
+    const discordSettings = await getDiscordSettings();
+    if (
+      !discordSettings ||
+      !discordSettings.enabled ||
+      !discordSettings.priceSpikeEnabled ||
+      !discordSettings.webhookUrl
+    ) {
+      return;
+    }
+
+    const directionEmoji = payload.direction === "up" ? "📈" : "📉";
+    const color = payload.direction === "up" ? 0x22c55e : 0xef4444;
+    const changeSymbol = payload.changeAmount >= 0 ? "+" : "-";
+    const percentFormatted = Math.abs(payload.changePercentage).toFixed(1);
+    const changeFormatted = `${changeSymbol}$${Math.abs(
+      payload.changeAmount
+    ).toFixed(2)} (${changeSymbol}${percentFormatted}%)`;
+    const timeWindowLabel =
+      payload.timeWindowMinutes < 1
+        ? `${Math.max(1, Math.round(payload.timeWindowMinutes * 60))} seconds`
+        : `${payload.timeWindowMinutes.toFixed(1)} minutes`;
+
+    const embed: DiscordEmbed = {
+      title: `${directionEmoji} ${payload.label}`,
+      url: payload.steamUrl,
+      description: `Price ${
+        payload.direction === "up" ? "jumped" : "dropped"
+      } ${changeSymbol}${percentFormatted}% in ${timeWindowLabel}.`,
+      color,
+      timestamp: payload.currentTimestamp,
+      fields: [
+        {
+          name: "Old Price",
+          value: `$${payload.previousPrice.toFixed(2)}`,
+          inline: true,
+        },
+        {
+          name: "New Price",
+          value: `$${payload.newPrice.toFixed(2)}`,
+          inline: true,
+        },
+        {
+          name: "Change",
+          value: changeFormatted,
+          inline: true,
+        },
+        {
+          name: "Window",
+          value: timeWindowLabel,
+          inline: true,
+        },
+        {
+          name: "Market Hash",
+          value: `\`${payload.marketHashName}\``,
+          inline: false,
+        },
+      ],
+      footer: {
+        text: "CS2 Price Spike Alert",
+        icon_url: "https://steamcommunity.com/favicon.ico",
+      },
+    };
+
+    const payloadBody: DiscordWebhookPayload = {
+      embeds: [embed],
+    };
+
+    const response = await fetch(discordSettings.webhookUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payloadBody),
+    });
+
+    if (!response.ok) {
+      throw new Error(
+        `Discord webhook failed: ${response.status} ${response.statusText}`
+      );
+    }
+
+    console.log(
+      `[Discord] Price spike notification sent for ${payload.marketHashName}`
+    );
+  } catch (error) {
+    console.error("[Discord] Failed to send price spike notification:", error);
+  }
+}
+
+export async function sendDevelopmentTestNotification(
+  payload: DevelopmentWebhookPayload
+) {
+  try {
+    const settings = await getDiscordSettings();
+    if (
+      !settings ||
+      !settings.enabled ||
+      !settings.developmentMode ||
+      !settings.webhookUrl
+    ) {
+      console.warn(
+        "[Discord] Development notification aborted – webhook disabled or development mode off."
+      );
+      return;
+    }
+
+    const changeAmount = payload.changeAmount;
+    const changePercentage = payload.changePercentage;
+    const previousPrice = payload.previousPrice;
+    const inferredDirection = (() => {
+      if (payload.direction) return payload.direction;
+      if (changeAmount !== undefined) {
+        return changeAmount < 0 ? "down" : "up";
+      }
+      if (changePercentage !== undefined) {
+        return changePercentage < 0 ? "down" : "up";
+      }
+      return "up";
+    })();
+    const direction = inferredDirection;
+    const directionEmoji = direction === "down" ? "📉" : "📈";
+    const color = direction === "down" ? 0xef4444 : 0x22c55e;
+    const changeSummaryParts: string[] = [];
+
+    if (changeAmount !== undefined) {
+      const sign = changeAmount >= 0 ? "+" : "-";
+      changeSummaryParts.push(`${sign}$${Math.abs(changeAmount).toFixed(2)}`);
+    }
+
+    if (changePercentage !== undefined) {
+      const sign = changePercentage >= 0 ? "+" : "-";
+      changeSummaryParts.push(`${sign}${Math.abs(changePercentage).toFixed(2)}%`);
+    }
+
+    const changeSummary = changeSummaryParts.join(" / ") || "N/A";
+
+    const embed: DiscordEmbed = {
+      title: `${directionEmoji} Dev Test • ${payload.item.label}`,
+      url: payload.item.steamUrl,
+      color,
+      timestamp: new Date().toISOString(),
+      description:
+        payload.note?.trim() ||
+        "Manual development notification triggered from the dashboard.",
+      fields: [
+        {
+          name: "Item",
+          value: `\`${payload.item.marketHashName}\``,
+          inline: false,
+        },
+        {
+          name: "Current Price",
+          value: `$${payload.currentPrice.toFixed(2)}`,
+          inline: true,
+        },
+      ],
+      footer: {
+        text: "CS2 Price Tracker • Dev Mode",
+        icon_url: "https://steamcommunity.com/favicon.ico",
+      },
+    };
+
+    if (previousPrice !== undefined) {
+      embed.fields.push({
+        name: "Previous Price",
+        value: `$${previousPrice.toFixed(2)}`,
+        inline: true,
+      });
+    }
+
+    embed.fields.push({
+      name: "Change",
+      value: changeSummary,
+      inline: true,
+    });
+
+    if (payload.timeWindowMinutes !== undefined) {
+      embed.fields.push({
+        name: "Time Window",
+        value: `${payload.timeWindowMinutes.toFixed(1)} min`,
+        inline: true,
+      });
+    }
+
+    const response = await fetch(settings.webhookUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ embeds: [embed] }),
+    });
+
+    if (!response.ok) {
+      throw new Error(
+        `Discord webhook failed: ${response.status} ${response.statusText}`
+      );
+    }
+
+    console.log(
+      `[Discord] Development notification sent for ${payload.item.marketHashName}`
+    );
+  } catch (error) {
+    console.error("[Discord] Failed to send development notification:", error);
+    throw error;
+  }
+}
+
+export async function getDiscordSettings(): Promise<DiscordSettings | null> {
   try {
     console.log("[Discord] Loading settings...");
     const settings: AppSettings = await getSettings();
@@ -267,6 +510,7 @@ export async function getDiscordSettings(): Promise<{
       enabled: settings.discordWebhookEnabled,
       webhookUrl: settings.discordWebhookUrl,
       developmentMode: settings.discordDevelopmentMode,
+      priceSpikeEnabled: settings.discordPriceSpikeEnabled,
     };
   } catch (error) {
     console.error("[Discord] Failed to load settings:", error);

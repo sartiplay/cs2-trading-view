@@ -109,13 +109,29 @@ export async function convertCurrency(
 
   const rates = await getExchangeRates();
 
-  // Convert from source currency to USD first
-  const usdAmount =
-    fromCurrency === "USD" ? amount : amount / rates.rates[fromCurrency];
+  const normalizedRates: Record<string, number> = {
+    [rates.base]: 1,
+    ...rates.rates,
+  };
 
-  // Then convert from USD to target currency
+  const fromRate = normalizedRates[fromCurrency];
+  const toRate = normalizedRates[toCurrency];
+
+  if (fromRate === undefined) {
+    throw new Error(`Unsupported source currency: ${fromCurrency}`);
+  }
+
+  if (toRate === undefined) {
+    throw new Error(`Unsupported target currency: ${toCurrency}`);
+  }
+
+  // Convert from source currency to the API base currency first
+  const usdAmount =
+    fromCurrency === rates.base ? amount : amount / fromRate;
+
+  // Then convert from base currency to target currency
   const convertedAmount =
-    toCurrency === "USD" ? usdAmount : usdAmount * rates.rates[toCurrency];
+    toCurrency === rates.base ? usdAmount : usdAmount * toRate;
 
   return convertedAmount;
 }

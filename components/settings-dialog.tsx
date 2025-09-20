@@ -37,6 +37,7 @@ export interface AppSettings {
   discordWebhookEnabled: boolean;
   discordWebhookUrl: string;
   discordDevelopmentMode: boolean;
+  discordPriceSpikeEnabled: boolean;
   schedulerEnabled: boolean;
   schedulerRunning: boolean;
 }
@@ -48,6 +49,7 @@ const defaultSettings: AppSettings = {
   discordWebhookEnabled: false,
   discordWebhookUrl: "",
   discordDevelopmentMode: false,
+  discordPriceSpikeEnabled: false,
   schedulerEnabled: false,
   schedulerRunning: false,
 };
@@ -314,6 +316,26 @@ export function SettingsDialog() {
                       Please enter a valid Discord webhook URL
                     </p>
                   )}
+
+                <div className="flex items-center space-x-2 mt-4">
+                  <Switch
+                    id="discord-price-spikes"
+                    checked={settings.discordPriceSpikeEnabled}
+                    onCheckedChange={(checked) =>
+                      setSettings({
+                        ...settings,
+                        discordPriceSpikeEnabled: checked,
+                      })
+                    }
+                  />
+                  <Label htmlFor="discord-price-spikes">
+                    Price spike notifications
+                  </Label>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Alert Discord when an item's market price surges or drops
+                  sharply in minutes.
+                </p>
 
                 <div className="flex items-center space-x-2 mt-4">
                   <Switch
