@@ -82,6 +82,12 @@ export interface SoldItem {
 export interface DataStore {
   items: Record<string, ItemWithHistory>;
   sold_items: SoldItem[];
+  portfolio_history: Array<{
+    timestamp: string;
+    date: string;
+    total_inventory_value: number;
+    total_money_invested: number;
+  }>;
   metadata: {
     last_capture: string | null;
     total_captures: number;
@@ -108,13 +114,17 @@ export async function readData(): Promise<DataStore> {
       parsed.sold_items = [];
     }
 
+    if (!parsed.portfolio_history) {
+      parsed.portfolio_history = [];
+    }
+
     return parsed;
   } catch (error) {
-    // If file doesn't exist, return empty structure
     console.log("[Data Storage] Creating new data file");
     return {
       items: {},
       sold_items: [],
+      portfolio_history: [],
       metadata: {
         last_capture: null,
         total_captures: 0,
@@ -138,7 +148,6 @@ export async function addOrUpdateItem(item: Item): Promise<void> {
   const data = await readData();
 
   if (!data.items[item.market_hash_name]) {
-    // Initialize new item with price history for customizations
     const itemWithHistory: ItemWithHistory = {
       ...item,
       price_history: [],
@@ -151,7 +160,6 @@ export async function addOrUpdateItem(item: Item): Promise<void> {
     };
     data.items[item.market_hash_name] = itemWithHistory;
   } else {
-    // Update existing item info but keep price history
     const existingItem = data.items[item.market_hash_name];
     existingItem.label = item.label;
     existingItem.description = item.description;
@@ -163,7 +171,6 @@ export async function addOrUpdateItem(item: Item): Promise<void> {
     existingItem.include_customizations_in_price =
       item.include_customizations_in_price;
 
-    // Update customizations while preserving price history
     existingItem.stickers = item.stickers?.map((sticker, index) => ({
       ...sticker,
       price_history:
@@ -207,7 +214,6 @@ export async function addPriceEntry(
       median_price: price,
     });
 
-    // Sort by date
     data.items[marketHashName].price_history.sort(
       (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
     );
@@ -312,7 +318,7 @@ export async function getInventoryValue(): Promise<{
     const latestPrice =
       item.price_history.length > 0
         ? item.price_history[item.price_history.length - 1].median_price
-        : purchasePriceUsd; // Use USD purchase price as fallback
+        : purchasePriceUsd;
 
     totalCurrentValue += latestPrice * item.quantity;
 
@@ -328,7 +334,6 @@ export async function getInventoryValue(): Promise<{
     }
   }
 
-  // Convert to timeline array and sort by date
   const timeline = Object.entries(dateValueMap)
     .map(([date, total_value]) => ({ date, total_value }))
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
@@ -414,7 +419,6 @@ export async function markItemAsSold(
   let customizationPurchaseCost = 0;
   let customizationCurrentValue = 0;
 
-  // Process stickers
   const soldStickers = item.stickers
     ? await Promise.all(
         item.stickers.map(async (sticker) => {
@@ -443,7 +447,6 @@ export async function markItemAsSold(
       )
     : undefined;
 
-  // Process charms
   const soldCharms = item.charms
     ? await Promise.all(
         item.charms.map(async (charm) => {
@@ -471,7 +474,6 @@ export async function markItemAsSold(
       )
     : undefined;
 
-  // Process patches
   const soldPatches = item.patches
     ? await Promise.all(
         item.patches.map(async (patch) => {
@@ -507,7 +509,6 @@ export async function markItemAsSold(
   const profitLossPercentage =
     totalPurchaseUsd > 0 ? (profitLoss / totalPurchaseUsd) * 100 : 0;
 
-  // Create sold item record
   const soldItem: SoldItem = {
     market_hash_name: item.market_hash_name,
     label: item.label,
@@ -532,7 +533,6 @@ export async function markItemAsSold(
     include_customizations_in_price: item.include_customizations_in_price,
   };
 
-  // Add to sold items and remove from active items
   data.sold_items.push(soldItem);
   delete data.items[marketHashName];
 
@@ -618,7 +618,6 @@ export async function addCustomizationPriceEntry(
         median_price: price,
       });
 
-      // Sort by date
       customizations[customizationIndex].price_history.sort(
         (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
       );
@@ -653,7 +652,6 @@ export async function getAllCustomizations(): Promise<
   }> = [];
 
   for (const [marketHashName, item] of Object.entries(data.items)) {
-    // Process stickers
     if (item.stickers) {
       item.stickers.forEach((sticker, index) => {
         if (sticker.steam_url) {
@@ -671,7 +669,6 @@ export async function getAllCustomizations(): Promise<
       });
     }
 
-    // Process charms
     if (item.charms) {
       item.charms.forEach((charm, index) => {
         if (charm.steam_url) {
@@ -689,7 +686,6 @@ export async function getAllCustomizations(): Promise<
       });
     }
 
-    // Process patches
     if (item.patches) {
       item.patches.forEach((patch, index) => {
         if (patch.steam_url) {
@@ -709,6 +705,50 @@ export async function getAllCustomizations(): Promise<
   }
 
   return customizations;
+}
+
+export async function addPortfolioSnapshot(): Promise<void> {
+  const data = await readData();
+  const inventoryValue = await getInventoryValue();
+
+  const now = new Date().toISOString();
+  const dateOnly = now.split("T")[0];
+
+  const snapshot = {
+    timestamp: now,
+    date: dateOnly,
+    total_inventory_value: inventoryValue.total_current_value,
+    total_money_invested: inventoryValue.total_purchase_value,
+  };
+
+  data.portfolio_history.push(snapshot);
+
+  data.portfolio_history.sort(
+    (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+  );
+
+  const oneYearAgo = new Date();
+  oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+  data.portfolio_history = data.portfolio_history.filter(
+    (entry) => new Date(entry.timestamp) >= oneYearAgo
+  );
+
+  await writeData(data);
+  console.log(`[Data Storage] Added portfolio snapshot for ${now}`);
+}
+
+export async function getPortfolioHistory(): Promise<
+  Array<{
+    timestamp: string;
+    date: string;
+    total_inventory_value: number;
+    total_money_invested: number;
+  }>
+> {
+  const data = await readData();
+  return data.portfolio_history.sort(
+    (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+  );
 }
 
 function extractHashFromSteamUrl(url: string): string | null {

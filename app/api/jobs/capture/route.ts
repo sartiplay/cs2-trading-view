@@ -6,6 +6,7 @@ import {
   getInventoryValue,
   getAllCustomizations,
   addCustomizationPriceEntry,
+  addPortfolioSnapshot,
 } from "@/lib/data-storage.server";
 import { fetchSteamPrice, fetchMultiplePrices } from "@/lib/steam-api.server";
 import {
@@ -168,6 +169,17 @@ export async function POST(request: NextRequest) {
       console.log(
         `[Capture Job] Completed: ${customizationSuccessCount}/${customizationTotalCount} customizations captured successfully`
       );
+
+      try {
+        await addPortfolioSnapshot();
+        console.log("[Capture Job] Portfolio snapshot recorded");
+      } catch (snapshotError) {
+        console.error(
+          "[Capture Job] Failed to record portfolio snapshot:",
+          snapshotError
+        );
+        // Don't fail the entire capture job if snapshot fails
+      }
 
       try {
         console.log("[Capture Job] Sending Discord notification if enabled...");

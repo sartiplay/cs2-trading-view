@@ -2,6 +2,7 @@ import { ItemForm } from "@/components/item-form";
 import { ItemsTable } from "@/components/items-table";
 import { CaptureStats } from "@/components/capture-stats";
 import { SettingsDialog } from "@/components/settings-dialog";
+import { PortfolioChart } from "@/components/portfolio-chart";
 import {
   Card,
   CardContent,
@@ -79,6 +80,8 @@ export default function Dashboard() {
             <ItemsTable />
           </CardContent>
         </Card>
+
+        <PortfolioChart />
 
         <SoldItemsDisplay />
       </div>
