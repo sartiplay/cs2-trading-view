@@ -399,6 +399,8 @@ export async function addPriceEntry(
             threshold: lowerThreshold,
             price,
           });
+          config.lowerThreshold = null;
+          config.lowerTriggered = false;
         }
       } else if (config.lowerTriggered) {
         config.lowerTriggered = false;
@@ -423,6 +425,8 @@ export async function addPriceEntry(
             threshold: upperThreshold,
             price,
           });
+          config.upperThreshold = null;
+          config.upperTriggered = false;
         }
       } else if (config.upperTriggered) {
         config.upperTriggered = false;

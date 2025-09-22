@@ -453,7 +453,7 @@ export async function sendPriceAlertNotification(
       : [];
 
     if (mentions.length > 0) {
-      const mentionText = mentions.map((value) => "@" + value).join(" ");
+      const mentionText = mentions.map((value) => "<@" + value + ">").join(" ");
       if (mentionText.length > 0) {
         payloadBody.content = mentionText;
       }
@@ -636,3 +636,4 @@ export async function getDiscordSettings(): Promise<DiscordSettings | null> {
     return null;
   }
 }
+

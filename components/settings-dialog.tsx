@@ -40,6 +40,7 @@ export interface AppSettings {
   discordWebhookUrl: string;
   discordDevelopmentMode: boolean;
   discordPriceSpikeEnabled: boolean;
+  discordPriceAlertMentions: string[];
   pinnedMarketSites: string[];
   marketListingsFetchLimit: number;
   schedulerEnabled: boolean;
@@ -54,6 +55,7 @@ const defaultSettings: AppSettings = {
   discordWebhookUrl: "",
   discordDevelopmentMode: false,
   discordPriceSpikeEnabled: false,
+  discordPriceAlertMentions: [],
   pinnedMarketSites: DEFAULT_PINNED_PROVIDERS,
   marketListingsFetchLimit: 5,
   schedulerEnabled: false,
@@ -78,7 +80,9 @@ export function SettingsDialog() {
             discordPriceAlertMentions:
               apiSettings.discordPriceAlertMentions ?? [],
           });
-          setAlertMentionsInput((apiSettings.discordPriceAlertMentions ?? []).join("\n"));
+          setAlertMentionsInput(
+            (apiSettings.discordPriceAlertMentions ?? []).join("\n")
+          );
         }
       } catch (error) {
         console.error("Failed to load settings from API:", error);
@@ -90,10 +94,11 @@ export function SettingsDialog() {
             setSettings({
               ...defaultSettings,
               ...parsed,
-              discordPriceAlertMentions:
-                parsed.discordPriceAlertMentions ?? [],
+              discordPriceAlertMentions: parsed.discordPriceAlertMentions ?? [],
             });
-            setAlertMentionsInput((parsed.discordPriceAlertMentions ?? []).join("\n"));
+            setAlertMentionsInput(
+              (parsed.discordPriceAlertMentions ?? []).join("\n")
+            );
           } catch (error) {
             console.error("Failed to parse saved settings:", error);
           }
@@ -414,8 +419,8 @@ export function SettingsDialog() {
                     }
                   />
                   <p className="text-xs text-muted-foreground">
-                    Enter Discord user IDs (one per line or separated by commas) to
-                    mention when price alerts trigger.
+                    Enter Discord user IDs (one per line or separated by commas)
+                    to mention when price alerts trigger.
                   </p>
                 </div>
               </div>
@@ -457,8 +462,7 @@ export function useSettings(): AppSettings {
             setSettings({
               ...defaultSettings,
               ...parsed,
-              discordPriceAlertMentions:
-                parsed.discordPriceAlertMentions ?? [],
+              discordPriceAlertMentions: parsed.discordPriceAlertMentions ?? [],
             });
           } catch (error) {
             console.error("Failed to parse saved settings:", error);
@@ -472,10 +476,3 @@ export function useSettings(): AppSettings {
 
   return settings;
 }
-
-
-
-
-
-
-
