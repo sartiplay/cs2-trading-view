@@ -18,6 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Settings, Save } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -61,6 +62,7 @@ const defaultSettings: AppSettings = {
 
 export function SettingsDialog() {
   const [settings, setSettings] = useState<AppSettings>(defaultSettings);
+  const [alertMentionsInput, setAlertMentionsInput] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const { toast } = useToast();
 
@@ -70,7 +72,13 @@ export function SettingsDialog() {
         const response = await fetch("/api/settings");
         if (response.ok) {
           const apiSettings = await response.json();
-          setSettings({ ...defaultSettings, ...apiSettings });
+          setSettings({
+            ...defaultSettings,
+            ...apiSettings,
+            discordPriceAlertMentions:
+              apiSettings.discordPriceAlertMentions ?? [],
+          });
+          setAlertMentionsInput((apiSettings.discordPriceAlertMentions ?? []).join("\n"));
         }
       } catch (error) {
         console.error("Failed to load settings from API:", error);
@@ -78,8 +86,14 @@ export function SettingsDialog() {
         const savedSettings = await res.json();
         if (savedSettings) {
           try {
-            const parsed = saveSettings;
-            setSettings({ ...defaultSettings, ...parsed });
+            const parsed = savedSettings;
+            setSettings({
+              ...defaultSettings,
+              ...parsed,
+              discordPriceAlertMentions:
+                parsed.discordPriceAlertMentions ?? [],
+            });
+            setAlertMentionsInput((parsed.discordPriceAlertMentions ?? []).join("\n"));
           } catch (error) {
             console.error("Failed to parse saved settings:", error);
           }
@@ -114,10 +128,19 @@ export function SettingsDialog() {
     }
 
     try {
+      const normalizedMentions = parseAlertMentions(alertMentionsInput);
+      const payload = {
+        ...settings,
+        discordPriceAlertMentions: normalizedMentions,
+      };
+      setSettings((prev) => ({
+        ...prev,
+        discordPriceAlertMentions: normalizedMentions,
+      }));
       const response = await fetch("/api/settings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(settings),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
@@ -181,6 +204,22 @@ export function SettingsDialog() {
     } catch {
       return false;
     }
+  };
+
+  const parseAlertMentions = (value: string): string[] => {
+    return value
+      .split(/[\n,]/)
+      .map((entry) => entry.trim())
+      .filter((entry) => entry.length > 0);
+  };
+
+  const handleAlertMentionsChange = (value: string) => {
+    setAlertMentionsInput(value);
+    const normalized = parseAlertMentions(value);
+    setSettings((prev) => ({
+      ...prev,
+      discordPriceAlertMentions: normalized,
+    }));
   };
 
   return (
@@ -312,8 +351,8 @@ export function SettingsDialog() {
                   }
                 />
                 <p className="text-sm text-muted-foreground">
-                  Get your webhook URL from Discord Server Settings →
-                  Integrations → Webhooks
+                  Get your webhook URL from Discord Server Settings â†’
+                  Integrations â†’ Webhooks
                 </p>
                 {!isValidWebhookUrl(settings.discordWebhookUrl) &&
                   settings.discordWebhookUrl && (
@@ -359,6 +398,26 @@ export function SettingsDialog() {
                   Send all items in webhook regardless of price changes (for
                   testing)
                 </p>
+
+                <div className="space-y-2 mt-4">
+                  <Label htmlFor="discord-alert-mentions">
+                    Price alert mentions
+                  </Label>
+                  <Textarea
+                    id="discord-alert-mentions"
+                    rows={3}
+                    placeholder="123456789012345678\n987654321098765432"
+                    value={alertMentionsInput}
+                    disabled={!settings.discordWebhookEnabled}
+                    onChange={(event) =>
+                      handleAlertMentionsChange(event.target.value)
+                    }
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Enter Discord user IDs (one per line or separated by commas) to
+                    mention when price alerts trigger.
+                  </p>
+                </div>
               </div>
             )}
           </div>
@@ -382,7 +441,12 @@ export function useSettings(): AppSettings {
         const response = await fetch("/api/settings");
         if (response.ok) {
           const apiSettings = await response.json();
-          setSettings({ ...defaultSettings, ...apiSettings });
+          setSettings({
+            ...defaultSettings,
+            ...apiSettings,
+            discordPriceAlertMentions:
+              apiSettings.discordPriceAlertMentions ?? [],
+          });
         }
       } catch (error) {
         console.error("Failed to load settings from API:", error);
@@ -390,7 +454,12 @@ export function useSettings(): AppSettings {
         if (savedSettings) {
           try {
             const parsed = JSON.parse(savedSettings);
-            setSettings({ ...defaultSettings, ...parsed });
+            setSettings({
+              ...defaultSettings,
+              ...parsed,
+              discordPriceAlertMentions:
+                parsed.discordPriceAlertMentions ?? [],
+            });
           } catch (error) {
             console.error("Failed to parse saved settings:", error);
           }
@@ -403,3 +472,10 @@ export function useSettings(): AppSettings {
 
   return settings;
 }
+
+
+
+
+
+
+

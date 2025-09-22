@@ -113,6 +113,7 @@ export async function GET() {
           customization_current_value_usd: customizationCurrentValueUSD, // Add current customization value
           include_customizations_in_price:
             item.include_customizations_in_price || false,
+          price_alert_config: item.price_alert_config ?? null,
         };
       })
     );
@@ -216,3 +217,4 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Failed to add item" }, { status: 500 });
   }
 }
+

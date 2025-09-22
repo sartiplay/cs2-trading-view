@@ -95,6 +95,16 @@ interface Customization {
   currency: string;
 }
 
+interface PriceAlertConfig {
+  lowerThreshold?: number | null;
+  upperThreshold?: number | null;
+  lowerTriggered?: boolean;
+  upperTriggered?: boolean;
+  lastTriggeredLower?: string | null;
+  lastTriggeredUpper?: string | null;
+  updatedAt?: string;
+}
+
 interface ItemData {
   market_hash_name: string;
   label: string;
@@ -102,6 +112,7 @@ interface ItemData {
   description?: string;
   steam_url?: string;
   price_history: PriceEntry[];
+  price_alert_config?: PriceAlertConfig;
   stickers?: Customization[];
   charms?: Customization[];
   patches?: Customization[];
@@ -224,6 +235,24 @@ export function ItemDetail({ hash }: ItemDetailProps) {
   const [apiKeyValue, setApiKeyValue] = useState("");
   const [apiKeySaving, setApiKeySaving] = useState(false);
   const [marketSettingsSaving, setMarketSettingsSaving] = useState(false);
+  const [alertDialogOpen, setAlertDialogOpen] = useState(false);
+  const [alertLowerInput, setAlertLowerInput] = useState("");
+  const [alertUpperInput, setAlertUpperInput] = useState("");
+  const [alertSaving, setAlertSaving] = useState(false);
+
+  const resetAlertInputs = useCallback(() => {
+    const config = item?.price_alert_config;
+    setAlertLowerInput(
+      config?.lowerThreshold != null ? String(config.lowerThreshold) : ""
+    );
+    setAlertUpperInput(
+      config?.upperThreshold != null ? String(config.upperThreshold) : ""
+    );
+  }, [item?.price_alert_config]);
+
+  useEffect(() => {
+    resetAlertInputs();
+  }, [resetAlertInputs]);
   const priceHistory = item?.price_history ?? EMPTY_PRICE_HISTORY;
 
   const providerStatusMap = useMemo(() => {
@@ -374,6 +403,71 @@ export function ItemDetail({ hash }: ItemDetailProps) {
       setMarketSettingsSaving(false);
     }
   }, [fetchLimitDraft, pinnedDraft, settings, toast]);
+  const handleAlertDialogOpenChange = (open: boolean) => {
+    setAlertDialogOpen(open);
+    resetAlertInputs();
+  };
+
+  const handleSavePriceAlerts = useCallback(async () => {
+    setAlertSaving(true);
+    try {
+      const parseValue = (raw: string, label: string): number | null => {
+        const trimmed = raw.trim();
+        if (trimmed.length === 0) {
+          return null;
+        }
+        const parsed = Number(trimmed);
+        if (!Number.isFinite(parsed) || parsed < 0) {
+          throw new Error(`${label} threshold must be a positive number`);
+        }
+        return parsed;
+      };
+
+      const lower = parseValue(alertLowerInput, "Lower");
+      const upper = parseValue(alertUpperInput, "Upper");
+
+      const response = await fetch(
+        `/api/items/${encodeURIComponent(hash)}/alerts`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            lowerThreshold: lower,
+            upperThreshold: upper,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const error = await response.json().catch(() => null);
+        throw new Error(error?.error ?? "Failed to update price alerts");
+      }
+
+      const result: { config: PriceAlertConfig } = await response.json();
+      setItem((prev) =>
+        prev ? { ...prev, price_alert_config: result.config } : prev
+      );
+      setAlertLowerInput(lower != null ? String(lower) : "");
+      setAlertUpperInput(upper != null ? String(upper) : "");
+      resetAlertInputs();
+      setAlertDialogOpen(false);
+      toast({
+        title: "Price alerts updated",
+        description:
+          "Discord notifications will trigger on the new thresholds.",
+      });
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Unexpected error";
+      toast({
+        title: "Unable to update alerts",
+        description: message,
+        variant: "destructive",
+      });
+    } finally {
+      setAlertSaving(false);
+    }
+  }, [alertLowerInput, alertUpperInput, hash, resetAlertInputs, toast]);
 
   const submitApiKey = useCallback(
     async (value: string, successMessage: string) => {
@@ -567,6 +661,17 @@ export function ItemDetail({ hash }: ItemDetailProps) {
     );
     return [...requested, ...fallback].slice(0, 3);
   }, [effectiveSettings.pinnedMarketSites, providerMetaMap]);
+
+  useEffect(() => {
+    const config = item?.price_alert_config;
+    setAlertLowerInput(
+      config?.lowerThreshold != null ? String(config.lowerThreshold) : ""
+    );
+    setAlertUpperInput(
+      config?.upperThreshold != null ? String(config.upperThreshold) : ""
+    );
+  }, [item?.price_alert_config]);
+
 
   const groupedListings = useMemo(() => {
     const map = new Map<string, TradeListing[]>();
@@ -1148,6 +1253,14 @@ export function ItemDetail({ hash }: ItemDetailProps) {
                   </a>
                 </Button>
               )}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleAlertDialogOpenChange(true)}
+                className="gap-2"
+              >
+                Price Alerts
+              </Button>
               <div className="flex-shrink-0">
                 <SettingsDialog />
               </div>
@@ -1167,6 +1280,21 @@ export function ItemDetail({ hash }: ItemDetailProps) {
             <p className="text-sm text-muted-foreground/90 leading-relaxed text-pretty">
               {item.description}
             </p>
+          )}
+          {(item.price_alert_config?.lowerThreshold != null ||
+            item.price_alert_config?.upperThreshold != null) && (
+            <div className="flex flex-wrap gap-2 text-xs">
+              {item.price_alert_config?.lowerThreshold != null && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-red-500/10 px-3 py-1 font-medium text-red-300">
+                  Stop Loss: ${item.price_alert_config.lowerThreshold.toFixed(2)}
+                </span>
+              )}
+              {item.price_alert_config?.upperThreshold != null && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-3 py-1 font-medium text-emerald-300">
+                  Take Profit: ${item.price_alert_config.upperThreshold.toFixed(2)}
+                </span>
+              )}
+            </div>
           )}
         </div>
       </div>
@@ -1583,6 +1711,104 @@ export function ItemDetail({ hash }: ItemDetailProps) {
         </CardContent>
       </Card>
 
+      <Dialog
+        open={alertDialogOpen}
+        onOpenChange={handleAlertDialogOpenChange}
+      >
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Price Alerts</DialogTitle>
+            <DialogDescription>
+              Receive Discord notifications when this item's price crosses your
+              thresholds.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="price-alert-lower">Lower threshold (Stop Loss)</Label>
+              <Input
+                id="price-alert-lower"
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="Leave blank to disable"
+                value={alertLowerInput}
+                onChange={(event) => setAlertLowerInput(event.target.value)}
+              />
+              <p className="text-xs text-muted-foreground">
+                Notify when the price falls to or below this value.
+              </p>
+              {item?.price_alert_config?.lastTriggeredLower && (
+                <p className="text-xs text-amber-500">
+                  Last triggered{" "}
+                  {new Date(
+                    item.price_alert_config.lastTriggeredLower
+                  ).toLocaleString()}
+                </p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="price-alert-upper">Upper threshold (Take Profit)</Label>
+              <Input
+                id="price-alert-upper"
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="Leave blank to disable"
+                value={alertUpperInput}
+                onChange={(event) => setAlertUpperInput(event.target.value)}
+              />
+              <p className="text-xs text-muted-foreground">
+                Notify when the price rises to or above this value.
+              </p>
+              {item?.price_alert_config?.lastTriggeredUpper && (
+                <p className="text-xs text-amber-500">
+                  Last triggered{" "}
+                  {new Date(
+                    item.price_alert_config.lastTriggeredUpper
+                  ).toLocaleString()}
+                </p>
+              )}
+            </div>
+            {item?.price_alert_config?.updatedAt && (
+              <p className="text-xs text-muted-foreground">
+                Updated{" "}
+                {new Date(item.price_alert_config.updatedAt).toLocaleString()}
+              </p>
+            )}
+          </div>
+          <DialogFooter className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-between">
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => handleAlertDialogOpenChange(false)}
+              disabled={alertSaving}
+            >
+              Cancel
+            </Button>
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setAlertLowerInput("");
+                  setAlertUpperInput("");
+                }}
+                disabled={alertSaving}
+              >
+                Clear
+              </Button>
+              <Button
+                type="button"
+                onClick={handleSavePriceAlerts}
+                disabled={alertSaving}
+              >
+                {alertSaving ? "Saving..." : "Save alerts"}
+              </Button>
+            </div>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       <Dialog open={marketSettingsOpen} onOpenChange={setMarketSettingsOpen}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
@@ -2188,3 +2414,4 @@ export function ItemDetail({ hash }: ItemDetailProps) {
     </div>
   );
 }
+

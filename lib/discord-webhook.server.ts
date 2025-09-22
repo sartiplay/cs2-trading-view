@@ -55,11 +55,21 @@ export interface PriceSpikeNotificationPayload {
   timeWindowMinutes: number;
 }
 
+export interface PriceAlertNotificationPayload {
+  marketHashName: string;
+  label: string;
+  steamUrl?: string;
+  direction: "lower" | "upper";
+  threshold: number;
+  price: number;
+}
+
 export interface DiscordSettings {
   enabled: boolean;
   webhookUrl: string;
   developmentMode: boolean;
   priceSpikeEnabled: boolean;
+  alertMentions?: string[];
 }
 
 export interface DevelopmentWebhookPayload {
@@ -381,6 +391,96 @@ export async function sendPriceSpikeNotification(
   }
 }
 
+export async function sendPriceAlertNotification(
+  payload: PriceAlertNotificationPayload
+) {
+  try {
+    const settings = await getDiscordSettings();
+    if (!settings || !settings.enabled || !settings.webhookUrl) {
+      return;
+    }
+
+    const directionIsUpper = payload.direction === "upper";
+    const directionLabel = directionIsUpper
+      ? "Upper Threshold"
+      : "Lower Threshold";
+    const directionKeyword = directionIsUpper ? "Take Profit" : "Stop Loss";
+    const color = directionIsUpper ? 0x22c55e : 0xef4444;
+
+    const embed: DiscordEmbed = {
+      title: "Price Alert • " + payload.label,
+      url: payload.steamUrl,
+      description:
+        directionKeyword +
+        " alert triggered at " +
+        directionLabel.toLowerCase(),
+      color,
+      timestamp: new Date().toISOString(),
+      fields: [
+        {
+          name: "Current Price",
+          value: "$" + payload.price.toFixed(2),
+          inline: true,
+        },
+        {
+          name: "Threshold",
+          value:
+            "$" + payload.threshold.toFixed(2) + " (" + directionLabel + ")",
+          inline: true,
+        },
+        {
+          name: "Market Hash",
+          value: "`" + payload.marketHashName + "`",
+          inline: false,
+        },
+      ],
+      footer: {
+        text: "CS2 Price Alert",
+        icon_url: "https://steamcommunity.com/favicon.ico",
+      },
+    };
+
+    const payloadBody: { embeds: DiscordEmbed[]; content?: string } = {
+      embeds: [embed],
+    };
+
+    const mentions = Array.isArray(settings.alertMentions)
+      ? settings.alertMentions
+          .filter(
+            (value) => typeof value === "string" && value.trim().length > 0
+          )
+          .map((value) => value.trim())
+      : [];
+
+    if (mentions.length > 0) {
+      const mentionText = mentions.map((value) => "@" + value).join(" ");
+      if (mentionText.length > 0) {
+        payloadBody.content = mentionText;
+      }
+    }
+
+    const response = await fetch(settings.webhookUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payloadBody),
+    });
+
+    if (!response.ok) {
+      throw new Error(
+        "Discord webhook failed: " + response.status + " " + response.statusText
+      );
+    }
+
+    console.log(
+      "[Discord] Price alert notification sent for " + payload.marketHashName
+    );
+  } catch (error) {
+    console.error("[Discord] Failed to send price alert:", error);
+  }
+}
+
 export async function sendDevelopmentTestNotification(
   payload: DevelopmentWebhookPayload
 ) {
@@ -423,7 +523,9 @@ export async function sendDevelopmentTestNotification(
 
     if (changePercentage !== undefined) {
       const sign = changePercentage >= 0 ? "+" : "-";
-      changeSummaryParts.push(`${sign}${Math.abs(changePercentage).toFixed(2)}%`);
+      changeSummaryParts.push(
+        `${sign}${Math.abs(changePercentage).toFixed(2)}%`
+      );
     }
 
     const changeSummary = changeSummaryParts.join(" / ") || "N/A";
@@ -505,12 +607,29 @@ export async function getDiscordSettings(): Promise<DiscordSettings | null> {
     const settings: AppSettings = await getSettings();
 
     console.log("[Discord] Settings loaded:", settings);
+    const alertMentions =
+      typeof settings === "object" &&
+      settings !== null &&
+      Array.isArray(
+        (settings as unknown as Record<string, unknown>)
+          .discordPriceAlertMentions
+      )
+        ? (
+            (settings as unknown as Record<string, unknown>)
+              .discordPriceAlertMentions as string[]
+          )
+            .filter(
+              (value) => typeof value === "string" && value.trim().length > 0
+            )
+            .map((value) => value.trim())
+        : [];
 
     return {
       enabled: settings.discordWebhookEnabled,
       webhookUrl: settings.discordWebhookUrl,
       developmentMode: settings.discordDevelopmentMode,
       priceSpikeEnabled: settings.discordPriceSpikeEnabled,
+      alertMentions,
     };
   } catch (error) {
     console.error("[Discord] Failed to load settings:", error);

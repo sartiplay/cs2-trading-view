@@ -14,6 +14,7 @@ export interface Settings {
   discordWebhookUrl: string;
   discordDevelopmentMode: boolean;
   discordPriceSpikeEnabled: boolean;
+  discordPriceAlertMentions: string[];
   pinnedMarketSites: string[];
   marketListingsFetchLimit: number;
   schedulerEnabled: boolean;
@@ -53,6 +54,21 @@ function normalizeFetchLimit(value: unknown): number {
   return DEFAULT_FETCH_LIMIT;
 }
 
+function normalizeAlertMentions(input: unknown): string[] {
+  if (Array.isArray(input)) {
+    return input
+      .map((value) => (typeof value === "string" ? value.trim() : ""))
+      .filter((value) => value.length > 0);
+  }
+  if (typeof input === "string") {
+    return input
+      .split(/[\n,]/)
+      .map((value) => value.trim())
+      .filter((value) => value.length > 0);
+  }
+  return [];
+}
+
 const DEFAULT_SETTINGS: Settings = {
   timelineResolution: "1d",
   cronDelayMinutes: 1440,
@@ -61,6 +77,7 @@ const DEFAULT_SETTINGS: Settings = {
   discordWebhookUrl: "",
   discordDevelopmentMode: false,
   discordPriceSpikeEnabled: false,
+  discordPriceAlertMentions: [],
   pinnedMarketSites: DEFAULT_PINNED_PROVIDERS.slice(0, 3),
   marketListingsFetchLimit: DEFAULT_FETCH_LIMIT,
   schedulerEnabled: true,
@@ -75,6 +92,9 @@ async function readSettings(): Promise<Settings> {
     return {
       ...DEFAULT_SETTINGS,
       ...parsed,
+      discordPriceAlertMentions: normalizeAlertMentions(
+        parsed.discordPriceAlertMentions
+      ),
       pinnedMarketSites: normalizePinnedSites(parsed.pinnedMarketSites),
       marketListingsFetchLimit: normalizeFetchLimit(
         parsed.marketListingsFetchLimit
@@ -171,6 +191,10 @@ export async function POST(request: NextRequest) {
     const updatedSettings: Settings = {
       ...currentSettings,
       ...newSettings,
+      discordPriceAlertMentions: normalizeAlertMentions(
+        newSettings.discordPriceAlertMentions ??
+          currentSettings.discordPriceAlertMentions
+      ),
       pinnedMarketSites: normalizePinnedSites(
         newSettings.pinnedMarketSites ?? currentSettings.pinnedMarketSites
       ),
@@ -193,3 +217,4 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+

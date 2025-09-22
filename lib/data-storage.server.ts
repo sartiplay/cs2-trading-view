@@ -4,6 +4,7 @@ import { convertCurrency } from "./currency-converter.server";
 import {
   sendPriceSpikeNotification,
   type PriceSpikeNotificationPayload,
+  sendPriceAlertNotification,
 } from "./discord-webhook.server";
 
 interface PriceEntry {
@@ -22,6 +23,16 @@ export interface CustomizationWithHistory extends Customization {
   price_history: PriceEntry[];
 }
 
+export interface PriceAlertConfig {
+  lowerThreshold?: number | null;
+  upperThreshold?: number | null;
+  lowerTriggered?: boolean;
+  upperTriggered?: boolean;
+  lastTriggeredLower?: string | null;
+  lastTriggeredUpper?: string | null;
+  updatedAt?: string;
+}
+
 export interface Item {
   market_hash_name: string;
   label: string;
@@ -35,6 +46,7 @@ export interface Item {
   charms?: CustomizationWithHistory[]; // Max 1 for weapons
   patches?: CustomizationWithHistory[]; // For character skins
   include_customizations_in_price?: boolean; // Whether to include customization costs in selling price
+  price_alert_config?: PriceAlertConfig;
 }
 
 export interface ItemWithHistory extends Item {
@@ -104,6 +116,15 @@ const DATA_FILE = path.join(process.cwd(), "data.json");
 const PRICE_SPIKE_PERCENT_THRESHOLD = 15; // percent change
 const PRICE_SPIKE_MIN_ABSOLUTE = 1; // USD difference
 const PRICE_SPIKE_TIME_WINDOW_MS = 30 * 60 * 1000; // 30 minutes
+
+interface PriceAlertTrigger {
+  marketHashName: string;
+  label: string;
+  steamUrl?: string;
+  direction: "lower" | "upper";
+  threshold: number;
+  price: number;
+}
 
 async function readDataFile(): Promise<DataStore> {
   try {
@@ -187,6 +208,7 @@ export async function addOrUpdateItem(item: Item): Promise<void> {
     if (!data.items[item.market_hash_name]) {
       const itemWithHistory: ItemWithHistory = {
         ...item,
+        price_alert_config: item.price_alert_config,
         price_history: [],
         stickers: item.stickers?.map((sticker) => ({
           ...sticker,
@@ -212,6 +234,8 @@ export async function addOrUpdateItem(item: Item): Promise<void> {
     existingItem.purchase_currency = item.purchase_currency;
     existingItem.include_customizations_in_price =
       item.include_customizations_in_price;
+    existingItem.price_alert_config =
+      item.price_alert_config ?? existingItem.price_alert_config;
 
     existingItem.stickers = item.stickers?.map((sticker, index) => ({
       ...sticker,
@@ -234,6 +258,50 @@ export async function addOrUpdateItem(item: Item): Promise<void> {
   });
 }
 
+export async function updatePriceAlertConfig(
+  marketHashName: string,
+  config: PriceAlertConfig
+): Promise<PriceAlertConfig> {
+  return updateData((data) => {
+    const item = data.items[marketHashName];
+    if (!item) {
+      throw new Error("Item not found");
+    }
+
+    const existing = item.price_alert_config ?? {};
+    const nextConfig: PriceAlertConfig = {
+      ...existing,
+    };
+
+    if (config.lowerThreshold !== undefined) {
+      nextConfig.lowerThreshold =
+        config.lowerThreshold !== null ? Number(config.lowerThreshold) : null;
+      nextConfig.lowerTriggered = false;
+      nextConfig.lastTriggeredLower = null;
+    } else if (nextConfig.lowerThreshold === undefined) {
+      nextConfig.lowerThreshold = null;
+      nextConfig.lowerTriggered = false;
+      nextConfig.lastTriggeredLower = null;
+    }
+
+    if (config.upperThreshold !== undefined) {
+      nextConfig.upperThreshold =
+        config.upperThreshold !== null ? Number(config.upperThreshold) : null;
+      nextConfig.upperTriggered = false;
+      nextConfig.lastTriggeredUpper = null;
+    } else if (nextConfig.upperThreshold === undefined) {
+      nextConfig.upperThreshold = null;
+      nextConfig.upperTriggered = false;
+      nextConfig.lastTriggeredUpper = null;
+    }
+
+    nextConfig.updatedAt = new Date().toISOString();
+
+    item.price_alert_config = nextConfig;
+
+    return nextConfig;
+  });
+}
 export async function removeItem(marketHashName: string): Promise<void> {
   await updateData((data) => {
     delete data.items[marketHashName];
@@ -245,6 +313,7 @@ export async function addPriceEntry(
   price: number
 ): Promise<void> {
   let spikeNotification: PriceSpikeNotificationPayload | null = null;
+  const alertNotifications: PriceAlertTrigger[] = [];
 
   await updateData((data) => {
     const item = data.items[marketHashName];
@@ -304,6 +373,7 @@ export async function addPriceEntry(
       }
     }
 
+
     history.push({
       date: nowIso,
       median_price: price,
@@ -312,6 +382,57 @@ export async function addPriceEntry(
     history.sort(
       (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
     );
+
+    const config = item.price_alert_config ?? (item.price_alert_config = {});
+    const lowerThreshold =
+      config.lowerThreshold !== undefined ? config.lowerThreshold : null;
+    if (typeof lowerThreshold === "number" && Number.isFinite(lowerThreshold)) {
+      if (price <= lowerThreshold) {
+        if (!config.lowerTriggered) {
+          config.lowerTriggered = true;
+          config.lastTriggeredLower = nowIso;
+          alertNotifications.push({
+            marketHashName,
+            label: item.label,
+            steamUrl: item.steam_url,
+            direction: "lower",
+            threshold: lowerThreshold,
+            price,
+          });
+        }
+      } else if (config.lowerTriggered) {
+        config.lowerTriggered = false;
+      }
+    } else {
+      config.lowerTriggered = false;
+      config.lastTriggeredLower = null;
+    }
+
+    const upperThreshold =
+      config.upperThreshold !== undefined ? config.upperThreshold : null;
+    if (typeof upperThreshold === "number" && Number.isFinite(upperThreshold)) {
+      if (price >= upperThreshold) {
+        if (!config.upperTriggered) {
+          config.upperTriggered = true;
+          config.lastTriggeredUpper = nowIso;
+          alertNotifications.push({
+            marketHashName,
+            label: item.label,
+            steamUrl: item.steam_url,
+            direction: "upper",
+            threshold: upperThreshold,
+            price,
+          });
+        }
+      } else if (config.upperTriggered) {
+        config.upperTriggered = false;
+      }
+    } else {
+      config.upperTriggered = false;
+      config.lastTriggeredUpper = null;
+    }
+
+    config.updatedAt = nowIso;
 
     data.metadata.last_capture = nowIso;
     data.metadata.total_captures += 1;
@@ -331,6 +452,26 @@ export async function addPriceEntry(
         `[Data Storage] Failed to send price spike notification for ${marketHashName}:`,
         error
       );
+    }
+  }
+
+  if (alertNotifications.length > 0) {
+    for (const alert of alertNotifications) {
+      try {
+        await sendPriceAlertNotification({
+          marketHashName: alert.marketHashName,
+          label: alert.label,
+          steamUrl: alert.steamUrl,
+          direction: alert.direction,
+          threshold: alert.threshold,
+          price: alert.price,
+        });
+      } catch (error) {
+        console.error(
+          `[Data Storage] Failed to send price alert for ${alert.marketHashName}:`,
+          error
+        );
+      }
     }
   }
 }
