@@ -6,6 +6,12 @@
   "discordWebhookUrl": "",
   "discordDevelopmentMode": true,
   "discordPriceSpikeEnabled": false,
+  "pinnedMarketSites": [
+    "CS.MONEY",
+    "SkinsMonkey",
+    "CSFloat"
+  ],
+  "marketListingsFetchLimit": 5,
   "schedulerEnabled": true,
   "schedulerRunning": true
 }

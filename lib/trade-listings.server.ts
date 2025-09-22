@@ -7,20 +7,10 @@ interface TradeListing {
   url?: string;
 }
 
-interface ProviderConfig {
-  name: string;
-  baseUrl: string;
-  color: string;
-}
-
-const PROVIDERS: ProviderConfig[] = [
-  { name: "CS.MONEY", baseUrl: "https://cs.money/csgo", color: "bg-blue-500" },
-  { name: "SkinsMonkey", baseUrl: "https://skinsmonkey.com", color: "bg-purple-500" },
-  { name: "CSFloat", baseUrl: "https://csfloat.com", color: "bg-green-500" },
-  { name: "Skinport", baseUrl: "https://skinport.com", color: "bg-amber-500" },
-  { name: "Skinbid", baseUrl: "https://skinbid.com", color: "bg-rose-500" },
-  { name: "TradeIt", baseUrl: "https://tradeit.gg", color: "bg-sky-500" },
-];
+import {
+  TRADE_PROVIDERS,
+  type TradeProviderMeta,
+} from "./trade-providers";
 
 const WEAR_TIERS = [
   "Factory New",
@@ -36,15 +26,16 @@ const WEAR_TIERS = [
 // provider integrations as credentials/endpoints become available.
 
 function generateMockListings(
-  provider: ProviderConfig,
-  marketHashName: string
+  provider: TradeProviderMeta,
+  marketHashName: string,
+  limit: number
 ): TradeListing[] {
   const seed = Array.from(marketHashName).reduce(
     (acc, char) => acc + char.charCodeAt(0),
     provider.name.length
   );
 
-  return Array.from({ length: 5 }).map((_, index) => {
+  return Array.from({ length: limit }).map((_, index) => {
     const wearIndex = (seed + index) % WEAR_TIERS.length;
     const basePrice = 50 + ((seed % 30) + index * 3);
     const variance = ((seed * (index + 1)) % 100) / 100;
@@ -63,10 +54,11 @@ function generateMockListings(
 export type { TradeListing };
 
 export async function fetchTradeListings(
-  marketHashName: string
+  marketHashName: string,
+  limit = 5
 ): Promise<TradeListing[]> {
   // Swap the mock aggregation below with real API calls.
-  return PROVIDERS.flatMap((provider) =>
-    generateMockListings(provider, marketHashName)
+  return TRADE_PROVIDERS.flatMap((provider) =>
+    generateMockListings(provider, marketHashName, limit)
   );
 }

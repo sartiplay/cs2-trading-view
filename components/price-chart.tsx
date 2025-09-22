@@ -581,8 +581,7 @@ export function PriceChart({ data }: PriceChartProps) {
     <div className="space-y-2">
       <div className="flex justify-between items-center text-sm text-muted-foreground">
         <span>
-          Default view: {timeSpanLabel} ({settings.timelineResolution}{" "}
-          resolution) • Scroll left for history
+          Default view: {timeSpanLabel} ({settings.timelineResolution} resolution) • {rawData.length} points in view • Scroll left for history
         </span>
         <span>
           Showing {visibleData.length} of {trimmedData.length} data points

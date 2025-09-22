@@ -23,6 +23,8 @@ export async function getSettings() {
     discordWebhookUrl: "",
     discordDevelopmentMode: false,
     discordPriceSpikeEnabled: false,
+    pinnedMarketSites: ["CS.MONEY", "SkinsMonkey", "CSFloat"],
+    marketListingsFetchLimit: 5,
     schedulerEnabled: true,
     schedulerRunning: false,
   };

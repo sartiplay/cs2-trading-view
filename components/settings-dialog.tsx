@@ -21,6 +21,7 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Settings, Save } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { DEFAULT_PINNED_PROVIDERS } from "@/lib/trade-providers";
 
 export interface AppSettings {
   timelineResolution:
@@ -38,6 +39,8 @@ export interface AppSettings {
   discordWebhookUrl: string;
   discordDevelopmentMode: boolean;
   discordPriceSpikeEnabled: boolean;
+  pinnedMarketSites: string[];
+  marketListingsFetchLimit: number;
   schedulerEnabled: boolean;
   schedulerRunning: boolean;
 }
@@ -50,6 +53,8 @@ const defaultSettings: AppSettings = {
   discordWebhookUrl: "",
   discordDevelopmentMode: false,
   discordPriceSpikeEnabled: false,
+  pinnedMarketSites: DEFAULT_PINNED_PROVIDERS,
+  marketListingsFetchLimit: 5,
   schedulerEnabled: false,
   schedulerRunning: false,
 };

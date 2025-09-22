@@ -1,7 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { JSX, useEffect, useState } from "react";
+
 import { Button } from "@/components/ui/button";
+
 import {
   Table,
   TableBody,
@@ -10,84 +12,186 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+
 import { Trash2, Eye, ExternalLink, Edit } from "lucide-react";
+
 import { useToast } from "@/hooks/use-toast";
+
 import Link from "next/link";
 
 import { EditItemDialog } from "@/components/edit-item-dialog";
+
 import { DeleteItemDialog } from "@/components/delete-file-dialog";
+
+type Customization = {
+  name: string;
+
+  steam_url: string;
+
+  price: number;
+
+  currency: string;
+};
 
 interface Item {
   market_hash_name: string;
+
   label: string;
+
   description?: string;
+
   appid: number;
+
   steam_url?: string;
+
   purchase_price: number;
+
   purchase_price_usd: number;
+
   purchase_currency: string;
+
   quantity: number;
+
   latest_price?: number;
+
   last_updated?: string;
+
   profit_loss?: number | null;
+
   profit_loss_percentage?: number | null;
-  stickers?: Array<{
-    name: string;
-    steam_url: string;
-    price: number;
-    currency: string;
-  }>;
-  charms?: Array<{
-    name: string;
-    steam_url: string;
-    price: number;
-    currency: string;
-  }>;
-  patches?: Array<{
-    name: string;
-    steam_url: string;
-    price: number;
-    currency: string;
-  }>;
+
+  stickers?: Customization[];
+
+  charms?: Customization[];
+
+  patches?: Customization[];
 }
 
 const CURRENCY_SYMBOLS: Record<string, string> = {
   USD: "$",
-  EUR: "€",
-  GBP: "£",
-  JPY: "¥",
+
+  EUR: "?",
+
+  GBP: "?",
+
+  JPY: "?",
+
   CAD: "C$",
+
   AUD: "A$",
+
   CHF: "CHF",
-  CNY: "¥",
+
+  CNY: "?",
+
   SEK: "kr",
+
   NOK: "kr",
+
   DKK: "kr",
-  PLN: "zł",
-  CZK: "Kč",
+
+  PLN: "z?",
+
+  CZK: "K?",
+
   HUF: "Ft",
-  RUB: "₽",
+
+  RUB: "?",
+
   BRL: "R$",
+
   MXN: "$",
-  INR: "₹",
-  KRW: "₩",
+
+  INR: "?",
+
+  KRW: "?",
+
   SGD: "S$",
+};
+
+const MAX_CUSTOMIZATION_PREVIEW = 2;
+
+const formatCustomizationPreview = (
+  customizations: Customization[] | undefined,
+
+  maxVisible = MAX_CUSTOMIZATION_PREVIEW
+): { preview: string; tooltip: string } | null => {
+  if (!customizations || customizations.length === 0) {
+    return null;
+  }
+
+  const names = customizations
+
+    .map((customization) => customization.name?.trim())
+
+    .filter((name): name is string => Boolean(name));
+
+  if (names.length === 0) {
+    return null;
+  }
+
+  const previewNames = names.slice(0, maxVisible);
+
+  const preview =
+    names.length > maxVisible
+      ? `${previewNames.join(" | ")} | ...`
+      : previewNames.join(" | ");
+
+  return {
+    preview,
+
+    tooltip: names.join(" | "),
+  };
+};
+
+const renderCustomizationRow = (
+  customizations: Customization[] | undefined,
+
+  label: string,
+
+  labelColorClass: string
+): JSX.Element | null => {
+  const previewData = formatCustomizationPreview(customizations);
+
+  if (!previewData) {
+    return null;
+  }
+
+  return (
+    <div className="text-xs text-muted-foreground">
+      <span className={`font-medium ${labelColorClass}`}>{label}:</span>{" "}
+      <span
+        className="inline-block max-w-[260px] whitespace-nowrap overflow-hidden text-ellipsis"
+        title={previewData.tooltip}
+      >
+        {previewData.preview}
+      </span>
+    </div>
+  );
 };
 
 export function ItemsTable() {
   const [items, setItems] = useState<Item[]>([]);
+
   const [isLoading, setIsLoading] = useState(true);
+
   const [editingItem, setEditingItem] = useState<Item | null>(null);
+
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+
   const [deletingItem, setDeletingItem] = useState<Item | null>(null);
+
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
   const { toast } = useToast();
 
   const fetchItems = async () => {
     try {
       const response = await fetch("/api/items");
+
       if (response.ok) {
         const data = await response.json();
+
         setItems(data);
       }
     } catch (error) {
@@ -99,30 +203,45 @@ export function ItemsTable() {
 
   const handleDeleteItem = (item: Item) => {
     setDeletingItem(item);
+
     setDeleteDialogOpen(true);
   };
 
   const handleItemDeleted = () => {
     fetchItems(); // Refresh the items list
+
     window.dispatchEvent(new Event("refreshItems"));
   };
 
   const handleEditItem = (item: Item) => {
     if (!item) return;
+
     setEditingItem({
       market_hash_name: item.market_hash_name,
+
       label: item.label,
+
       description: item.description,
+
       appid: item.appid,
+
       steam_url: item.steam_url,
+
       purchase_price: item.purchase_price,
+
       purchase_price_usd: item.purchase_price_usd,
+
       purchase_currency: item.purchase_currency,
+
       quantity: item.quantity,
+
       stickers: item.stickers,
+
       charms: item.charms,
+
       patches: item.patches,
     });
+
     setEditDialogOpen(true);
   };
 
@@ -160,88 +279,73 @@ export function ItemsTable() {
             <TableHeader className="sticky top-0 bg-background z-10">
               <TableRow>
                 <TableHead>Item</TableHead>
+
                 <TableHead>Quantity</TableHead>
+
                 <TableHead>Purchase Price</TableHead>
+
                 <TableHead>Current Price</TableHead>
+
                 <TableHead>Total Value</TableHead>
+
                 <TableHead>Profit/Loss</TableHead>
+
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
+
             <TableBody>
               {items.map((item) => {
                 const currencySymbol =
                   CURRENCY_SYMBOLS[item.purchase_currency] ||
                   item.purchase_currency;
+
                 return (
                   <TableRow key={item.market_hash_name}>
                     <TableCell>
                       <div>
                         <div className="font-medium">{item.label}</div>
+
                         <div className="text-sm text-muted-foreground">
                           {item.market_hash_name}
                         </div>
+
                         {item.description && (
                           <div className="text-xs text-muted-foreground italic mt-1">
                             {item.description}
                           </div>
                         )}
+
                         {(item.stickers?.length !== 0 ||
                           item.charms?.length !== 0 ||
                           item.patches?.length !== 0) && (
                           <div className="mt-2 space-y-1">
-                            {item.stickers && item.stickers.length > 0 && (
-                              <div className="text-xs">
-                                <span className="font-medium text-blue-400">
-                                  Stickers:
-                                </span>{" "}
-                                {item.stickers.map((sticker, idx) => (
-                                  <span
-                                    key={idx}
-                                    className="text-muted-foreground"
-                                  >
-                                    {sticker.name}
-                                    {idx < item.stickers!.length - 1
-                                      ? ", "
-                                      : ""}
-                                  </span>
-                                ))}
-                              </div>
+                            {renderCustomizationRow(
+                              item.stickers,
+
+                              "Stickers",
+
+                              "text-blue-400"
                             )}
-                            {item.charms && item.charms.length > 0 && (
-                              <div className="text-xs">
-                                <span className="font-medium text-green-400">
-                                  Charms:
-                                </span>{" "}
-                                {item.charms.map((charm, idx) => (
-                                  <span
-                                    key={idx}
-                                    className="text-muted-foreground"
-                                  >
-                                    {charm.name}
-                                    {idx < item.charms!.length - 1 ? ", " : ""}
-                                  </span>
-                                ))}
-                              </div>
+
+                            {renderCustomizationRow(
+                              item.charms,
+
+                              "Charms",
+
+                              "text-green-400"
                             )}
-                            {item.patches && item.patches.length > 0 && (
-                              <div className="text-xs">
-                                <span className="font-medium text-purple-400">
-                                  Patches:
-                                </span>{" "}
-                                {item.patches.map((patch, idx) => (
-                                  <span
-                                    key={idx}
-                                    className="text-muted-foreground"
-                                  >
-                                    {patch.name}
-                                    {idx < item.patches!.length - 1 ? ", " : ""}
-                                  </span>
-                                ))}
-                              </div>
+
+                            {renderCustomizationRow(
+                              item.patches,
+
+                              "Patches",
+
+                              "text-purple-400"
                             )}
                           </div>
                         )}
+
                         {item.steam_url && (
                           <div className="mt-1">
                             <a
@@ -257,30 +361,37 @@ export function ItemsTable() {
                         )}
                       </div>
                     </TableCell>
+
                     <TableCell>
                       <div className="font-medium">{item.quantity}x</div>
                     </TableCell>
+
                     <TableCell>
                       <div className="font-medium">
                         {currencySymbol}
+
                         {item.purchase_price.toFixed(2)}
                       </div>
+
                       {item.purchase_currency !== "USD" && (
                         <div className="text-sm text-muted-foreground">
                           ≈ ${item.purchase_price_usd.toFixed(2)} USD
                         </div>
                       )}
+
                       <div className="text-sm text-muted-foreground">
                         Total: $
                         {(item.purchase_price_usd * item.quantity).toFixed(2)}
                       </div>
                     </TableCell>
+
                     <TableCell>
                       {item.latest_price ? (
                         <div>
                           <div className="font-medium">
                             ${item.latest_price.toFixed(2)}
                           </div>
+
                           {item.last_updated && (
                             <div className="text-sm text-muted-foreground">
                               {new Date(item.last_updated).toLocaleDateString()}
@@ -291,6 +402,7 @@ export function ItemsTable() {
                         <span className="text-muted-foreground">No data</span>
                       )}
                     </TableCell>
+
                     <TableCell>
                       {item.latest_price ? (
                         <div className="font-medium">
@@ -300,6 +412,7 @@ export function ItemsTable() {
                         <span className="text-muted-foreground">No data</span>
                       )}
                     </TableCell>
+
                     <TableCell>
                       {item.profit_loss !== null &&
                       item.profit_loss !== undefined ? (
@@ -314,6 +427,7 @@ export function ItemsTable() {
                             {item.profit_loss >= 0 ? "+" : ""}$
                             {item.profit_loss.toFixed(2)}
                           </div>
+
                           {item.profit_loss_percentage !== null && (
                             <div
                               className={`text-sm ${
@@ -333,6 +447,7 @@ export function ItemsTable() {
                         <span className="text-muted-foreground">No data</span>
                       )}
                     </TableCell>
+
                     <TableCell>
                       <div className="flex gap-2">
                         <Button variant="outline" size="sm" asChild>
@@ -344,6 +459,7 @@ export function ItemsTable() {
                             <Eye className="h-4 w-4" />
                           </Link>
                         </Button>
+
                         <Button
                           variant="outline"
                           size="sm"
@@ -351,6 +467,7 @@ export function ItemsTable() {
                         >
                           <Edit className="h-4 w-4" />
                         </Button>
+
                         <Button
                           variant="outline"
                           size="sm"
@@ -367,12 +484,14 @@ export function ItemsTable() {
           </Table>
         </div>
       </div>
+
       <EditItemDialog
         item={editingItem}
         open={editDialogOpen}
         onOpenChange={setEditDialogOpen}
         onItemUpdated={handleItemDeleted}
       />
+
       <DeleteItemDialog
         item={deletingItem}
         open={deleteDialogOpen}

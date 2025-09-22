@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -31,20 +31,32 @@ import {
   Save,
   Send,
   X,
+  SlidersHorizontal,
 } from "lucide-react";
 import Link from "next/link";
 import { PriceChart } from "@/components/price-chart";
-import { SettingsDialog, useSettings } from "@/components/settings-dialog";
+import {
+  SettingsDialog,
+  useSettings,
+  type AppSettings,
+} from "@/components/settings-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  DEFAULT_PINNED_PROVIDERS,
+  TRADE_PROVIDERS,
+  type TradeProviderMeta,
+} from "@/lib/trade-providers";
 
 const CURRENCIES = [
   { code: "USD", name: "US Dollar", symbol: "$" },
@@ -134,13 +146,17 @@ const CONDITION_COLORS: Record<string, string> = {
 };
 
 const getConditionBadgeClass = (condition: string): string => {
-  return (
-    CONDITION_COLORS[condition] ?? "bg-muted text-muted-foreground"
-  );
+  return CONDITION_COLORS[condition] ?? "bg-muted text-muted-foreground";
 };
 
 export function ItemDetail({ hash }: ItemDetailProps) {
   const settings = useSettings();
+  const [effectiveSettings, setEffectiveSettings] = useState(settings);
+
+  useEffect(() => {
+    setEffectiveSettings(settings);
+  }, [settings]);
+
   const [item, setItem] = useState<ItemData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isCapturing, setIsCapturing] = useState(false);
@@ -165,7 +181,300 @@ export function ItemDetail({ hash }: ItemDetailProps) {
   const [listingsLoaded, setListingsLoaded] = useState(false);
   const { toast } = useToast();
 
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const handleSettingsUpdate = (event: Event) => {
+      const detail = (event as CustomEvent<Partial<AppSettings>>).detail;
+      if (detail) {
+        setEffectiveSettings((current) => ({ ...current, ...detail }));
+      }
+    };
+
+    window.addEventListener(
+      "app-settings-updated",
+      handleSettingsUpdate as EventListener
+    );
+
+    return () => {
+      window.removeEventListener(
+        "app-settings-updated",
+        handleSettingsUpdate as EventListener
+      );
+    };
+  }, []);
+  const [marketSettingsOpen, setMarketSettingsOpen] = useState(false);
+  const [pinnedDraft, setPinnedDraft] = useState<string[]>(
+    DEFAULT_PINNED_PROVIDERS
+  );
+  const [fetchLimitDraft, setFetchLimitDraft] = useState<string>("5");
+  const [providerStatuses, setProviderStatuses] = useState<
+    Array<{
+      providerId: string;
+      providerName: string;
+      hasKey: boolean;
+    }>
+  >([]);
+  const [providerStatusLoading, setProviderStatusLoading] = useState(false);
+  const [selectedProviderId, setSelectedProviderId] = useState<string>(
+    TRADE_PROVIDERS[0].id
+  );
+  const [apiKeyValue, setApiKeyValue] = useState("");
+  const [apiKeySaving, setApiKeySaving] = useState(false);
+  const [marketSettingsSaving, setMarketSettingsSaving] = useState(false);
   const priceHistory = item?.price_history ?? EMPTY_PRICE_HISTORY;
+
+  const providerStatusMap = useMemo(() => {
+    const map = new Map<string, boolean>();
+    providerStatuses.forEach((status) => {
+      map.set(status.providerId, status.hasKey);
+    });
+    return map;
+  }, [providerStatuses]);
+
+  const loadProviderStatuses = useCallback(async () => {
+    setProviderStatusLoading(true);
+    try {
+      const response = await fetch("/api/provider-keys");
+      if (!response.ok) {
+        throw new Error("Failed to load provider keys");
+      }
+      const data: {
+        providers?: Array<{
+          providerId: string;
+          providerName: string;
+          hasKey: boolean;
+        }>;
+      } = await response.json();
+      setProviderStatuses(data.providers ?? []);
+    } catch (error) {
+      console.error("Failed to load provider key status:", error);
+      toast({
+        title: "API key status unavailable",
+        description:
+          "We could not load provider credentials. Try again shortly.",
+        variant: "destructive",
+      });
+    } finally {
+      setProviderStatusLoading(false);
+    }
+  }, [toast]);
+
+  const selectedProviderMeta = useMemo(() => {
+    return (
+      TRADE_PROVIDERS.find((provider) => provider.id === selectedProviderId) ??
+      TRADE_PROVIDERS[0]
+    );
+  }, [selectedProviderId]);
+
+  const selectedProviderHasKey =
+    providerStatusMap.get(selectedProviderId) ?? false;
+
+  const handleTogglePinned = useCallback(
+    (providerName: string, shouldSelect: boolean) => {
+      setPinnedDraft((current) => {
+        const normalized = TRADE_PROVIDERS.map(
+          (provider) => provider.name
+        ).filter((name) => current.includes(name));
+        if (shouldSelect) {
+          if (normalized.includes(providerName)) {
+            return normalized;
+          }
+          if (normalized.length >= 3) {
+            toast({
+              title: "Limit reached",
+              description: "You can pin up to three providers.",
+              variant: "destructive",
+            });
+            return normalized;
+          }
+          const updated = [...normalized, providerName];
+          return TRADE_PROVIDERS.map((provider) => provider.name)
+            .filter((name) => updated.includes(name))
+            .slice(0, 3);
+        }
+        const filtered = normalized.filter((name) => name !== providerName);
+        return TRADE_PROVIDERS.map((provider) => provider.name)
+          .filter((name) => filtered.includes(name))
+          .slice(0, 3);
+      });
+    },
+    [toast]
+  );
+
+  const handleSaveMarketSettings = useCallback(async () => {
+    const normalizedPinned = TRADE_PROVIDERS.map((provider) => provider.name)
+      .filter((name) => pinnedDraft.includes(name))
+      .slice(0, 3);
+
+    if (normalizedPinned.length === 0) {
+      toast({
+        title: "Select providers",
+        description: "Choose at least one marketplace to pin.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const parsedLimit = Number.parseInt(fetchLimitDraft, 10);
+    if (!Number.isFinite(parsedLimit) || parsedLimit < 1 || parsedLimit > 25) {
+      toast({
+        title: "Invalid fetch limit",
+        description: "Enter a number between 1 and 25.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setMarketSettingsSaving(true);
+    try {
+      const response = await fetch("/api/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          pinnedMarketSites: normalizedPinned,
+          marketListingsFetchLimit: parsedLimit,
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json().catch(() => null);
+        throw new Error(error?.error ?? "Failed to save settings");
+      }
+
+      const nextSettings = {
+        ...settings,
+        pinnedMarketSites: normalizedPinned,
+        marketListingsFetchLimit: parsedLimit,
+      };
+
+      toast({
+        title: "Settings saved",
+        description: "Market snapshot configuration updated.",
+      });
+
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(
+          new CustomEvent("app-settings-updated", { detail: nextSettings })
+        );
+      }
+
+      setMarketSettingsOpen(false);
+    } catch (error) {
+      console.error("Failed to save market settings:", error);
+      toast({
+        title: "Unable to save",
+        description:
+          error instanceof Error ? error.message : "Please try again later.",
+        variant: "destructive",
+      });
+    } finally {
+      setMarketSettingsSaving(false);
+    }
+  }, [fetchLimitDraft, pinnedDraft, settings, toast]);
+
+  const submitApiKey = useCallback(
+    async (value: string, successMessage: string) => {
+      setApiKeySaving(true);
+      try {
+        const response = await fetch("/api/provider-keys", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            providerId: selectedProviderId,
+            apiKey: value,
+          }),
+        });
+
+        if (!response.ok) {
+          const error = await response.json().catch(() => null);
+          throw new Error(error?.error ?? "Failed to update API key");
+        }
+
+        toast({
+          title: "API key updated",
+          description: successMessage,
+        });
+
+        setApiKeyValue("");
+        await loadProviderStatuses();
+      } catch (error) {
+        console.error("Failed to update provider key:", error);
+        toast({
+          title: "Unable to update API key",
+          description:
+            error instanceof Error ? error.message : "Please try again later.",
+          variant: "destructive",
+        });
+      } finally {
+        setApiKeySaving(false);
+      }
+    },
+    [loadProviderStatuses, selectedProviderId, toast]
+  );
+
+  const handleSaveApiKey = useCallback(async () => {
+    const trimmed = apiKeyValue.trim();
+    if (!trimmed) {
+      toast({
+        title: "Missing API key",
+        description: "Add a value or use remove to clear the stored key.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    await submitApiKey(
+      trimmed,
+      `Stored API key for ${selectedProviderMeta.name}.`
+    );
+  }, [apiKeyValue, submitApiKey, selectedProviderMeta, toast]);
+
+  const handleRemoveApiKey = useCallback(async () => {
+    if (!selectedProviderHasKey) {
+      return;
+    }
+    await submitApiKey("", `Removed API key for ${selectedProviderMeta.name}.`);
+  }, [selectedProviderHasKey, selectedProviderMeta, submitApiKey]);
+
+  useEffect(() => {
+    if (!marketSettingsOpen) {
+      return;
+    }
+
+    const pinnedFromSettings = TRADE_PROVIDERS.map(
+      (provider) => provider.name
+    ).filter((name) =>
+      (
+        effectiveSettings.pinnedMarketSites ?? DEFAULT_PINNED_PROVIDERS
+      ).includes(name)
+    );
+
+    const fallback = DEFAULT_PINNED_PROVIDERS.filter(
+      (name) => !pinnedFromSettings.includes(name)
+    );
+
+    setPinnedDraft([...pinnedFromSettings, ...fallback].slice(0, 3));
+
+    setFetchLimitDraft(
+      String(
+        Math.min(
+          25,
+          Math.max(1, effectiveSettings.marketListingsFetchLimit ?? 5)
+        )
+      )
+    );
+
+    setApiKeyValue("");
+    void loadProviderStatuses();
+  }, [
+    loadProviderStatuses,
+    marketSettingsOpen,
+    effectiveSettings.marketListingsFetchLimit,
+    effectiveSettings.pinnedMarketSites,
+  ]);
 
   const priceStats = useMemo<PriceStats>(() => {
     if (priceHistory.length === 0) {
@@ -241,6 +550,24 @@ export function ItemDetail({ hash }: ItemDetailProps) {
     totalDataPoints,
   } = priceStats;
 
+  const marketFetchLimit = effectiveSettings.marketListingsFetchLimit ?? 5;
+
+  const providerMetaMap = useMemo(() => {
+    const map = new Map<string, TradeProviderMeta>();
+    TRADE_PROVIDERS.forEach((provider) => map.set(provider.name, provider));
+    return map;
+  }, []);
+
+  const pinnedProviders = useMemo(() => {
+    const requested = (effectiveSettings.pinnedMarketSites ?? []).filter(
+      (name) => providerMetaMap.has(name)
+    );
+    const fallback = DEFAULT_PINNED_PROVIDERS.filter(
+      (name) => providerMetaMap.has(name) && !requested.includes(name)
+    );
+    return [...requested, ...fallback].slice(0, 3);
+  }, [effectiveSettings.pinnedMarketSites, providerMetaMap]);
+
   const groupedListings = useMemo(() => {
     const map = new Map<string, TradeListing[]>();
     marketListings.forEach((listing) => {
@@ -248,11 +575,43 @@ export function ItemDetail({ hash }: ItemDetailProps) {
       bucket.push(listing);
       map.set(listing.site, bucket);
     });
-    return Array.from(map.entries()).map(([site, listings]) => ({
-      site,
-      listings,
-    }));
-  }, [marketListings]);
+
+    const ordered: Array<{ site: string; listings: TradeListing[] }> =
+      TRADE_PROVIDERS.map((provider) => ({
+        site: provider.name,
+        listings: map.get(provider.name) ?? [],
+      }));
+
+    map.forEach((listings, site) => {
+      if (!providerMetaMap.has(site)) {
+        ordered.push({ site, listings });
+      }
+    });
+
+    const pinnedOrder = new Map<string, number>(
+      pinnedProviders.map((name, index) => [name, index])
+    );
+    const pinnedSet = new Set(pinnedProviders);
+
+    return ordered.sort((a, b) => {
+      const aPinned = pinnedSet.has(a.site);
+      const bPinned = pinnedSet.has(b.site);
+      if (aPinned && bPinned) {
+        return (pinnedOrder.get(a.site) ?? 0) - (pinnedOrder.get(b.site) ?? 0);
+      }
+      if (aPinned) return -1;
+      if (bPinned) return 1;
+      return a.site.localeCompare(b.site);
+    });
+  }, [marketListings, pinnedProviders, providerMetaMap]);
+
+  const listingRows = useMemo(() => {
+    const rows: Array<Array<{ site: string; listings: TradeListing[] }>> = [];
+    for (let i = 0; i < groupedListings.length; i += 3) {
+      rows.push(groupedListings.slice(i, i + 3));
+    }
+    return rows;
+  }, [groupedListings]);
 
   function extractHashFromSteamUrl(url: string): string | null {
     try {
@@ -379,7 +738,10 @@ export function ItemDetail({ hash }: ItemDetailProps) {
   };
 
   useEffect(() => {
-    if (!settings.discordWebhookEnabled || !settings.discordDevelopmentMode) {
+    if (
+      !effectiveSettings.discordWebhookEnabled ||
+      !effectiveSettings.discordDevelopmentMode
+    ) {
       setAvailableItems([]);
       return;
     }
@@ -422,7 +784,10 @@ export function ItemDetail({ hash }: ItemDetailProps) {
     return () => {
       isMounted = false;
     };
-  }, [settings.discordWebhookEnabled, settings.discordDevelopmentMode]);
+  }, [
+    effectiveSettings.discordWebhookEnabled,
+    effectiveSettings.discordDevelopmentMode,
+  ]);
 
   useEffect(() => {
     if (!item) {
@@ -465,7 +830,10 @@ export function ItemDetail({ hash }: ItemDetailProps) {
   }, [item]);
 
   const sendDevelopmentWebhook = async () => {
-    if (!settings.discordWebhookEnabled || !settings.discordDevelopmentMode) {
+    if (
+      !effectiveSettings.discordWebhookEnabled ||
+      !effectiveSettings.discordDevelopmentMode
+    ) {
       toast({
         title: "Development mode disabled",
         description: "Enable Discord development mode in settings first.",
@@ -582,14 +950,16 @@ export function ItemDetail({ hash }: ItemDetailProps) {
       return;
     }
 
+    const previouslyLoaded = listingsLoaded;
     setListingsError(null);
+    setListingsLoaded(false);
     setListingsLoading(true);
 
     try {
       const response = await fetch(
         `/api/item-listings?market_hash_name=${encodeURIComponent(
           item.market_hash_name
-        )}`
+        )}&limit=${marketFetchLimit}`
       );
       if (!response.ok) {
         const error = await response.json().catch(() => null);
@@ -604,6 +974,7 @@ export function ItemDetail({ hash }: ItemDetailProps) {
       setListingsError(
         error instanceof Error ? error.message : "Unexpected error occurred"
       );
+      setListingsLoaded(previouslyLoaded);
     } finally {
       setListingsLoading(false);
     }
@@ -735,7 +1106,8 @@ export function ItemDetail({ hash }: ItemDetailProps) {
   }
 
   const showDevWebhookTools =
-    settings.discordWebhookEnabled && settings.discordDevelopmentMode;
+    effectiveSettings.discordWebhookEnabled &&
+    effectiveSettings.discordDevelopmentMode;
   const devItemOptions: ItemOption[] = showDevWebhookTools
     ? availableItems.length > 0
       ? availableItems
@@ -749,44 +1121,55 @@ export function ItemDetail({ hash }: ItemDetailProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Button variant="outline" size="sm" asChild>
-          <Link href="/">
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Dashboard
-          </Link>
-        </Button>
-        <div className="flex-1">
-          <h1 className="text-3xl font-bold text-balance text-foreground">
-            {item.label}
-          </h1>
-          <p className="text-muted-foreground text-pretty">
-            {item.market_hash_name}
-          </p>
+      <div className="overflow-hidden rounded-2xl border border-border/60 bg-gradient-to-br from-background via-background/80 to-muted/20 shadow-lg">
+        <div className="flex flex-col gap-6 p-6 lg:p-8">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center gap-3">
+              <Button variant="outline" size="sm" asChild>
+                <Link href="/">
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  Back to Dashboard
+                </Link>
+              </Button>
+              <span className="inline-flex items-center gap-2 rounded-full border border-border/40 bg-background/60 px-3 py-1 text-xs font-medium text-muted-foreground">
+                App ID {item.appid}
+              </span>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              {item.steam_url && (
+                <Button variant="outline" size="sm" asChild className="gap-2">
+                  <a
+                    href={item.steam_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <ExternalLink className="h-4 w-4" />
+                    Steam Market
+                  </a>
+                </Button>
+              )}
+              <div className="flex-shrink-0">
+                <SettingsDialog />
+              </div>
+            </div>
+          </div>
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div className="space-y-2">
+              <h1 className="text-3xl font-bold lg:text-4xl text-foreground">
+                {item.label}
+              </h1>
+              <p className="text-sm text-muted-foreground text-pretty">
+                {item.market_hash_name}
+              </p>
+            </div>
+          </div>
           {item.description && (
-            <p className="text-sm text-muted-foreground mt-2 italic">
+            <p className="text-sm text-muted-foreground/90 leading-relaxed text-pretty">
               {item.description}
             </p>
           )}
-          {item.steam_url && (
-            <div className="mt-2">
-              <a
-                href={item.steam_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-sm text-blue-400 hover:text-blue-300 hover:underline"
-              >
-                <ExternalLink className="h-4 w-4" />
-                View on Steam Market
-              </a>
-            </div>
-          )}
-        </div>
-        <div className="flex-shrink-0">
-          <SettingsDialog />
         </div>
       </div>
-
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <Card className="bg-card/50 backdrop-blur-sm border-border/50">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -1059,7 +1442,7 @@ export function ItemDetail({ hash }: ItemDetailProps) {
 
       <Card className="bg-card/50 backdrop-blur-sm border-border/50">
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-3">
             <div>
               <CardTitle className="text-card-foreground">
                 Market Listings Snapshot
@@ -1067,15 +1450,32 @@ export function ItemDetail({ hash }: ItemDetailProps) {
               <CardDescription>
                 Fetch up to five live offers from each supported marketplace.
               </CardDescription>
+              <div className="text-xs text-muted-foreground mt-1">
+                Pinned providers: {pinnedProviders.join(", ")}
+              </div>
             </div>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={loadMarketListings}
-              disabled={listingsLoading}
-            >
-              {listingsLoading ? "Loading…" : listingsLoaded ? "Refresh" : "Load"}
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setMarketSettingsOpen(true)}
+              >
+                <SlidersHorizontal className="mr-2 h-4 w-4" />
+                Snapshot Settings
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={loadMarketListings}
+                disabled={listingsLoading}
+              >
+                {listingsLoading
+                  ? "Loading..."
+                  : listingsLoaded
+                  ? "Refresh"
+                  : "Load"}
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -1083,11 +1483,13 @@ export function ItemDetail({ hash }: ItemDetailProps) {
             <div className="text-sm text-red-500">{listingsError}</div>
           )}
 
-          {!listingsLoading && listingsLoaded && marketListings.length === 0 && (
-            <div className="text-sm text-muted-foreground">
-              No listings found for this item across the configured providers.
-            </div>
-          )}
+          {!listingsLoading &&
+            listingsLoaded &&
+            marketListings.length === 0 && (
+              <div className="text-sm text-muted-foreground">
+                No listings found for this item across the configured providers.
+              </div>
+            )}
 
           {listingsLoading && (
             <div className="flex items-center justify-center py-6">
@@ -1095,71 +1497,85 @@ export function ItemDetail({ hash }: ItemDetailProps) {
             </div>
           )}
 
-          {marketListings.length > 0 && (
+          {listingsLoaded && listingRows.length > 0 && (
             <div className="space-y-6">
-              {groupedListings.map(({ site, listings }) => (
-                <div key={site} className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-card-foreground">
-                      {site}
-                    </span>
-                    <span className="text-xs text-muted-foreground">
-                      {Math.min(listings.length, 5)} offers
-                    </span>
-                  </div>
-                  <div className="overflow-hidden rounded-md border border-border/60">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead className="w-40">Condition</TableHead>
-                          <TableHead className="w-24">Float</TableHead>
-                          <TableHead className="w-28 text-right">Price</TableHead>
-                          <TableHead className="w-24 text-right">Currency</TableHead>
-                          <TableHead className="w-32 text-right">Listing</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {listings.slice(0, 5).map((listing, index) => (
-                          <TableRow key={`${site}-${index}`}>
-                            <TableCell>
-                              <span
-                                className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${getConditionBadgeClass(
-                                  listing.condition
-                                )}`}
-                              >
-                                {listing.condition}
-                              </span>
-                            </TableCell>
-                            <TableCell>
-                              {listing.float != null
-                                ? listing.float.toFixed(3)
-                                : "—"}
-                            </TableCell>
-                            <TableCell className="text-right font-medium">
-                              ${listing.price.toFixed(2)}
-                            </TableCell>
-                            <TableCell className="text-right text-muted-foreground">
-                              {listing.currency}
-                            </TableCell>
-                            <TableCell className="text-right">
-                              {listing.url ? (
+              {listingRows.map((row, rowIndex) => (
+                <div
+                  key={`listing-row-${rowIndex}`}
+                  className="grid gap-4 md:grid-cols-3"
+                >
+                  {row.map(({ site, listings }) => {
+                    const meta = providerMetaMap.get(site);
+                    const accent = meta?.accentColor ?? "bg-muted";
+                    return (
+                      <div
+                        key={site}
+                        className="rounded-lg border border-border/60 bg-background/60 p-4 space-y-3"
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2 text-sm font-semibold text-card-foreground">
+                            <span
+                              className={`inline-block h-2 w-2 rounded-full ${accent}`}
+                            />
+                            {site}
+                          </div>
+                          <span className="text-xs text-muted-foreground">
+                            {Math.min(listings.length, 5)} offers
+                          </span>
+                        </div>
+                        <div className="space-y-3">
+                          {listings.slice(0, 5).map((listing, index) => (
+                            <div
+                              key={`${site}-${index}`}
+                              className="space-y-2 rounded-md border border-border/50 bg-background/50 p-3"
+                            >
+                              <div className="flex items-center justify-between text-sm font-medium">
+                                <span
+                                  className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-semibold ${getConditionBadgeClass(
+                                    listing.condition
+                                  )}`}
+                                >
+                                  {listing.condition}
+                                </span>
+                                <span>${listing.price.toFixed(2)}</span>
+                              </div>
+                              <div className="flex items-center justify-between text-xs text-muted-foreground">
+                                <span>
+                                  Float:{" "}
+                                  {listing.float != null
+                                    ? listing.float.toFixed(3)
+                                    : "—"}
+                                </span>
+                                <span>{listing.currency}</span>
+                              </div>
+                              {listing.url && (
                                 <a
                                   href={listing.url}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="text-primary hover:underline"
+                                  className="text-xs text-primary hover:underline"
                                 >
                                   View offer
                                 </a>
-                              ) : (
-                                "—"
                               )}
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
+                            </div>
+                          ))}
+                          {listings.length === 0 && (
+                            <div className="rounded-md border border-dashed border-border/50 bg-background/40 p-4 text-xs text-muted-foreground">
+                              No offers captured for this provider.
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                  {row.length < 3 &&
+                    Array.from({ length: 3 - row.length }).map((_, index) => (
+                      <div
+                        key={`placeholder-${rowIndex}-${index}`}
+                        className="hidden md:block"
+                      />
+                    ))}
                 </div>
               ))}
             </div>
@@ -1167,6 +1583,166 @@ export function ItemDetail({ hash }: ItemDetailProps) {
         </CardContent>
       </Card>
 
+      <Dialog open={marketSettingsOpen} onOpenChange={setMarketSettingsOpen}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Market Snapshot Settings</DialogTitle>
+            <DialogDescription>
+              Choose which marketplaces to pin, control fetch limits, and manage
+              provider API keys stored locally.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-6 py-2">
+            <div className="space-y-3">
+              <div>
+                <h4 className="text-sm font-medium text-card-foreground">
+                  Pinned providers
+                </h4>
+                <p className="text-xs text-muted-foreground">
+                  Select up to three marketplaces to highlight in market
+                  snapshots.
+                </p>
+              </div>
+              <div className="space-y-2">
+                {TRADE_PROVIDERS.map((provider) => {
+                  const checked = pinnedDraft.includes(provider.name);
+                  return (
+                    <label
+                      key={provider.id}
+                      className="flex items-center justify-between gap-3 rounded-md border border-border/40 bg-background/60 px-3 py-2"
+                    >
+                      <div>
+                        <p className="text-sm font-medium text-card-foreground">
+                          {provider.name}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {provider.baseUrl.replace(/^https?:\/\//, "")}
+                        </p>
+                      </div>
+                      <Checkbox
+                        checked={checked}
+                        onCheckedChange={(value) =>
+                          handleTogglePinned(provider.name, value === true)
+                        }
+                      />
+                    </label>
+                  );
+                })}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {pinnedDraft.length} of 3 selected.
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="market-fetch-limit">Listings per provider</Label>
+              <Input
+                id="market-fetch-limit"
+                type="number"
+                min={1}
+                max={25}
+                value={fetchLimitDraft}
+                onChange={(event) => setFetchLimitDraft(event.target.value)}
+              />
+              <p className="text-xs text-muted-foreground">
+                Control how many offers are fetched from each marketplace
+                (1-25).
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="text-sm font-medium text-card-foreground">
+                    API keys
+                  </h4>
+                  <p className="text-xs text-muted-foreground">
+                    Stored securely in your local .env.local file.
+                  </p>
+                </div>
+                {providerStatusLoading ? (
+                  <Badge variant="secondary">Checking...</Badge>
+                ) : selectedProviderHasKey ? (
+                  <Badge variant="secondary">Key stored</Badge>
+                ) : (
+                  <Badge variant="outline">No key</Badge>
+                )}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="api-key-provider">Provider</Label>
+                <Select
+                  value={selectedProviderId}
+                  onValueChange={setSelectedProviderId}
+                >
+                  <SelectTrigger id="api-key-provider">
+                    <SelectValue placeholder="Choose provider" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {TRADE_PROVIDERS.map((provider) => (
+                      <SelectItem key={provider.id} value={provider.id}>
+                        {provider.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="api-key-value">
+                  {selectedProviderMeta.name} API key
+                </Label>
+                <div className="flex flex-col gap-2 sm:flex-row">
+                  <Input
+                    id="api-key-value"
+                    type="text"
+                    value={apiKeyValue}
+                    onChange={(event) => setApiKeyValue(event.target.value)}
+                    placeholder="Paste API key"
+                    className="sm:flex-1"
+                  />
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      onClick={handleSaveApiKey}
+                      disabled={apiKeySaving}
+                    >
+                      {apiKeySaving ? "Saving..." : "Save"}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={handleRemoveApiKey}
+                      disabled={!selectedProviderHasKey || apiKeySaving}
+                    >
+                      Remove
+                    </Button>
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Keys are saved locally; leave the field empty and click remove
+                  to clear a stored key.
+                </p>
+              </div>
+            </div>
+          </div>
+          <DialogFooter className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-between">
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => setMarketSettingsOpen(false)}
+              disabled={marketSettingsSaving}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              onClick={handleSaveMarketSettings}
+              disabled={marketSettingsSaving}
+            >
+              {marketSettingsSaving ? "Saving..." : "Save changes"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {(item.stickers?.length ||
         item.charms?.length ||
