@@ -1,5 +1,18 @@
 {
   "is_active": false,
-  "recent_tasks": [],
-  "last_updated": "2025-09-23T11:47:17.089Z"
+  "recent_tasks": [
+    {
+      "id": "task_1758628270355_1f8cc8rz0",
+      "type": "image_fetch",
+      "status": "completed",
+      "title": "Loading Item Image",
+      "description": "Fetching image for ★ Survival Knife",
+      "started_at": "2025-09-23T11:51:10.355Z",
+      "metadata": {
+        "marketHashName": "★ Survival Knife"
+      },
+      "completed_at": "2025-09-23T11:51:10.968Z"
+    }
+  ],
+  "last_updated": "2025-09-23T11:51:10.968Z"
 }

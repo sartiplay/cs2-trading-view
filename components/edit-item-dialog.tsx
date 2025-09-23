@@ -100,6 +100,7 @@ export function EditItemDialog({
   const [categoryId, setCategoryId] = useState<string | undefined>(undefined);
   const [isLoadingImage, setIsLoadingImage] = useState(false);
   const [newImageUrl, setNewImageUrl] = useState<string | undefined>(undefined);
+  const [currentImageUrl, setCurrentImageUrl] = useState<string | undefined>(undefined);
 
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast(); // Declare useToast
@@ -116,6 +117,7 @@ export function EditItemDialog({
       setPatches(item.patches || []);
       setCategoryId(item.category_id);
       setNewImageUrl(undefined); // Reset new image URL when dialog opens
+      setCurrentImageUrl(item.image_url); // Set current image URL
     }
   }, [item, open]);
 
@@ -243,6 +245,7 @@ export function EditItemDialog({
         const imageData = await response.json();
         if (imageData.image_url) {
           setNewImageUrl(imageData.image_url);
+          setCurrentImageUrl(imageData.image_url); // Update the displayed image immediately
           toast({
             title: "Success",
             description: "Item image reloaded and saved successfully!",
@@ -375,6 +378,45 @@ export function EditItemDialog({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             />
+          </div>
+          
+          {/* Item Image Display */}
+          <div className="space-y-2">
+            <Label>Item Image</Label>
+            <div className="flex items-center gap-4">
+              <div className="w-20 h-20 border rounded-lg bg-muted flex items-center justify-center overflow-hidden">
+                {currentImageUrl ? (
+                  <img
+                    src={currentImageUrl}
+                    alt={item.label}
+                    className="w-full h-full object-contain"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = 'none';
+                    }}
+                  />
+                ) : (
+                  <div className="text-xs text-muted-foreground text-center">
+                    No Image
+                  </div>
+                )}
+              </div>
+              <div className="flex-1">
+                <p className="text-sm text-muted-foreground">
+                  {currentImageUrl ? "Image loaded" : "No image available"}
+                </p>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={reloadImage}
+                  disabled={isLoadingImage || isLoading}
+                  className="mt-2"
+                >
+                  <RefreshCw className={`h-4 w-4 mr-2 ${isLoadingImage ? 'animate-spin' : ''}`} />
+                  {isLoadingImage ? "Reloading..." : "Reload Image"}
+                </Button>
+              </div>
+            </div>
           </div>
           <div className="space-y-2">
             <Label htmlFor="edit-category">Category (Optional)</Label>
@@ -717,18 +759,6 @@ export function EditItemDialog({
             </CardContent>
           </Card>
 
-          <div className="flex items-center justify-between pt-4 border-t">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={reloadImage}
-              disabled={isLoadingImage || isLoading}
-              className="flex items-center gap-2"
-            >
-              <RefreshCw className={`h-4 w-4 ${isLoadingImage ? 'animate-spin' : ''}`} />
-              {isLoadingImage ? "Reloading Image..." : "Reload Image"}
-            </Button>
-          </div>
 
           <DialogFooter>
             <Button
