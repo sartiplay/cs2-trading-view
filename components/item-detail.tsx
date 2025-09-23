@@ -1272,6 +1272,16 @@ export function ItemDetail({ hash }: ItemDetailProps) {
   useEffect(() => {
     fetchItem();
     fetchCategories();
+
+    const handleCategoryCreated = () => {
+      fetchCategories();
+    };
+
+    window.addEventListener("categoryCreated", handleCategoryCreated);
+
+    return () => {
+      window.removeEventListener("categoryCreated", handleCategoryCreated);
+    };
   }, [hash, displayCurrency]);
 
   useEffect(() => {

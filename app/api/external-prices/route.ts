@@ -3,6 +3,43 @@ import { scrapeCSGOSkinsPrice, scrapeMultipleCSGOSkinsPrices } from "@/lib/csgos
 import { addExternalPriceData, getExternalPriceData, getAllExternalPriceData } from "@/lib/external-data-storage.server";
 import { startWorkerTask, updateWorkerTaskProgress, completeWorkerTask } from "@/lib/worker-storage.server";
 
+// URL conversion function to match the scraper's URL format
+function convertMarketHashNameToURL(marketHashName: string): string {
+  // Convert Steam market hash name to CSGOSKINS.GG URL format
+  // Examples:
+  // "★ Survival Knife" -> "survival-knife-vanilla"
+  // "USP-S | Black Lotus" -> "usp-s-black-lotus"
+  // "M4A1-S | Black Lotus (Field-Tested)" -> "m4a1-s-black-lotus"
+  // "StatTrak™ AK-47 | Redline (Minimal Wear)" -> "ak-47-redline"
+  
+  // Remove rarity indicators (★, StatTrak™, Souvenir, etc.)
+  let cleanName = marketHashName
+    .replace(/★\s*/g, '') // Remove star symbol
+    .replace(/StatTrak™\s*/g, '') // Remove StatTrak™
+    .replace(/Souvenir\s*/g, '') // Remove Souvenir
+    .replace(/★\s*/g, '') // Remove any remaining stars
+    .trim();
+
+  // Remove wear condition from parentheses (we don't need it in the URL)
+  cleanName = cleanName.replace(/\s*\([^)]+\)\s*/, '').trim();
+
+  // Convert to URL format
+  let url = cleanName
+    .toLowerCase()
+    .replace(/\s*\|\s*/g, '-') // Replace pipe with dash
+    .replace(/\s+/g, '-') // Replace spaces with dashes
+    .replace(/[^\w\-]/g, '') // Remove special characters except dashes
+    .replace(/-+/g, '-') // Replace multiple dashes with single dash
+    .replace(/^-|-$/g, ''); // Remove leading/trailing dashes
+
+  // For items without wear conditions, add "vanilla" for knives and some other items
+  if (url.includes('knife') || url.includes('glove')) {
+    url += '-vanilla';
+  }
+
+  return `https://csgoskins.gg/items/${url}`;
+}
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -51,7 +88,7 @@ export async function POST(request: NextRequest) {
           currency: scrapedData.currency,
           source: "csgoskins.gg" as const,
           last_updated: new Date().toISOString(),
-          url: `https://csgoskins.gg/items/${market_hash_name.toLowerCase().replace(/\s+/g, '-')}`,
+          url: convertMarketHashNameToURL(market_hash_name),
           price_change_24h: scrapedData.priceChange24h,
           price_change_24h_percent: scrapedData.priceChange24hPercent,
           trading_volume_24h: scrapedData.tradingVolume24h,
@@ -113,7 +150,7 @@ export async function POST(request: NextRequest) {
           currency: data.currency,
           source: "csgoskins.gg" as const,
           last_updated: new Date().toISOString(),
-          url: `https://csgoskins.gg/items/${marketHashName.toLowerCase().replace(/\s+/g, '-')}`,
+          url: convertMarketHashNameToURL(marketHashName),
           price_change_24h: data.priceChange24h,
           price_change_24h_percent: data.priceChange24hPercent,
           trading_volume_24h: data.tradingVolume24h,

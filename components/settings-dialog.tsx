@@ -388,6 +388,8 @@ export function SettingsDialog() {
           title: "Success",
           description: `Category "${newCategory.name}" created successfully`,
         });
+        // Dispatch event to notify other components about the new category
+        window.dispatchEvent(new CustomEvent('categoryCreated', { detail: newCategory }));
       } else {
         throw new Error("Failed to create category");
       }
