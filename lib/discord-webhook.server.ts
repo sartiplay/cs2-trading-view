@@ -636,4 +636,3 @@ export async function getDiscordSettings(): Promise<DiscordSettings | null> {
     return null;
   }
 }
-

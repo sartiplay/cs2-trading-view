@@ -37,6 +37,7 @@ export interface Item {
   market_hash_name: string;
   label: string;
   description?: string;
+  category_id?: string; // Reference to category in the categories object
   appid: number;
   steam_url: string;
   purchase_price: number;
@@ -49,6 +50,16 @@ export interface Item {
   price_alert_config?: PriceAlertConfig;
 }
 
+export interface CategoryConfig {
+  id: string;
+  name: string;
+  color?: string; // Hex color for UI display
+  includeInInventoryValue: boolean; // Whether items in this category should be included in total inventory value calculations
+  includeInProfitLoss: boolean; // Whether items in this category should be included in profit/loss calculations
+  created_at: string;
+  updated_at: string;
+}
+
 export interface ItemWithHistory extends Item {
   price_history: PriceEntry[];
 }
@@ -57,6 +68,7 @@ export interface SoldItem {
   market_hash_name: string;
   label: string;
   description?: string;
+  category_id?: string; // Reference to category in the categories object
   appid: number;
   steam_url: string;
   purchase_price: number;
@@ -96,6 +108,7 @@ export interface SoldItem {
 }
 
 export interface DataStore {
+  categories: Record<string, CategoryConfig>;
   items: Record<string, ItemWithHistory>;
   sold_items: SoldItem[];
   portfolio_history: Array<{
@@ -152,6 +165,7 @@ async function readDataFile(): Promise<DataStore> {
     console.log("[Data Storage] Creating new data file");
     return {
       items: {},
+      categories: {},
       sold_items: [],
       portfolio_history: [],
       metadata: {
@@ -227,6 +241,7 @@ export async function addOrUpdateItem(item: Item): Promise<void> {
     const existingItem = data.items[item.market_hash_name];
     existingItem.label = item.label;
     existingItem.description = item.description;
+    existingItem.category_id = item.category_id;
     existingItem.appid = item.appid;
     existingItem.steam_url = item.steam_url;
     existingItem.purchase_price = item.purchase_price;
@@ -372,7 +387,6 @@ export async function addPriceEntry(
         }
       }
     }
-
 
     history.push({
       date: nowIso,
@@ -556,6 +570,13 @@ async function calculateInventoryValue(data: DataStore): Promise<{
   const dateValueMap: Record<string, number> = {};
 
   for (const item of items) {
+    // Check if item's category should be included in inventory value calculations
+    if (item.category_id) {
+      const category = data.categories[item.category_id];
+      if (category && !category.includeInInventoryValue) {
+        continue; // Skip this item if its category is excluded from inventory value
+      }
+    }
     const purchasePriceUsd = await convertCurrency(
       item.purchase_price,
       item.purchase_currency,
@@ -853,6 +874,7 @@ export async function markItemAsSold(
       market_hash_name: item.market_hash_name,
       label: item.label,
       description: item.description,
+      category_id: item.category_id,
       appid: item.appid,
       steam_url: item.steam_url,
       purchase_price: item.purchase_price,
@@ -1109,4 +1131,84 @@ function extractHashFromSteamUrl(url: string): string | null {
   } catch {
     return null;
   }
+}
+
+// Category management functions
+export async function getAllCategories(): Promise<CategoryConfig[]> {
+  const data = await readData();
+  return Object.values(data.categories).sort((a, b) => a.name.localeCompare(b.name));
+}
+
+export async function getCategory(categoryId: string): Promise<CategoryConfig | null> {
+  const data = await readData();
+  return data.categories[categoryId] || null;
+}
+
+export async function createCategory(category: Omit<CategoryConfig, 'id' | 'created_at' | 'updated_at'>): Promise<CategoryConfig> {
+  const newCategory: CategoryConfig = {
+    ...category,
+    id: crypto.randomUUID(),
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  };
+
+  await updateData((data) => {
+    data.categories[newCategory.id] = newCategory;
+  });
+
+  console.log(`[Data Storage] Created category: ${newCategory.name} (${newCategory.id})`);
+  return newCategory;
+}
+
+export async function updateCategory(categoryId: string, updates: Partial<Omit<CategoryConfig, 'id' | 'created_at'>>): Promise<CategoryConfig> {
+  return updateData((data) => {
+    const category = data.categories[categoryId];
+    if (!category) {
+      throw new Error("Category not found");
+    }
+
+    const updatedCategory: CategoryConfig = {
+      ...category,
+      ...updates,
+      updated_at: new Date().toISOString(),
+    };
+
+    data.categories[categoryId] = updatedCategory;
+    console.log(`[Data Storage] Updated category: ${updatedCategory.name} (${categoryId})`);
+    return updatedCategory;
+  });
+}
+
+export async function deleteCategory(categoryId: string): Promise<void> {
+  await updateData((data) => {
+    const category = data.categories[categoryId];
+    if (!category) {
+      throw new Error("Category not found");
+    }
+
+    // Check if any items are using this category
+    const itemsUsingCategory = Object.values(data.items).filter(item => item.category_id === categoryId);
+    if (itemsUsingCategory.length > 0) {
+      throw new Error(`Cannot delete category "${category.name}" because ${itemsUsingCategory.length} item(s) are using it`);
+    }
+
+    // Check if any sold items are using this category
+    const soldItemsUsingCategory = data.sold_items.filter(item => item.category_id === categoryId);
+    if (soldItemsUsingCategory.length > 0) {
+      throw new Error(`Cannot delete category "${category.name}" because ${soldItemsUsingCategory.length} sold item(s) are using it`);
+    }
+
+    delete data.categories[categoryId];
+    console.log(`[Data Storage] Deleted category: ${category.name} (${categoryId})`);
+  });
+}
+
+export async function getItemsByCategory(categoryId: string): Promise<ItemWithHistory[]> {
+  const data = await readData();
+  return Object.values(data.items).filter(item => item.category_id === categoryId);
+}
+
+export async function getSoldItemsByCategory(categoryId: string): Promise<SoldItem[]> {
+  const data = await readData();
+  return data.sold_items.filter(item => item.category_id === categoryId);
 }

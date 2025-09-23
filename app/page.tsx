@@ -23,7 +23,7 @@ import { SchedulerAccordionTrigger } from "@/components/scheduer-accordion-trigg
 export default function Dashboard() {
   return (
     <div className="min-h-screen bg-background p-6">
-      <div className="mx-auto max-w-6xl space-y-8">
+      <div className="mx-auto max-w-7xl space-y-8">
         <div className="flex items-center justify-between">
           <div className="text-center flex-1">
             <h1 className="text-4xl font-bold tracking-tight text-balance">
@@ -76,7 +76,7 @@ export default function Dashboard() {
               View and manage your tracked items
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-0">
             <ItemsTable />
           </CardContent>
         </Card>

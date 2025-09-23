@@ -27,6 +27,12 @@ export async function getSettings() {
     marketListingsFetchLimit: 5,
     schedulerEnabled: true,
     schedulerRunning: false,
+    categorySettings: {
+      showCategoryFilter: true,
+      defaultCategoryId: "default-trading",
+      allowCustomCategories: true,
+      maxCategories: 20,
+    },
   };
 }
 

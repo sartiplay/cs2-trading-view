@@ -52,6 +52,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { CategorySelector } from "@/components/category-selector";
 import {
   DEFAULT_PINNED_PROVIDERS,
   TRADE_PROVIDERS,
@@ -110,6 +111,7 @@ interface ItemData {
   label: string;
   appid: number;
   description?: string;
+  category_id?: string;
   steam_url?: string;
   price_history: PriceEntry[];
   price_alert_config?: PriceAlertConfig;
@@ -239,6 +241,10 @@ export function ItemDetail({ hash }: ItemDetailProps) {
   const [alertLowerInput, setAlertLowerInput] = useState("");
   const [alertUpperInput, setAlertUpperInput] = useState("");
   const [alertSaving, setAlertSaving] = useState(false);
+  const [isEditingCategory, setIsEditingCategory] = useState(false);
+  const [editingCategoryId, setEditingCategoryId] = useState<string | undefined>(undefined);
+  const [categorySaving, setCategorySaving] = useState(false);
+  const [categories, setCategories] = useState<Array<{id: string; name: string; color?: string}>>([]);
 
   const resetAlertInputs = useCallback(() => {
     const config = item?.price_alert_config;
@@ -671,7 +677,6 @@ export function ItemDetail({ hash }: ItemDetailProps) {
       config?.upperThreshold != null ? String(config.upperThreshold) : ""
     );
   }, [item?.price_alert_config]);
-
 
   const groupedListings = useMemo(() => {
     const map = new Map<string, TradeListing[]>();
@@ -1191,8 +1196,69 @@ export function ItemDetail({ hash }: ItemDetailProps) {
     setEditingPatches(updated);
   };
 
+  const startEditingCategory = () => {
+    setEditingCategoryId(item?.category_id);
+    setIsEditingCategory(true);
+  };
+
+  const cancelEditingCategory = () => {
+    setIsEditingCategory(false);
+    setEditingCategoryId(undefined);
+  };
+
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch("/api/categories");
+      if (response.ok) {
+        const data = await response.json();
+        setCategories(data);
+      }
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
+
+  const getCategoryInfo = (categoryId: string) => {
+    return categories.find(cat => cat.id === categoryId);
+  };
+
+  const saveCategory = async () => {
+    if (!item) return;
+
+    setCategorySaving(true);
+    try {
+      const response = await fetch(`/api/items/${encodeURIComponent(hash)}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          category_id: editingCategoryId,
+        }),
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Success",
+          description: "Category updated successfully",
+        });
+        await fetchItem(); // Refresh item data
+        setIsEditingCategory(false);
+      } else {
+        throw new Error("Failed to update category");
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update category",
+        variant: "destructive",
+      });
+    } finally {
+      setCategorySaving(false);
+    }
+  };
+
   useEffect(() => {
     fetchItem();
+    fetchCategories();
   }, [hash]);
 
   useEffect(() => {
@@ -1281,17 +1347,94 @@ export function ItemDetail({ hash }: ItemDetailProps) {
               {item.description}
             </p>
           )}
+          {/* Category Section */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              {!isEditingCategory ? (
+                <>
+                  <span className="text-sm text-muted-foreground">Category:</span>
+                  {item.category_id ? (
+                    (() => {
+                      const categoryInfo = getCategoryInfo(item.category_id);
+                      return categoryInfo ? (
+                        <div className="flex items-center gap-2">
+                          {categoryInfo.color && (
+                            <div
+                              className="w-3 h-3 rounded-full"
+                              style={{ backgroundColor: categoryInfo.color }}
+                            />
+                          )}
+                          <Badge variant="secondary">
+                            {categoryInfo.name}
+                          </Badge>
+                        </div>
+                      ) : (
+                        <Badge variant="secondary">
+                          {item.category_id}
+                        </Badge>
+                      );
+                    })()
+                  ) : (
+                    <span className="text-sm text-muted-foreground italic">No category</span>
+                  )}
+                </>
+              ) : (
+                <div className="flex items-center gap-2 flex-1">
+                  <span className="text-sm text-muted-foreground">Category:</span>
+                  <CategorySelector
+                    value={editingCategoryId}
+                    onValueChange={setEditingCategoryId}
+                    placeholder="Select a category"
+                    showCreateButton={true}
+                  />
+                </div>
+              )}
+            </div>
+            <div className="flex gap-2">
+              {!isEditingCategory ? (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={startEditingCategory}
+                >
+                  <Edit className="h-4 w-4 mr-2" />
+                  {item.category_id ? "Change" : "Set Category"}
+                </Button>
+              ) : (
+                <>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={cancelEditingCategory}
+                  >
+                    <X className="h-4 w-4 mr-2" />
+                    Cancel
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={saveCategory}
+                    disabled={categorySaving}
+                  >
+                    <Save className="h-4 w-4 mr-2" />
+                    {categorySaving ? "Saving..." : "Save"}
+                  </Button>
+                </>
+              )}
+            </div>
+          </div>
           {(item.price_alert_config?.lowerThreshold != null ||
             item.price_alert_config?.upperThreshold != null) && (
             <div className="flex flex-wrap gap-2 text-xs">
               {item.price_alert_config?.lowerThreshold != null && (
                 <span className="inline-flex items-center gap-1 rounded-full bg-red-500/10 px-3 py-1 font-medium text-red-300">
-                  Stop Loss: ${item.price_alert_config.lowerThreshold.toFixed(2)}
+                  Stop Loss: $
+                  {item.price_alert_config.lowerThreshold.toFixed(2)}
                 </span>
               )}
               {item.price_alert_config?.upperThreshold != null && (
                 <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-3 py-1 font-medium text-emerald-300">
-                  Take Profit: ${item.price_alert_config.upperThreshold.toFixed(2)}
+                  Take Profit: $
+                  {item.price_alert_config.upperThreshold.toFixed(2)}
                 </span>
               )}
             </div>
@@ -1711,10 +1854,7 @@ export function ItemDetail({ hash }: ItemDetailProps) {
         </CardContent>
       </Card>
 
-      <Dialog
-        open={alertDialogOpen}
-        onOpenChange={handleAlertDialogOpenChange}
-      >
+      <Dialog open={alertDialogOpen} onOpenChange={handleAlertDialogOpenChange}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Price Alerts</DialogTitle>
@@ -1725,7 +1865,9 @@ export function ItemDetail({ hash }: ItemDetailProps) {
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="price-alert-lower">Lower threshold (Stop Loss)</Label>
+              <Label htmlFor="price-alert-lower">
+                Lower threshold (Stop Loss)
+              </Label>
               <Input
                 id="price-alert-lower"
                 type="number"
@@ -1748,7 +1890,9 @@ export function ItemDetail({ hash }: ItemDetailProps) {
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="price-alert-upper">Upper threshold (Take Profit)</Label>
+              <Label htmlFor="price-alert-upper">
+                Upper threshold (Take Profit)
+              </Label>
               <Input
                 id="price-alert-upper"
                 type="number"
@@ -2414,4 +2558,3 @@ export function ItemDetail({ hash }: ItemDetailProps) {
     </div>
   );
 }
-

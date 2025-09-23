@@ -31,10 +31,7 @@ import {
   Plus, 
   Edit, 
   Trash2,
-  Palette,
-  Download,
-  Check,
-  X
+  Palette
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { DEFAULT_PINNED_PROVIDERS } from "@/lib/trade-providers";
@@ -124,45 +121,6 @@ interface CategoryConfig {
   updated_at: string;
 }
 
-interface SteamItem {
-  assetid: string;
-  classid: string;
-  instanceid: string;
-  amount: string;
-  market_hash_name: string;
-  market_name: string;
-  name: string;
-  icon_url: string;
-  icon_url_large?: string;
-  type: string;
-  tradable: number;
-  marketable: number;
-  commodity: number;
-  market_tradable_restriction?: number;
-  market_marketable_restriction?: number;
-  fraudwarnings?: string[];
-  descriptions?: Array<{
-    type: string;
-    value: string;
-    color?: string;
-  }>;
-  actions?: Array<{
-    link: string;
-    name: string;
-  }>;
-  market_actions?: Array<{
-    link: string;
-    name: string;
-  }>;
-  tags?: Array<{
-    category: string;
-    internal_name: string;
-    localized_category_name: string;
-    localized_tag_name: string;
-    color?: string;
-  }>;
-}
-
 export function SettingsDialog() {
   const [settings, setSettings] = useState<AppSettings>(defaultSettings);
   const [alertMentionsInput, setAlertMentionsInput] = useState("");
@@ -173,14 +131,6 @@ export function SettingsDialog() {
   const [newCategoryColor, setNewCategoryColor] = useState("#3B82F6");
   const [newCategoryIncludeInventory, setNewCategoryIncludeInventory] = useState(true);
   const [newCategoryIncludeProfitLoss, setNewCategoryIncludeProfitLoss] = useState(true);
-  
-  // Import state
-  const [steamInventoryUrl, setSteamInventoryUrl] = useState("");
-  const [steamItems, setSteamItems] = useState<SteamItem[]>([]);
-  const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
-  const [importLoading, setImportLoading] = useState(false);
-  const [importStep, setImportStep] = useState<"url" | "select" | "importing">("url");
-  
   const { toast } = useToast();
 
   const fetchCategories = async () => {
@@ -474,240 +424,6 @@ export function SettingsDialog() {
     }
   };
 
-  // Import functions
-  const parseSteamIdFromUrl = (url: string): string | null => {
-    try {
-      const urlObj = new URL(url);
-      if (urlObj.hostname.includes('steamcommunity.com')) {
-        const pathParts = urlObj.pathname.split('/').filter(part => part.length > 0);
-        
-        // Handle different Steam URL formats:
-        // /id/username/inventory/730/ (old format)
-        // /profiles/76561198123456789/inventory/730/ (old format)
-        // /id/username/inventory#730 (new format with hash)
-        // /profiles/76561198123456789/inventory#730 (new format with hash)
-        // /inventory/730/ (for current user)
-        
-        if (pathParts.includes('inventory')) {
-          const inventoryIndex = pathParts.findIndex(part => part === 'inventory');
-          
-          // If inventory is at the beginning, this is a current user URL
-          if (inventoryIndex === 0) {
-            return 'current_user';
-          }
-          
-          // Look for Steam ID before inventory
-          if (inventoryIndex > 0) {
-            const potentialSteamId = pathParts[inventoryIndex - 1];
-            
-            // Check if it's a numeric Steam ID (64-bit)
-            if (/^\d{17}$/.test(potentialSteamId)) {
-              return potentialSteamId;
-            }
-            
-            // Check if it's a custom URL (id/username)
-            if (pathParts[inventoryIndex - 2] === 'id' && potentialSteamId) {
-              // For custom URLs, we need to resolve them to Steam ID
-              // This will be handled by the API
-              return `custom_${potentialSteamId}`;
-            }
-            
-            // Check if it's a profile URL (profiles/steamid)
-            if (pathParts[inventoryIndex - 2] === 'profiles' && potentialSteamId) {
-              return potentialSteamId;
-            }
-          }
-        }
-        
-        // Handle the new hash-based format: /id/username/inventory#730
-        // Check if URL ends with inventory and has a hash fragment
-        if (pathParts[pathParts.length - 1] === 'inventory' && urlObj.hash) {
-          if (pathParts.length >= 3 && pathParts[pathParts.length - 3] === 'id') {
-            const customId = pathParts[pathParts.length - 2];
-            return `custom_${customId}`;
-          } else if (pathParts.length >= 3 && pathParts[pathParts.length - 3] === 'profiles') {
-            const steamId = pathParts[pathParts.length - 2];
-            if (/^\d{17}$/.test(steamId)) {
-              return steamId;
-            }
-          }
-        }
-      }
-      return null;
-    } catch {
-      return null;
-    }
-  };
-
-  const fetchSteamInventory = async () => {
-    if (!steamInventoryUrl.trim()) {
-      toast({
-        title: "Error",
-        description: "Please enter a Steam inventory URL",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setImportLoading(true);
-    try {
-      const steamId = parseSteamIdFromUrl(steamInventoryUrl);
-      console.log('Parsed Steam ID:', steamId);
-      console.log('Original URL:', steamInventoryUrl);
-      
-      if (!steamId) {
-        throw new Error("Invalid Steam inventory URL");
-      }
-
-      const response = await fetch(`/api/steam-inventory?steamid=${encodeURIComponent(steamId)}`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch Steam inventory");
-      }
-
-      const data = await response.json();
-      if (data.success && data.items) {
-        // Filter for CS2 items only
-        const cs2Items = data.items.filter((item: SteamItem) => 
-          item.market_hash_name && 
-          (item.market_hash_name.includes('AK-47') || 
-           item.market_hash_name.includes('M4A4') ||
-           item.market_hash_name.includes('M4A1') ||
-           item.market_hash_name.includes('AWP') ||
-           item.market_hash_name.includes('Glock') ||
-           item.market_hash_name.includes('USP') ||
-           item.market_hash_name.includes('Desert Eagle') ||
-           item.market_hash_name.includes('P250') ||
-           item.market_hash_name.includes('Tec-9') ||
-           item.market_hash_name.includes('Five-SeveN') ||
-           item.market_hash_name.includes('CZ75') ||
-           item.market_hash_name.includes('Dual Berettas') ||
-           item.market_hash_name.includes('P2000') ||
-           item.market_hash_name.includes('UMP') ||
-           item.market_hash_name.includes('MAC-10') ||
-           item.market_hash_name.includes('MP9') ||
-           item.market_hash_name.includes('MP7') ||
-           item.market_hash_name.includes('MP5') ||
-           item.market_hash_name.includes('Galil') ||
-           item.market_hash_name.includes('FAMAS') ||
-           item.market_hash_name.includes('SG 553') ||
-           item.market_hash_name.includes('AUG') ||
-           item.market_hash_name.includes('SSG 08') ||
-           item.market_hash_name.includes('SCAR-20') ||
-           item.market_hash_name.includes('G3SG1') ||
-           item.market_hash_name.includes('XM1014') ||
-           item.market_hash_name.includes('Nova') ||
-           item.market_hash_name.includes('Sawed-Off') ||
-           item.market_hash_name.includes('MAG-7') ||
-           item.market_hash_name.includes('M249') ||
-           item.market_hash_name.includes('Negev') ||
-           item.market_hash_name.includes('Knife') ||
-           item.market_hash_name.includes('Gloves') ||
-           item.market_hash_name.includes('Sticker') ||
-           item.market_hash_name.includes('Case') ||
-           item.market_hash_name.includes('Key') ||
-           item.market_hash_name.includes('Graffiti') ||
-           item.market_hash_name.includes('Music Kit') ||
-           item.market_hash_name.includes('Pin') ||
-           item.market_hash_name.includes('Patch'))
-        );
-        
-        setSteamItems(cs2Items);
-        setSelectedItems(new Set(cs2Items.map((item: SteamItem) => item.classid)));
-        setImportStep("select");
-        toast({
-          title: "Success",
-          description: `Found ${cs2Items.length} CS2 items in your inventory`,
-        });
-      } else {
-        throw new Error(data.error || "Failed to parse inventory");
-      }
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to fetch Steam inventory",
-        variant: "destructive",
-      });
-    } finally {
-      setImportLoading(false);
-    }
-  };
-
-  const toggleItemSelection = (classid: string) => {
-    const newSelected = new Set(selectedItems);
-    if (newSelected.has(classid)) {
-      newSelected.delete(classid);
-    } else {
-      newSelected.add(classid);
-    }
-    setSelectedItems(newSelected);
-  };
-
-  const selectAllItems = () => {
-    setSelectedItems(new Set(steamItems.map(item => item.classid)));
-  };
-
-  const deselectAllItems = () => {
-    setSelectedItems(new Set());
-  };
-
-  const importSelectedItems = async () => {
-    if (selectedItems.size === 0) {
-      toast({
-        title: "Error",
-        description: "Please select at least one item to import",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setImportLoading(true);
-    setImportStep("importing");
-    
-    try {
-      const itemsToImport = steamItems.filter(item => selectedItems.has(item.classid));
-      
-      const response = await fetch("/api/import-steam-items", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          items: itemsToImport,
-          defaultCategory: settings.categorySettings.defaultCategoryId,
-        }),
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        toast({
-          title: "Success",
-          description: `Successfully imported ${result.importedCount} items`,
-        });
-        
-        // Reset import state
-        setImportStep("url");
-        setSteamInventoryUrl("");
-        setSteamItems([]);
-        setSelectedItems(new Set());
-      } else {
-        throw new Error("Failed to import items");
-      }
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to import items",
-        variant: "destructive",
-      });
-    } finally {
-      setImportLoading(false);
-    }
-  };
-
-  const resetImport = () => {
-    setImportStep("url");
-    setSteamInventoryUrl("");
-    setSteamItems([]);
-    setSelectedItems(new Set());
-  };
-
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
@@ -722,7 +438,7 @@ export function SettingsDialog() {
         </DialogHeader>
         
         <Tabs defaultValue="general" className="w-full">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="general" className="flex items-center gap-2">
               <Clock className="h-4 w-4" />
               General
@@ -734,10 +450,6 @@ export function SettingsDialog() {
             <TabsTrigger value="categories" className="flex items-center gap-2">
               <Tag className="h-4 w-4" />
               Categories
-            </TabsTrigger>
-            <TabsTrigger value="import" className="flex items-center gap-2">
-              <Download className="h-4 w-4" />
-              Import
             </TabsTrigger>
             <TabsTrigger value="advanced" className="flex items-center gap-2">
               <Settings className="h-4 w-4" />
@@ -1157,121 +869,6 @@ export function SettingsDialog() {
                   ))}
                 </div>
               </div>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="import" className="space-y-6 mt-6 max-h-[60vh] overflow-y-auto">
-            <div className="space-y-4">
-              <h3 className="text-lg font-medium">Steam Inventory Import</h3>
-              
-              {importStep === "url" && (
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="steam-inventory-url">Steam Inventory URL</Label>
-                    <Input
-                      id="steam-inventory-url"
-                      type="url"
-                      placeholder="https://steamcommunity.com/id/yourusername/inventory#730"
-                      value={steamInventoryUrl}
-                      onChange={(e) => setSteamInventoryUrl(e.target.value)}
-                    />
-                    <p className="text-sm text-muted-foreground">
-                      Enter your public Steam inventory URL. Make sure your inventory is set to public.
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      💡 <strong>How to get the correct URL:</strong> Go to your Steam profile → Inventory → Select "Counter-Strike 2" → Copy the URL from your browser address bar
-                    </p>
-                  </div>
-                  
-                  <Button 
-                    onClick={fetchSteamInventory} 
-                    disabled={importLoading}
-                    className="w-full"
-                  >
-                    {importLoading ? "Fetching Inventory..." : "Fetch Steam Inventory"}
-                  </Button>
-                </div>
-              )}
-
-              {importStep === "select" && (
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="font-medium">Select Items to Import</h4>
-                      <p className="text-sm text-muted-foreground">
-                        Found {steamItems.length} CS2 items. Select which ones you want to import.
-                      </p>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button variant="outline" size="sm" onClick={selectAllItems}>
-                        <Check className="h-4 w-4 mr-2" />
-                        Select All
-                      </Button>
-                      <Button variant="outline" size="sm" onClick={deselectAllItems}>
-                        <X className="h-4 w-4 mr-2" />
-                        Deselect All
-                      </Button>
-                    </div>
-                  </div>
-
-                  <div className="max-h-96 overflow-y-auto border rounded-lg">
-                    <div className="grid grid-cols-1 gap-2 p-4">
-                      {steamItems.map((item) => (
-                        <div
-                          key={item.classid}
-                          className={`flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-colors ${
-                            selectedItems.has(item.classid)
-                              ? "bg-primary/10 border-primary"
-                              : "hover:bg-muted/50"
-                          }`}
-                          onClick={() => toggleItemSelection(item.classid)}
-                        >
-                          <div className="flex items-center justify-center w-6 h-6 border rounded">
-                            {selectedItems.has(item.classid) && (
-                              <Check className="h-4 w-4 text-primary" />
-                            )}
-                          </div>
-                          <img
-                            src={`https://steamcommunity-a.akamaihd.net/economy/image/${item.icon_url}`}
-                            alt={item.name}
-                            className="w-12 h-12 object-contain"
-                          />
-                          <div className="flex-1 min-w-0">
-                            <div className="font-medium truncate">{item.name}</div>
-                            <div className="text-sm text-muted-foreground truncate">
-                              {item.market_hash_name}
-                            </div>
-                            <div className="text-xs text-muted-foreground">
-                              Quantity: {item.amount}
-                            </div>
-                          </div>
-                          <div className="text-sm text-muted-foreground">
-                            {item.tradable ? "Tradable" : "Not Tradable"}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="flex gap-2">
-                    <Button onClick={importSelectedItems} disabled={selectedItems.size === 0}>
-                      Import {selectedItems.size} Selected Items
-                    </Button>
-                    <Button variant="outline" onClick={resetImport}>
-                      Back
-                    </Button>
-                  </div>
-                </div>
-              )}
-
-              {importStep === "importing" && (
-                <div className="text-center py-8">
-                  <div className="text-lg font-medium mb-2">Importing Items...</div>
-                  <div className="text-sm text-muted-foreground">
-                    Please wait while we import your selected items.
-                  </div>
-                </div>
-              )}
             </div>
           </TabsContent>
 

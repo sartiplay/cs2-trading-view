@@ -24,6 +24,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Plus, Trash2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast"; // Import useToast
+import { CategorySelector } from "@/components/category-selector";
 
 const CURRENCIES = [
   { code: "USD", name: "US Dollar", symbol: "$" },
@@ -59,6 +60,7 @@ interface Item {
   market_hash_name: string;
   label: string;
   description?: string;
+  category_id?: string;
   appid: number;
   steam_url?: string;
   purchase_price: number;
@@ -93,6 +95,7 @@ export function EditItemDialog({
   const [patches, setPatches] = useState<Customization[]>([]);
   const [includeCustomizationCosts, setIncludeCustomizationCosts] =
     useState(false);
+  const [categoryId, setCategoryId] = useState<string | undefined>(undefined);
 
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast(); // Declare useToast
@@ -107,6 +110,7 @@ export function EditItemDialog({
       setStickers(item.stickers || []);
       setCharms(item.charms || []);
       setPatches(item.patches || []);
+      setCategoryId(item.category_id);
     }
   }, [item, open]);
 
@@ -260,6 +264,7 @@ export function EditItemDialog({
             purchase_price: price,
             quantity: qty,
             purchase_currency: purchaseCurrency,
+            category_id: categoryId,
             stickers: stickers.filter((s) => s.name.trim()),
             charms: charms.filter((c) => c.name.trim()),
             patches: patches.filter((p) => p.name.trim()),
@@ -319,6 +324,14 @@ export function EditItemDialog({
               placeholder="e.g., My favorite skin, bought for trading"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="edit-category">Category (Optional)</Label>
+            <CategorySelector
+              value={categoryId}
+              onValueChange={setCategoryId}
+              placeholder="Select a category for this item"
             />
           </div>
           <div className="grid grid-cols-3 gap-4">

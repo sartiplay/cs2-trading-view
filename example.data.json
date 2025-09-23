@@ -1,4 +1,42 @@
 {
+  "categories": {
+    "default-trading": {
+      "id": "default-trading",
+      "name": "Trading",
+      "color": "#3B82F6",
+      "includeInInventoryValue": true,
+      "includeInProfitLoss": true,
+      "created_at": "2025-01-27T00:00:00.000Z",
+      "updated_at": "2025-01-27T00:00:00.000Z"
+    },
+    "default-playing": {
+      "id": "default-playing",
+      "name": "Playing",
+      "color": "#10B981",
+      "includeInInventoryValue": true,
+      "includeInProfitLoss": true,
+      "created_at": "2025-01-27T00:00:00.000Z",
+      "updated_at": "2025-01-27T00:00:00.000Z"
+    },
+    "default-collecting": {
+      "id": "default-collecting",
+      "name": "Collecting",
+      "color": "#8B5CF6",
+      "includeInInventoryValue": true,
+      "includeInProfitLoss": true,
+      "created_at": "2025-01-27T00:00:00.000Z",
+      "updated_at": "2025-01-27T00:00:00.000Z"
+    },
+    "default-other": {
+      "id": "default-other",
+      "name": "Other",
+      "color": "#6B7280",
+      "includeInInventoryValue": true,
+      "includeInProfitLoss": true,
+      "created_at": "2025-01-27T00:00:00.000Z",
+      "updated_at": "2025-01-27T00:00:00.000Z"
+    }
+  },
   "items": {},
   "metadata": {
     "last_capture": "2025-09-18T19:30:07.394Z",

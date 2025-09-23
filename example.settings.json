@@ -13,5 +13,11 @@
   ],
   "marketListingsFetchLimit": 5,
   "schedulerEnabled": true,
-  "schedulerRunning": true
+  "schedulerRunning": true,
+  "categorySettings": {
+    "showCategoryFilter": true,
+    "defaultCategoryId": "default-trading",
+    "allowCustomCategories": true,
+    "maxCategories": 20
+  }
 }

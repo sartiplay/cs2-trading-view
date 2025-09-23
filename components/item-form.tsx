@@ -17,6 +17,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Trash2, Plus } from "lucide-react";
+import { CategorySelector } from "@/components/category-selector";
 
 const CURRENCIES = [
   { code: "USD", name: "US Dollar", symbol: "$" },
@@ -90,6 +91,7 @@ export function ItemForm() {
   const [patches, setPatches] = useState<Customization[]>([]);
   const [includeCustomizationsInPrice, setIncludeCustomizationsInPrice] =
     useState(false);
+  const [categoryId, setCategoryId] = useState<string | undefined>(undefined);
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -161,6 +163,7 @@ export function ItemForm() {
           purchase_price: price,
           quantity: qty,
           purchase_currency: purchaseCurrency,
+          category_id: categoryId,
           stickers: stickers.filter((s) => s.name.trim() && s.steam_url.trim()),
           charms: charms.filter((c) => c.name.trim() && c.steam_url.trim()),
           patches: patches.filter((p) => p.name.trim() && p.steam_url.trim()),
@@ -214,6 +217,7 @@ export function ItemForm() {
         setCharms([]);
         setPatches([]);
         setIncludeCustomizationsInPrice(false);
+        setCategoryId(undefined);
         window.location.reload();
       } else {
         throw new Error("Failed to add item");
@@ -374,6 +378,17 @@ export function ItemForm() {
         />
         <p className="text-sm text-muted-foreground">
           Add personal notes or description for this item
+        </p>
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="category">Category (Optional)</Label>
+        <CategorySelector
+          value={categoryId}
+          onValueChange={setCategoryId}
+          placeholder="Select a category for this item"
+        />
+        <p className="text-sm text-muted-foreground">
+          Organize your items by category. You can create custom categories.
         </p>
       </div>
       <div className="grid grid-cols-3 gap-4">

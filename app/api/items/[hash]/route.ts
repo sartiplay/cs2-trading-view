@@ -65,6 +65,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       purchase_price,
       quantity,
       purchase_currency,
+      category_id,
       stickers,
       charms,
       patches,
@@ -140,6 +141,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
         purchase_currency !== undefined
           ? purchase_currency
           : existingItem.purchase_currency,
+      category_id: category_id !== undefined ? category_id : existingItem.category_id,
       stickers: stickers !== undefined ? stickers : existingItem.stickers,
       charms: charms !== undefined ? charms : existingItem.charms,
       patches: patches !== undefined ? patches : existingItem.patches,
