@@ -312,7 +312,7 @@ export function EditItemDialog({
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             label: label.trim(),
-            description: description.trim() || undefined,
+            description: description.trim(),
             purchase_price: price,
             quantity: qty,
             purchase_currency: purchaseCurrency,

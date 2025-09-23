@@ -14,6 +14,20 @@ import {
   getDiscordSettings,
 } from "@/lib/discord-webhook.server";
 import { startWorkerTask, updateWorkerTaskProgress, completeWorkerTask } from "@/lib/worker-storage.server";
+import { readFile } from "fs/promises";
+import { join } from "path";
+
+async function getFetchDelay(): Promise<number> {
+  try {
+    const settingsPath = join(process.cwd(), "settings.json");
+    const settingsData = await readFile(settingsPath, "utf-8");
+    const settings = JSON.parse(settingsData);
+    return settings.fetchDelayMs || 2000; // Default to 2 seconds if not set
+  } catch (error) {
+    console.warn("[Capture Job] Could not read settings, using default delay of 2000ms");
+    return 2000; // Default to 2 seconds
+  }
+}
 
 export async function POST(request: NextRequest) {
   let market_hash_name: string | undefined;
@@ -59,12 +73,13 @@ export async function POST(request: NextRequest) {
         );
 
         if (itemCustomizations.length > 0) {
+          const fetchDelay = await getFetchDelay();
           const customizationResults = await fetchMultiplePrices(
             itemCustomizations.map((customization) => ({
               market_hash_name: customization.customization_hash,
               appid: 730, // CS2 app ID
             })),
-            1000 // 1 second delay between requests
+            fetchDelay // Use delay from settings
           );
 
           // Save successful customization price captures
@@ -148,12 +163,13 @@ export async function POST(request: NextRequest) {
       const previousInventoryValue = await getInventoryValue();
 
       // Capture main item prices
+      const fetchDelay = await getFetchDelay();
       const results = await fetchMultiplePrices(
         items.map((item) => ({
           market_hash_name: item.market_hash_name,
           appid: item.appid,
         })),
-        1000 // 1 second delay between requests
+        fetchDelay // Use delay from settings
       );
 
       // Update progress after main items
@@ -171,7 +187,7 @@ export async function POST(request: NextRequest) {
           market_hash_name: customization.customization_hash,
           appid: 730, // CS2 app ID
         })),
-        1000 // 1 second delay between requests
+        fetchDelay // Use delay from settings
       );
 
       // Save successful customization price captures

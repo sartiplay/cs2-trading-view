@@ -138,8 +138,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       id: existingItem.id, // This is crucial - include the existing item's ID
       market_hash_name: marketHashName,
       label: label !== undefined ? label : existingItem.label,
-      description:
-        description !== undefined ? description : existingItem.description,
+      description: description !== undefined ? description : existingItem.description,
       appid: existingItem.appid,
       steam_url: existingItem.steam_url,
       image_url: image_url !== undefined ? image_url : existingItem.image_url,

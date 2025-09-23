@@ -939,7 +939,6 @@ export function SettingsDialog() {
                   id="fetch-delay"
                   type="number"
                   min="500"
-                  max="10000"
                   step="500"
                   value={settings.fetchDelayMs}
                   onChange={(e) =>
@@ -950,7 +949,7 @@ export function SettingsDialog() {
                   }
                 />
                 <p className="text-sm text-muted-foreground">
-                  Delay between Steam API requests (500-10000ms)
+                  Delay between Steam API requests (minimum 500ms, no maximum limit)
                 </p>
               </div>
 
