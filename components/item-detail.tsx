@@ -1250,6 +1250,7 @@ export function ItemDetail({ hash }: ItemDetailProps) {
           description: "Category updated successfully",
         });
         await fetchItem(); // Refresh item data
+        await fetchCategories(); // Refresh categories list
         setIsEditingCategory(false);
       } else {
         throw new Error("Failed to update category");
@@ -1413,6 +1414,7 @@ export function ItemDetail({ hash }: ItemDetailProps) {
                     onValueChange={setEditingCategoryId}
                     placeholder="Select a category"
                     showCreateButton={true}
+                    onCategoryCreated={() => fetchCategories()}
                   />
                 </div>
               )}

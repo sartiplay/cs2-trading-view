@@ -31,6 +31,7 @@ interface CategorySelectorProps {
   disabled?: boolean;
   showCreateButton?: boolean;
   showSettingsButton?: boolean;
+  onCategoryCreated?: (category: CategoryConfig) => void;
 }
 
 export function CategorySelector({
@@ -40,6 +41,7 @@ export function CategorySelector({
   disabled = false,
   showCreateButton = true,
   showSettingsButton = false,
+  onCategoryCreated,
 }: CategorySelectorProps) {
   const [categories, setCategories] = useState<CategoryConfig[]>([]);
   const [loading, setLoading] = useState(true);
@@ -79,6 +81,10 @@ export function CategorySelector({
       title: "Success",
       description: `Category "${newCategory.name}" created successfully`,
     });
+    // Call the optional callback to notify parent components
+    onCategoryCreated?.(newCategory);
+    // Dispatch a custom event to notify other components
+    window.dispatchEvent(new CustomEvent('categoryCreated', { detail: newCategory }));
   };
 
   const selectedCategory = categories.find((cat) => cat.id === value);

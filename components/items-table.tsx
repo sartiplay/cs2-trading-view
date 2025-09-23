@@ -558,10 +558,16 @@ export function ItemsTable() {
       fetchItems();
     };
 
+    const handleCategoryCreated = () => {
+      fetchCategories();
+    };
+
     window.addEventListener("refreshItems", handleRefresh);
+    window.addEventListener("categoryCreated", handleCategoryCreated);
 
     return () => {
       window.removeEventListener("refreshItems", handleRefresh);
+      window.removeEventListener("categoryCreated", handleCategoryCreated);
     };
   }, []);
 
