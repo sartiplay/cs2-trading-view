@@ -30,7 +30,8 @@ interface AppSettings {
 }
 
 export default function Dashboard() {
-  const [settings, setSettings] = useState<AppSettings>({ workerStatusVisible: true });
+  const [settings, setSettings] = useState<AppSettings>({ workerStatusVisible: false });
+  const [settingsLoaded, setSettingsLoaded] = useState(false);
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -42,6 +43,8 @@ export default function Dashboard() {
         }
       } catch (error) {
         console.error("Failed to fetch settings:", error);
+      } finally {
+        setSettingsLoaded(true);
       }
     };
 
@@ -80,7 +83,7 @@ export default function Dashboard() {
           <CaptureStats priceSource={settings.priceSource || "steam"} />
 
           {/* Worker Status - Mobile/Tablet: In accordion */}
-          {settings.workerStatusVisible && (
+          {settingsLoaded && settings.workerStatusVisible && (
             <div className="xl:hidden">
               <Accordion type="multiple" className="w-full">
                 <AccordionItem value="worker-status">
@@ -126,7 +129,7 @@ export default function Dashboard() {
         </div>
 
         {/* Worker Status - Desktop: Floating sidebar */}
-        {settings.workerStatusVisible && (
+        {settingsLoaded && settings.workerStatusVisible && (
           <div className="hidden xl:block fixed top-24 right-6 w-80 z-10">
             <WorkerStatus />
           </div>
