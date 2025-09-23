@@ -34,6 +34,7 @@ export interface PriceAlertConfig {
 }
 
 export interface Item {
+  id: string; // Unique identifier for this specific item instance
   market_hash_name: string;
   label: string;
   description?: string;
@@ -49,6 +50,7 @@ export interface Item {
   patches?: CustomizationWithHistory[]; // For character skins
   include_customizations_in_price?: boolean; // Whether to include customization costs in selling price
   price_alert_config?: PriceAlertConfig;
+  created_at: string; // When this item instance was created
 }
 
 export interface CategoryConfig {
@@ -66,6 +68,7 @@ export interface ItemWithHistory extends Item {
 }
 
 export interface SoldItem {
+  id: string; // Unique identifier for this specific item instance
   market_hash_name: string;
   label: string;
   description?: string;
@@ -111,7 +114,7 @@ export interface SoldItem {
 
 export interface DataStore {
   categories: Record<string, CategoryConfig>;
-  items: Record<string, ItemWithHistory>;
+  items: Record<string, ItemWithHistory>; // Key is now item.id instead of market_hash_name
   sold_items: SoldItem[];
   portfolio_history: Array<{
     timestamp: string;
@@ -130,6 +133,11 @@ const DATA_FILE = path.join(process.cwd(), "data.json");
 
 const PRICE_SPIKE_PERCENT_THRESHOLD = 15; // percent change
 const PRICE_SPIKE_MIN_ABSOLUTE = 1; // USD difference
+
+// Generate a unique ID for items
+function generateItemId(): string {
+  return `item_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+}
 const PRICE_SPIKE_TIME_WINDOW_MS = 30 * 60 * 1000; // 30 minutes
 
 interface PriceAlertTrigger {
@@ -219,11 +227,53 @@ export async function writeData(data: DataStore): Promise<void> {
   await queueUpdate(() => writeDataFile(data));
 }
 
-export async function addOrUpdateItem(item: Item): Promise<void> {
+export async function addOrUpdateItem(item: Item): Promise<string> {
+  let itemId: string = "";
+  
   await updateData((data) => {
-    if (!data.items[item.market_hash_name]) {
+    // If item has an ID and exists, update it; otherwise create a new one
+    if (item.id && data.items[item.id]) {
+      // Update existing item
+      const existingItem = data.items[item.id];
+      existingItem.label = item.label;
+      existingItem.description = item.description;
+      existingItem.category_id = item.category_id;
+      existingItem.appid = item.appid;
+      existingItem.steam_url = item.steam_url;
+      existingItem.image_url = item.image_url !== undefined ? item.image_url : existingItem.image_url;
+      existingItem.purchase_price = item.purchase_price;
+      existingItem.quantity = item.quantity;
+      existingItem.purchase_currency = item.purchase_currency;
+      existingItem.include_customizations_in_price = item.include_customizations_in_price;
+      existingItem.price_alert_config = item.price_alert_config ?? existingItem.price_alert_config;
+
+      existingItem.stickers = item.stickers?.map((sticker, index) => ({
+        ...sticker,
+        price_history:
+          (existingItem.stickers?.[index] as CustomizationWithHistory)
+            ?.price_history || [],
+      }));
+      existingItem.charms = item.charms?.map((charm, index) => ({
+        ...charm,
+        price_history:
+          (existingItem.charms?.[index] as CustomizationWithHistory)
+            ?.price_history || [],
+      }));
+      existingItem.patches = item.patches?.map((patch, index) => ({
+        ...patch,
+        price_history:
+          (existingItem.patches?.[index] as CustomizationWithHistory)
+            ?.price_history || [],
+      }));
+      
+      itemId = item.id;
+    } else {
+      // Create new item with new ID
+      itemId = generateItemId();
       const itemWithHistory: ItemWithHistory = {
         ...item,
+        id: itemId,
+        created_at: new Date().toISOString(),
         price_alert_config: item.price_alert_config,
         price_history: [],
         stickers: item.stickers?.map((sticker) => ({
@@ -236,44 +286,11 @@ export async function addOrUpdateItem(item: Item): Promise<void> {
           price_history: [],
         })),
       };
-      data.items[item.market_hash_name] = itemWithHistory;
-      return;
+      data.items[itemId] = itemWithHistory;
     }
-
-    const existingItem = data.items[item.market_hash_name];
-    existingItem.label = item.label;
-    existingItem.description = item.description;
-    existingItem.category_id = item.category_id;
-    existingItem.appid = item.appid;
-    existingItem.steam_url = item.steam_url;
-    existingItem.image_url = item.image_url !== undefined ? item.image_url : existingItem.image_url;
-    existingItem.purchase_price = item.purchase_price;
-    existingItem.quantity = item.quantity;
-    existingItem.purchase_currency = item.purchase_currency;
-    existingItem.include_customizations_in_price =
-      item.include_customizations_in_price;
-    existingItem.price_alert_config =
-      item.price_alert_config ?? existingItem.price_alert_config;
-
-    existingItem.stickers = item.stickers?.map((sticker, index) => ({
-      ...sticker,
-      price_history:
-        (existingItem.stickers?.[index] as CustomizationWithHistory)
-          ?.price_history || [],
-    }));
-    existingItem.charms = item.charms?.map((charm, index) => ({
-      ...charm,
-      price_history:
-        (existingItem.charms?.[index] as CustomizationWithHistory)
-          ?.price_history || [],
-    }));
-    existingItem.patches = item.patches?.map((patch, index) => ({
-      ...patch,
-      price_history:
-        (existingItem.patches?.[index] as CustomizationWithHistory)
-          ?.price_history || [],
-    }));
   });
+  
+  return itemId;
 }
 
 export async function updatePriceAlertConfig(
@@ -281,7 +298,8 @@ export async function updatePriceAlertConfig(
   config: PriceAlertConfig
 ): Promise<PriceAlertConfig> {
   return updateData((data) => {
-    const item = data.items[marketHashName];
+    // Find the item by market hash name
+    const item = Object.values(data.items).find(item => item.market_hash_name === marketHashName);
     if (!item) {
       throw new Error("Item not found");
     }
@@ -320,9 +338,9 @@ export async function updatePriceAlertConfig(
     return nextConfig;
   });
 }
-export async function removeItem(marketHashName: string): Promise<void> {
+export async function removeItem(itemId: string): Promise<void> {
   await updateData((data) => {
-    delete data.items[marketHashName];
+    delete data.items[itemId];
   });
 }
 
@@ -334,13 +352,15 @@ export async function addPriceEntry(
   const alertNotifications: PriceAlertTrigger[] = [];
 
   await updateData((data) => {
-    const item = data.items[marketHashName];
-    if (!item) {
-      return;
-    }
-
+    // Find all items with this market_hash_name and update their prices
+    const itemsWithHashName = Object.values(data.items).filter(
+      item => item.market_hash_name === marketHashName
+    );
+    
     const now = new Date();
     const nowIso = now.toISOString();
+    
+    for (const item of itemsWithHashName) {
     const history = item.price_history;
     const previousEntry =
       history.length > 0 ? history[history.length - 1] : null;
@@ -453,7 +473,19 @@ export async function addPriceEntry(
       config.lastTriggeredUpper = null;
     }
 
-    config.updatedAt = nowIso;
+      config.updatedAt = nowIso;
+
+      // Add the new price entry to the history
+      item.price_history.push({
+        date: nowIso,
+        median_price: price,
+      });
+
+      // Sort the price history by date
+      item.price_history.sort(
+        (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+      );
+    }
 
     data.metadata.last_capture = nowIso;
     data.metadata.total_captures += 1;
@@ -503,10 +535,18 @@ export async function getAllItems(): Promise<ItemWithHistory[]> {
 }
 
 export async function getItem(
+  itemId: string
+): Promise<ItemWithHistory | null> {
+  const data = await readData();
+  return data.items[itemId] || null;
+}
+
+export async function getItemByMarketHashName(
   marketHashName: string
 ): Promise<ItemWithHistory | null> {
   const data = await readData();
-  return data.items[marketHashName] || null;
+  // Find the first item with this market_hash_name
+  return Object.values(data.items).find(item => item.market_hash_name === marketHashName) || null;
 }
 
 export async function getCaptureStats(): Promise<{
@@ -760,13 +800,13 @@ export async function getLatestPrices(): Promise<
 }
 
 export async function markItemAsSold(
-  marketHashName: string,
+  itemId: string,
   soldPrice: number,
   soldCurrency: string,
   soldPriceUsd: number
 ): Promise<void> {
   await updateData(async (data) => {
-    const item = data.items[marketHashName];
+    const item = data.items[itemId];
 
     if (!item) {
       throw new Error("Item not found");
@@ -874,12 +914,14 @@ export async function markItemAsSold(
       totalPurchaseUsd > 0 ? (profitLoss / totalPurchaseUsd) * 100 : 0;
 
     const soldItem: SoldItem = {
+      id: item.id,
       market_hash_name: item.market_hash_name,
       label: item.label,
       description: item.description,
       category_id: item.category_id,
       appid: item.appid,
       steam_url: item.steam_url,
+      image_url: item.image_url,
       purchase_price: item.purchase_price,
       purchase_price_usd: purchasePriceUsd,
       purchase_currency: item.purchase_currency,
@@ -899,10 +941,10 @@ export async function markItemAsSold(
     };
 
     data.sold_items.push(soldItem);
-    delete data.items[marketHashName];
+    delete data.items[itemId];
 
     console.log(
-      `[Data Storage] Marked item as sold: ${marketHashName} for ${soldCurrency}${soldPrice}`
+      `[Data Storage] Marked item as sold: ${item.market_hash_name} (${itemId}) for ${soldCurrency}${soldPrice}`
     );
   });
 }
@@ -967,11 +1009,11 @@ export async function addCustomizationPriceEntry(
   price: number
 ): Promise<void> {
   await updateData((data) => {
-    if (!data.items[marketHashName]) {
+    // Find the item by market hash name
+    const item = Object.values(data.items).find(item => item.market_hash_name === marketHashName);
+    if (!item) {
       return;
     }
-
-    const item = data.items[marketHashName];
     const customizations = item[customizationType] as
       | CustomizationWithHistory[]
       | undefined;
@@ -1231,8 +1273,13 @@ export async function reloadItemImage(marketHashName: string): Promise<string | 
   
   if (imageUrl) {
     await updateData((data) => {
-      if (data.items[marketHashName]) {
-        data.items[marketHashName].image_url = imageUrl;
+      // Find all items with this market hash name and update their images
+      const itemsWithHashName = Object.values(data.items).filter(
+        item => item.market_hash_name === marketHashName
+      );
+      
+      for (const item of itemsWithHashName) {
+        item.image_url = imageUrl;
       }
     });
   }

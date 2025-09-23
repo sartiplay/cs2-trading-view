@@ -45,6 +45,7 @@ import { EditItemDialog } from "@/components/edit-item-dialog";
 import { DeleteItemDialog } from "@/components/delete-file-dialog";
 
 import { ImageDialog } from "@/components/image-dialog";
+import { ImageLoadingSpinner } from "@/components/image-loading-spinner";
 
 type Customization = {
   name: string;
@@ -57,6 +58,8 @@ type Customization = {
 };
 
 interface Item {
+  id: string;
+
   market_hash_name: string;
 
   label: string;
@@ -442,30 +445,20 @@ export function ItemsTable() {
     if (!item) return;
 
     setEditingItem({
+      id: item.id,
       market_hash_name: item.market_hash_name,
-
       label: item.label,
-
       description: item.description,
-
       category_id: item.category_id,
-
       appid: item.appid,
-
       steam_url: item.steam_url,
-
+      image_url: item.image_url,
       purchase_price: item.purchase_price,
-
       purchase_price_usd: item.purchase_price_usd,
-
       purchase_currency: item.purchase_currency,
-
       quantity: item.quantity,
-
       stickers: item.stickers,
-
       charms: item.charms,
-
       patches: item.patches,
     });
 
@@ -813,7 +806,7 @@ export function ItemsTable() {
                   item.purchase_currency;
 
                 return (
-                  <TableRow key={item.market_hash_name}>
+                  <TableRow key={item.id}>
                     <TableCell className="w-[8%] min-w-[80px] text-center">
                       {item.image_url ? (
                         <div className="flex items-center justify-center">
@@ -829,9 +822,7 @@ export function ItemsTable() {
                           />
                         </div>
                       ) : (
-                        <div className="w-12 h-12 flex items-center justify-center text-muted-foreground text-xs border rounded bg-muted">
-                          No Image
-                        </div>
+                        <ImageLoadingSpinner size="md" />
                       )}
                     </TableCell>
                     <TableCell className="w-[20%] min-w-[180px]">

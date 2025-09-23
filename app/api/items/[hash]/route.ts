@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import {
   getItem,
+  getItemByMarketHashName,
   removeItem,
   addOrUpdateItem,
 } from "@/lib/data-storage.server";
@@ -14,7 +15,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     const { hash } = await params;
     const marketHashName = decodeURIComponent(hash);
 
-    const item = await getItem(marketHashName);
+    const item = await getItemByMarketHashName(marketHashName);
 
     if (!item) {
       return NextResponse.json({ error: "Item not found" }, { status: 404 });
@@ -35,7 +36,13 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     const { hash } = await params;
     const marketHashName = decodeURIComponent(hash);
 
-    await removeItem(marketHashName);
+    // Find the item by market hash name first
+    const item = await getItemByMarketHashName(marketHashName);
+    if (!item) {
+      return NextResponse.json({ error: "Item not found" }, { status: 404 });
+    }
+
+    await removeItem(item.id);
 
     return NextResponse.json({ success: true });
   } catch (error) {
@@ -54,7 +61,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     const body = await request.json();
 
     // Get the existing item to preserve fields not being updated
-    const existingItem = await getItem(marketHashName);
+    const existingItem = await getItemByMarketHashName(marketHashName);
     if (!existingItem) {
       return NextResponse.json({ error: "Item not found" }, { status: 404 });
     }
@@ -126,12 +133,14 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 
     // Update the item with new values, preserving existing ones for undefined fields
     await addOrUpdateItem({
+      id: existingItem.id, // This is crucial - include the existing item's ID
       market_hash_name: marketHashName,
       label: label !== undefined ? label : existingItem.label,
       description:
         description !== undefined ? description : existingItem.description,
       appid: existingItem.appid,
       steam_url: existingItem.steam_url,
+      image_url: existingItem.image_url,
       purchase_price:
         purchase_price !== undefined
           ? purchase_price
@@ -149,6 +158,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
         include_customization_costs !== undefined
           ? include_customization_costs
           : existingItem.include_customizations_in_price,
+      price_alert_config: existingItem.price_alert_config,
     });
 
     return NextResponse.json({ success: true });

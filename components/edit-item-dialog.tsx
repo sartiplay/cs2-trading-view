@@ -57,6 +57,7 @@ interface Customization {
 }
 
 interface Item {
+  id: string;
   market_hash_name: string;
   label: string;
   description?: string;

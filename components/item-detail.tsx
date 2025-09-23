@@ -54,6 +54,7 @@ import {
 } from "@/components/ui/dialog";
 import { CategorySelector } from "@/components/category-selector";
 import { ImageDialog } from "@/components/image-dialog";
+import { ImageLoadingSpinner } from "@/components/image-loading-spinner";
 import {
   DEFAULT_PINNED_PROVIDERS,
   TRADE_PROVIDERS,
@@ -107,7 +108,12 @@ interface PriceAlertConfig {
   updatedAt?: string;
 }
 
+interface ItemDetailProps {
+  hash: string; // This will be the item ID, not market_hash_name
+}
+
 interface ItemData {
+  id: string;
   market_hash_name: string;
   label: string;
   appid: number;
@@ -1337,8 +1343,8 @@ export function ItemDetail({ hash }: ItemDetailProps) {
           </div>
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div className="flex items-start gap-4">
-              {item.image_url && (
-                <div className="flex-shrink-0">
+              <div className="flex-shrink-0">
+                {item.image_url ? (
                   <img
                     src={item.image_url}
                     alt={item.label}
@@ -1349,8 +1355,10 @@ export function ItemDetail({ hash }: ItemDetailProps) {
                       (e.target as HTMLImageElement).style.display = 'none';
                     }}
                   />
-                </div>
-              )}
+                ) : (
+                  <ImageLoadingSpinner size="lg" className="w-16 h-16 lg:w-20 lg:h-20" />
+                )}
+              </div>
               <div className="space-y-2">
                 <h1 className="text-3xl font-bold lg:text-4xl text-foreground">
                   {item.label}

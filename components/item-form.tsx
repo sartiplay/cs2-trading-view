@@ -152,47 +152,23 @@ export function ItemForm() {
 
     setIsLoading(true);
     try {
-      // Load item image first
-      setIsLoadingImage(true);
-      let imageUrl: string | undefined;
+      // Check if item already exists and has an image
+      let existingImageUrl: string | undefined;
+      let needsImageLoading = false;
       
       try {
-        const imageResponse = await fetch("/api/items/load-image", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            market_hash_name: marketHashName,
-            appid: 730,
-          }),
-        });
-        
-        if (imageResponse.ok) {
-          const imageData = await imageResponse.json();
-          imageUrl = imageData.image_url;
-          if (imageUrl) {
-            toast({
-              title: "Success",
-              description: "Item image loaded successfully!",
-            });
-          } else {
-            toast({
-              title: "Warning",
-              description: "Item image could not be loaded, but item will still be added.",
-              variant: "destructive",
-            });
-          }
+        const checkResponse = await fetch(`/api/items/check-image?market_hash_name=${encodeURIComponent(marketHashName)}`);
+        if (checkResponse.ok) {
+          const checkData = await checkResponse.json();
+          existingImageUrl = checkData.image_url;
+          needsImageLoading = !existingImageUrl;
         }
-      } catch (imageError) {
-        console.error("Error loading item image:", imageError);
-        toast({
-          title: "Warning",
-          description: "Could not load item image, but item will still be added.",
-          variant: "destructive",
-        });
-      } finally {
-        setIsLoadingImage(false);
+      } catch (checkError) {
+        console.error("Error checking existing image:", checkError);
+        needsImageLoading = true;
       }
 
+      // Create the item immediately with existing image (if available)
       const response = await fetch("/api/items", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -202,7 +178,7 @@ export function ItemForm() {
           description: description.trim() || undefined,
           appid: 730,
           steam_url: steamUrl.trim(),
-          image_url: imageUrl,
+          image_url: existingImageUrl,
           purchase_price: price,
           quantity: qty,
           purchase_currency: purchaseCurrency,
@@ -247,6 +223,35 @@ export function ItemForm() {
             title: "Partial Success",
             description:
               "Item added successfully, but price data fetch failed. It will be fetched on the next scheduled update.",
+          });
+        }
+
+        // Start background image loading if needed
+        if (needsImageLoading) {
+          try {
+            await fetch("/api/items/load-image-background", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                market_hash_name: marketHashName,
+              }),
+            });
+            toast({
+              title: "Image Loading",
+              description: "Item added successfully! Image is loading in the background and will appear shortly.",
+            });
+          } catch (bgError) {
+            console.error("Failed to start background image loading:", bgError);
+          }
+        } else if (existingImageUrl) {
+          toast({
+            title: "Success",
+            description: "Item added successfully with existing image!",
+          });
+        } else {
+          toast({
+            title: "Success",
+            description: "Item added successfully!",
           });
         }
 
