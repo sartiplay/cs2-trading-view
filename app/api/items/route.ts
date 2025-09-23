@@ -2,8 +2,11 @@ import { type NextRequest, NextResponse } from "next/server";
 import { addOrUpdateItem, getAllItems } from "@/lib/data-storage.server";
 import { convertCurrency } from "@/lib/currency-converter.server";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    const { searchParams } = new URL(request.url);
+    const displayCurrency = searchParams.get("display_currency") || "USD";
+    
     const items = await getAllItems();
 
     const itemsWithProfitLoss = await Promise.all(
@@ -93,6 +96,46 @@ export async function GET() {
             100
           : null;
 
+        // Convert all USD values to display currency if needed
+        let convertedPurchasePriceUSD = totalPurchaseCostUSD;
+        let convertedLatestPrice = totalCurrentValueUSD;
+        let convertedProfitLoss = profitLoss;
+        let convertedCustomizationCostUSD = customizationCostUSD;
+        let convertedCustomizationCurrentValueUSD = customizationCurrentValueUSD;
+
+        if (displayCurrency !== "USD") {
+          try {
+            convertedPurchasePriceUSD = await convertCurrency(
+              totalPurchaseCostUSD,
+              "USD",
+              displayCurrency
+            );
+            convertedLatestPrice = await convertCurrency(
+              totalCurrentValueUSD,
+              "USD",
+              displayCurrency
+            );
+            convertedProfitLoss = await convertCurrency(
+              profitLoss,
+              "USD",
+              displayCurrency
+            );
+            convertedCustomizationCostUSD = await convertCurrency(
+              customizationCostUSD,
+              "USD",
+              displayCurrency
+            );
+            convertedCustomizationCurrentValueUSD = await convertCurrency(
+              customizationCurrentValueUSD,
+              "USD",
+              displayCurrency
+            );
+          } catch (error) {
+            console.error("Failed to convert currency:", error);
+            // If conversion fails, use USD values
+          }
+        }
+
         return {
           id: item.id,
           market_hash_name: item.market_hash_name,
@@ -103,22 +146,23 @@ export async function GET() {
           steam_url: item.steam_url,
           image_url: item.image_url,
           purchase_price: item.purchase_price,
-          purchase_price_usd: totalPurchaseCostUSD, // Include customization costs in displayed purchase price
+          purchase_price_usd: convertedPurchasePriceUSD, // Include customization costs in displayed purchase price
           purchase_currency: item.purchase_currency || "USD",
           quantity: item.quantity,
-          latest_price: totalCurrentValueUSD, // Include customization values in displayed current price
+          latest_price: convertedLatestPrice, // Include customization values in displayed current price
           last_updated: latestEntry?.date,
-          profit_loss: profitLoss,
+          profit_loss: convertedProfitLoss,
           profit_loss_percentage: profitLossPercentage,
           stickers: item.stickers || [],
           charms: item.charms || [],
           patches: item.patches || [],
-          customization_cost_usd: customizationCostUSD,
-          customization_current_value_usd: customizationCurrentValueUSD, // Add current customization value
+          customization_cost_usd: convertedCustomizationCostUSD,
+          customization_current_value_usd: convertedCustomizationCurrentValueUSD, // Add current customization value
           include_customizations_in_price:
             item.include_customizations_in_price || false,
           price_alert_config: item.price_alert_config ?? null,
           created_at: item.created_at,
+          display_currency: displayCurrency,
         };
       })
     );

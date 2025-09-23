@@ -50,29 +50,7 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { DEFAULT_PINNED_PROVIDERS } from "@/lib/trade-providers";
-
-const AVAILABLE_CURRENCIES = [
-  { code: "USD", name: "US Dollar" },
-  { code: "EUR", name: "Euro" },
-  { code: "GBP", name: "British Pound" },
-  { code: "JPY", name: "Japanese Yen" },
-  { code: "CAD", name: "Canadian Dollar" },
-  { code: "AUD", name: "Australian Dollar" },
-  { code: "CHF", name: "Swiss Franc" },
-  { code: "CNY", name: "Chinese Yuan" },
-  { code: "SEK", name: "Swedish Krona" },
-  { code: "NOK", name: "Norwegian Krone" },
-  { code: "DKK", name: "Danish Krone" },
-  { code: "PLN", name: "Polish Zloty" },
-  { code: "CZK", name: "Czech Koruna" },
-  { code: "HUF", name: "Hungarian Forint" },
-  { code: "RUB", name: "Russian Ruble" },
-  { code: "BRL", name: "Brazilian Real" },
-  { code: "MXN", name: "Mexican Peso" },
-  { code: "INR", name: "Indian Rupee" },
-  { code: "KRW", name: "South Korean Won" },
-  { code: "SGD", name: "Singapore Dollar" },
-];
+import { SUPPORTED_CURRENCIES } from "@/lib/currency-utils";
 
 export interface AppSettings {
   timelineResolution:
@@ -965,7 +943,7 @@ export function SettingsDialog() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {AVAILABLE_CURRENCIES.map((currency) => (
+                    {SUPPORTED_CURRENCIES.map((currency) => (
                       <SelectItem key={currency.code} value={currency.code}>
                         {currency.code} - {currency.name}
                       </SelectItem>

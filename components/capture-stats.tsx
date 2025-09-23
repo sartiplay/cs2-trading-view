@@ -11,6 +11,8 @@ import {
   DollarSign,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useCurrency } from "@/contexts/currency-context";
+import { getClientCurrencySymbol } from "@/lib/currency-utils";
 
 interface CaptureStats {
   last_capture: string | null;
@@ -36,6 +38,7 @@ export function CaptureStats({ priceSource = "steam" }: CaptureStatsProps) {
   );
   const [isCapturing, setIsCapturing] = useState(false);
   const { toast } = useToast();
+  const { displayCurrency } = useCurrency();
 
   const fetchStats = async () => {
     try {
@@ -51,7 +54,7 @@ export function CaptureStats({ priceSource = "steam" }: CaptureStatsProps) {
 
   const fetchInventoryData = async () => {
     try {
-      const response = await fetch(`/api/inventory-value?price_source=${priceSource}`);
+      const response = await fetch(`/api/inventory-value?price_source=${priceSource}&display_currency=${displayCurrency}`);
       if (response.ok) {
         const data = await response.json();
         setInventoryData(data);
@@ -96,7 +99,7 @@ export function CaptureStats({ priceSource = "steam" }: CaptureStatsProps) {
   useEffect(() => {
     fetchStats();
     fetchInventoryData();
-  }, [priceSource]);
+  }, [priceSource, displayCurrency]);
 
   if (!stats) {
     return <div className="text-center py-4">Loading statistics...</div>;
@@ -139,7 +142,7 @@ export function CaptureStats({ priceSource = "steam" }: CaptureStatsProps) {
                 : "text-red-600"
             }`}
           >
-            $
+            {getClientCurrencySymbol(displayCurrency)}
             {inventoryData
               ? inventoryData.total_purchase_value.toFixed(2)
               : "0.00"}
@@ -159,7 +162,7 @@ export function CaptureStats({ priceSource = "steam" }: CaptureStatsProps) {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
-            $
+            {getClientCurrencySymbol(displayCurrency)}
             {inventoryData
               ? inventoryData.total_current_value.toFixed(2)
               : "0.00"}

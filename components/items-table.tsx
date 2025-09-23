@@ -38,6 +38,8 @@ import {
 } from "lucide-react";
 
 import { useToast } from "@/hooks/use-toast";
+import { useCurrency } from "@/contexts/currency-context";
+import { getClientCurrencySymbol } from "@/lib/currency-utils";
 
 import Link from "next/link";
 
@@ -236,6 +238,7 @@ export function ItemsTable() {
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
   const [selectedImageUrl, setSelectedImageUrl] = useState("");
   const [selectedImageItemName, setSelectedImageItemName] = useState("");
+  const { displayCurrency } = useCurrency();
   
   // Filter and sort state
   const [filters, setFilters] = useState<FilterState>({
@@ -259,7 +262,7 @@ export function ItemsTable() {
 
   const fetchItems = async () => {
     try {
-      const response = await fetch("/api/items");
+      const response = await fetch(`/api/items?display_currency=${displayCurrency}`);
 
       if (response.ok) {
         const data = await response.json();
@@ -569,7 +572,7 @@ export function ItemsTable() {
       window.removeEventListener("refreshItems", handleRefresh);
       window.removeEventListener("categoryCreated", handleCategoryCreated);
     };
-  }, []);
+  }, [displayCurrency]);
 
   // Fetch initial price source from settings
   useEffect(() => {
@@ -930,9 +933,7 @@ export function ItemsTable() {
 
             <TableBody>
               {filteredAndSortedItems.map((item) => {
-                const currencySymbol =
-                  CURRENCY_SYMBOLS[item.purchase_currency] ||
-                  item.purchase_currency;
+                const currencySymbol = getClientCurrencySymbol(displayCurrency);
 
                 return (
                   <TableRow key={item.id}>
@@ -1030,17 +1031,17 @@ export function ItemsTable() {
                     <TableCell className="w-[12%] min-w-[100px] text-right">
                       <div className="font-medium">
                         {currencySymbol}
-                        {item.purchase_price.toFixed(2)}
+                        {item.purchase_price_usd.toFixed(2)}
                       </div>
 
-                      {item.purchase_currency !== "USD" && (
+                      {item.purchase_currency !== displayCurrency && (
                         <div className="text-xs text-muted-foreground">
-                          ≈ ${item.purchase_price_usd.toFixed(2)} USD
+                          Original: {getClientCurrencySymbol(item.purchase_currency)}{item.purchase_price.toFixed(2)}
                         </div>
                       )}
 
                       <div className="text-xs text-muted-foreground">
-                        Total: ${(item.purchase_price_usd * item.quantity).toFixed(2)}
+                        Total: {currencySymbol}{(item.purchase_price_usd * item.quantity).toFixed(2)}
                       </div>
                     </TableCell>
 
@@ -1058,7 +1059,7 @@ export function ItemsTable() {
                           return (
                             <div>
                               <div className="font-medium">
-                                ${currentPrice.toFixed(2)}
+                                {currencySymbol}{currentPrice.toFixed(2)}
                               </div>
                               {priceSource === "csgoskins" && externalPrice && (
                                 <div className="text-xs text-muted-foreground">
@@ -1088,7 +1089,7 @@ export function ItemsTable() {
                         if (currentPrice) {
                           return (
                             <div className="font-medium">
-                              ${(currentPrice * item.quantity).toFixed(2)}
+                              {currencySymbol}{(currentPrice * item.quantity).toFixed(2)}
                             </div>
                           );
                         } else {
@@ -1121,7 +1122,7 @@ export function ItemsTable() {
                                     : "text-red-600"
                                 }`}
                               >
-                                {profitLoss >= 0 ? "+" : ""}$
+                                {profitLoss >= 0 ? "+" : ""}{currencySymbol}
                                 {profitLoss.toFixed(2)}
                               </div>
 

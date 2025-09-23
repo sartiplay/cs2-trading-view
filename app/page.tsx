@@ -7,6 +7,7 @@ import { CaptureStats } from "@/components/capture-stats";
 import { SettingsDialog } from "@/components/settings-dialog";
 import { PortfolioChart } from "@/components/portfolio-chart";
 import { WorkerStatus } from "@/components/worker-status";
+import { CurrencyProvider } from "@/contexts/currency-context";
 import {
   Card,
   CardContent,
@@ -63,8 +64,9 @@ export default function Dashboard() {
     };
   }, []);
   return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="mx-auto max-w-7xl space-y-8">
+    <CurrencyProvider>
+      <div className="min-h-screen bg-background p-6">
+        <div className="mx-auto max-w-7xl space-y-8">
         <div className="flex items-center justify-between">
           <div className="text-center flex-1">
             <h1 className="text-4xl font-bold tracking-tight text-balance">
@@ -152,5 +154,6 @@ export default function Dashboard() {
         <SoldItemsDisplay />
       </div>
     </div>
+    </CurrencyProvider>
   );
 }
