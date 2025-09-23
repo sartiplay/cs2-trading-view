@@ -99,6 +99,7 @@ export function EditItemDialog({
     useState(false);
   const [categoryId, setCategoryId] = useState<string | undefined>(undefined);
   const [isLoadingImage, setIsLoadingImage] = useState(false);
+  const [newImageUrl, setNewImageUrl] = useState<string | undefined>(undefined);
 
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast(); // Declare useToast
@@ -114,6 +115,7 @@ export function EditItemDialog({
       setCharms(item.charms || []);
       setPatches(item.patches || []);
       setCategoryId(item.category_id);
+      setNewImageUrl(undefined); // Reset new image URL when dialog opens
     }
   }, [item, open]);
 
@@ -228,7 +230,7 @@ export function EditItemDialog({
     
     setIsLoadingImage(true);
     try {
-      const response = await fetch("/api/items/load-image", {
+      const response = await fetch("/api/items/reload-image", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -240,11 +242,11 @@ export function EditItemDialog({
       if (response.ok) {
         const imageData = await response.json();
         if (imageData.image_url) {
+          setNewImageUrl(imageData.image_url);
           toast({
             title: "Success",
-            description: "Item image reloaded successfully!",
+            description: "Item image reloaded and saved successfully!",
           });
-          // The image will be updated when the item is saved
         } else {
           toast({
             title: "Warning",
@@ -316,6 +318,7 @@ export function EditItemDialog({
             charms: charms.filter((c) => c.name.trim()),
             patches: patches.filter((p) => p.name.trim()),
             include_customization_costs: includeCustomizationCosts,
+            image_url: newImageUrl,
           }),
         }
       );

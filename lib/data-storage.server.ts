@@ -231,17 +231,29 @@ export async function writeData(data: DataStore): Promise<void> {
 export async function addOrUpdateItem(item: Item): Promise<string> {
   let itemId: string = "";
   
+  console.log("[Data Storage] addOrUpdateItem called with:", {
+    id: item.id,
+    market_hash_name: item.market_hash_name,
+    image_url: item.image_url,
+  });
+  
   await updateData((data) => {
     // If item has an ID and exists, update it; otherwise create a new one
     if (item.id && data.items[item.id]) {
       // Update existing item
       const existingItem = data.items[item.id];
+      console.log("[Data Storage] Updating existing item:", {
+        id: item.id,
+        old_image_url: existingItem.image_url,
+        new_image_url: item.image_url,
+      });
       existingItem.label = item.label;
       existingItem.description = item.description;
       existingItem.category_id = item.category_id;
       existingItem.appid = item.appid;
       existingItem.steam_url = item.steam_url;
       existingItem.image_url = item.image_url !== undefined ? item.image_url : existingItem.image_url;
+      console.log("[Data Storage] After update, image_url is:", existingItem.image_url);
       existingItem.purchase_price = item.purchase_price;
       existingItem.quantity = item.quantity;
       existingItem.purchase_currency = item.purchase_currency;

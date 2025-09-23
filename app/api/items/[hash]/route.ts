@@ -77,6 +77,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       charms,
       patches,
       include_customization_costs,
+      image_url,
     } = body;
 
     // Validate required fields
@@ -129,6 +130,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       charms: charms?.length || 0,
       patches: patches?.length || 0,
       include_customization_costs,
+      image_url,
     });
 
     // Update the item with new values, preserving existing ones for undefined fields
@@ -140,7 +142,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
         description !== undefined ? description : existingItem.description,
       appid: existingItem.appid,
       steam_url: existingItem.steam_url,
-      image_url: existingItem.image_url,
+      image_url: image_url !== undefined ? image_url : existingItem.image_url,
       purchase_price:
         purchase_price !== undefined
           ? purchase_price
