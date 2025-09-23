@@ -3,7 +3,7 @@ import path from "path";
 
 export interface WorkerTask {
   id: string;
-  type: "image_fetch" | "price_fetch" | "inventory_import" | "bulk_image_reload" | "data_migration" | "scheduled_capture";
+  type: "image_fetch" | "price_fetch" | "inventory_import" | "bulk_image_reload" | "data_migration" | "scheduled_capture" | "external_price_fetch";
   status: "pending" | "running" | "completed" | "failed";
   title: string;
   description: string;

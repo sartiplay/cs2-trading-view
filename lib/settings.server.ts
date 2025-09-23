@@ -35,6 +35,7 @@ export async function getSettings() {
       maxCategories: 20,
     },
     workerStatusVisible: true, // Show worker status by default
+    priceSource: "steam" as "steam" | "csgoskins", // Default to Steam Market
   };
 }
 

@@ -25,7 +25,11 @@ interface InventoryData {
   total_profit_loss_percentage: number;
 }
 
-export function CaptureStats() {
+interface CaptureStatsProps {
+  priceSource?: "steam" | "csgoskins";
+}
+
+export function CaptureStats({ priceSource = "steam" }: CaptureStatsProps) {
   const [stats, setStats] = useState<CaptureStats | null>(null);
   const [inventoryData, setInventoryData] = useState<InventoryData | null>(
     null
@@ -47,7 +51,7 @@ export function CaptureStats() {
 
   const fetchInventoryData = async () => {
     try {
-      const response = await fetch("/api/inventory-value");
+      const response = await fetch(`/api/inventory-value?price_source=${priceSource}`);
       if (response.ok) {
         const data = await response.json();
         setInventoryData(data);
@@ -92,7 +96,7 @@ export function CaptureStats() {
   useEffect(() => {
     fetchStats();
     fetchInventoryData();
-  }, []);
+  }, [priceSource]);
 
   if (!stats) {
     return <div className="text-center py-4">Loading statistics...</div>;

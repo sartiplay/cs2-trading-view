@@ -19,6 +19,16 @@ export interface Settings {
   marketListingsFetchLimit: number;
   schedulerEnabled: boolean;
   schedulerRunning: boolean;
+  priceSource: "steam" | "csgoskins";
+  workerStatusVisible: boolean;
+  imageLoadingDelayMs: number;
+  categorySettings: {
+    showCategoryFilter: boolean;
+    defaultCategoryId: string;
+    allowCustomCategories: boolean;
+    maxCategories: number;
+  };
+  displayCurrency: string;
 }
 
 const SETTINGS_FILE = path.join(process.cwd(), "settings.json");
@@ -82,6 +92,16 @@ const DEFAULT_SETTINGS: Settings = {
   marketListingsFetchLimit: DEFAULT_FETCH_LIMIT,
   schedulerEnabled: true,
   schedulerRunning: false,
+  priceSource: "steam",
+  workerStatusVisible: true,
+  imageLoadingDelayMs: 3000,
+  categorySettings: {
+    showCategoryFilter: true,
+    defaultCategoryId: "default-trading",
+    allowCustomCategories: true,
+    maxCategories: 20,
+  },
+  displayCurrency: "USD",
 };
 
 async function readSettings(): Promise<Settings> {
@@ -142,6 +162,7 @@ export async function POST(request: NextRequest) {
       "discordPriceSpikeEnabled",
       "schedulerEnabled",
       "schedulerRunning",
+      "workerStatusVisible",
     ];
 
     const invalidBoolean = booleanFields.some((field) => {
@@ -188,6 +209,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (
+      newSettings.priceSource !== undefined &&
+      !["steam", "csgoskins"].includes(newSettings.priceSource)
+    ) {
+      return NextResponse.json(
+        {
+          error: "Price source must be either 'steam' or 'csgoskins'.",
+        },
+        { status: 400 }
+      );
+    }
+
     const updatedSettings: Settings = {
       ...currentSettings,
       ...newSettings,
@@ -213,6 +246,64 @@ export async function POST(request: NextRequest) {
     console.error("Failed to save settings:", error);
     return NextResponse.json(
       { error: "Failed to save settings" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PUT(request: NextRequest) {
+  try {
+    const partialSettings = await request.json();
+    const currentSettings = await readSettings();
+
+    // Validate priceSource if provided
+    if (
+      partialSettings.priceSource !== undefined &&
+      !["steam", "csgoskins"].includes(partialSettings.priceSource)
+    ) {
+      return NextResponse.json(
+        {
+          error: "Price source must be either 'steam' or 'csgoskins'.",
+        },
+        { status: 400 }
+      );
+    }
+
+    // Validate boolean fields if provided
+    const booleanFields: Array<keyof Settings> = [
+      "discordWebhookEnabled",
+      "discordDevelopmentMode",
+      "discordPriceSpikeEnabled",
+      "schedulerEnabled",
+      "schedulerRunning",
+      "workerStatusVisible",
+    ];
+
+    const invalidBoolean = booleanFields.some((field) => {
+      if (Object.prototype.hasOwnProperty.call(partialSettings, field)) {
+        return typeof partialSettings[field] !== "boolean";
+      }
+      return false;
+    });
+
+    if (invalidBoolean) {
+      return NextResponse.json({ error: "Invalid boolean settings" }, { status: 400 });
+    }
+
+    const updatedSettings: Settings = {
+      ...currentSettings,
+      ...partialSettings,
+    };
+
+    await writeSettings(updatedSettings);
+
+    console.log("[Settings] Partially updated:", partialSettings);
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("Failed to update settings:", error);
+    return NextResponse.json(
+      { error: "Failed to update settings" },
       { status: 500 }
     );
   }

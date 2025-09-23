@@ -600,7 +600,7 @@ export async function getItemWithProfitLoss(marketHashName: string): Promise<
   };
 }
 
-async function calculateInventoryValue(data: DataStore): Promise<{
+async function calculateInventoryValue(data: DataStore, externalPrices?: any[]): Promise<{
   total_purchase_value: number;
   total_current_value: number;
   total_profit_loss: number;
@@ -679,10 +679,20 @@ async function calculateInventoryValue(data: DataStore): Promise<{
       : purchasePriceUsd;
     totalPurchaseValue += perUnitPurchaseUsd * item.quantity;
 
-    const latestItemPrice =
-      item.price_history.length > 0
-        ? item.price_history[item.price_history.length - 1].median_price
-        : purchasePriceUsd;
+    // Use external price if available, otherwise use Steam Market price
+    let latestItemPrice;
+    if (externalPrices) {
+      const externalPrice = externalPrices.find(ep => ep.market_hash_name === item.market_hash_name);
+      latestItemPrice = externalPrice ? externalPrice.current_price : 
+        (item.price_history.length > 0
+          ? item.price_history[item.price_history.length - 1].median_price
+          : purchasePriceUsd);
+    } else {
+      latestItemPrice =
+        item.price_history.length > 0
+          ? item.price_history[item.price_history.length - 1].median_price
+          : purchasePriceUsd;
+    }
 
     const perUnitCurrentValue = includeCustomizations
       ? latestItemPrice + customizationCurrentValueUsd
@@ -743,7 +753,7 @@ async function calculateInventoryValue(data: DataStore): Promise<{
   };
 }
 
-export async function getInventoryValue(): Promise<{
+export async function getInventoryValue(externalPrices?: any[]): Promise<{
   total_purchase_value: number;
   total_current_value: number;
   total_profit_loss: number;
@@ -751,7 +761,7 @@ export async function getInventoryValue(): Promise<{
   timeline: Array<{ date: string; total_value: number }>;
 }> {
   const data = await readData();
-  return calculateInventoryValue(data);
+  return calculateInventoryValue(data, externalPrices);
 }
 
 export async function getLatestPrices(): Promise<

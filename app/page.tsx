@@ -26,6 +26,7 @@ import { SchedulerAccordionTrigger } from "@/components/scheduer-accordion-trigg
 
 interface AppSettings {
   workerStatusVisible: boolean;
+  priceSource?: "steam" | "csgoskins";
 }
 
 export default function Dashboard() {
@@ -46,6 +47,18 @@ export default function Dashboard() {
 
     fetchSettings();
   }, []);
+
+  // Listen for price source changes from the items table
+  useEffect(() => {
+    const handlePriceSourceChange = (event: CustomEvent) => {
+      setSettings(prev => ({ ...prev, priceSource: event.detail.priceSource }));
+    };
+
+    window.addEventListener('priceSourceChanged', handlePriceSourceChange as EventListener);
+    return () => {
+      window.removeEventListener('priceSourceChanged', handlePriceSourceChange as EventListener);
+    };
+  }, []);
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="mx-auto max-w-7xl space-y-8">
@@ -64,7 +77,7 @@ export default function Dashboard() {
         </div>
 
         <div className="space-y-8">
-          <CaptureStats />
+          <CaptureStats priceSource={settings.priceSource || "steam"} />
 
           {/* Worker Status - Mobile/Tablet: In accordion */}
           {settings.workerStatusVisible && (

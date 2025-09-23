@@ -33,7 +33,8 @@ import {
   ArrowUpDown, 
   ArrowUp, 
   ArrowDown,
-  X
+  X,
+  RefreshCw
 } from "lucide-react";
 
 import { useToast } from "@/hooks/use-toast";
@@ -46,6 +47,7 @@ import { DeleteItemDialog } from "@/components/delete-file-dialog";
 
 import { ImageDialog } from "@/components/image-dialog";
 import { ImageLoadingSpinner } from "@/components/image-loading-spinner";
+import { PriceSourceToggle } from "@/components/price-source-toggle";
 
 type Customization = {
   name: string;
@@ -249,6 +251,9 @@ export function ItemsTable() {
   const [sortField, setSortField] = useState<SortField>("label");
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
   const [showFilters, setShowFilters] = useState(false);
+  const [priceSource, setPriceSource] = useState<"steam" | "csgoskins">("steam");
+  const [externalPrices, setExternalPrices] = useState<Record<string, any>>({});
+  const [isUpdatingPrices, setIsUpdatingPrices] = useState(false);
 
   const { toast } = useToast();
 
@@ -282,6 +287,86 @@ export function ItemsTable() {
 
   const getCategoryInfo = (categoryId: string) => {
     return categories.find(cat => cat.id === categoryId);
+  };
+
+  const fetchExternalPrices = async () => {
+    try {
+      const response = await fetch("/api/external-prices");
+      if (response.ok) {
+        const externalData = await response.json();
+        const priceMap: Record<string, any> = {};
+        externalData.forEach((item: any) => {
+          priceMap[item.market_hash_name] = item;
+        });
+        setExternalPrices(priceMap);
+      }
+    } catch (error) {
+      console.error("Error fetching external prices:", error);
+    }
+  };
+
+  const handlePriceSourceChange = (newSource: "steam" | "csgoskins") => {
+    setPriceSource(newSource);
+    
+    // If switching to CSGOSKINS.GG, fetch external prices if we don't have them
+    if (newSource === "csgoskins" && Object.keys(externalPrices).length === 0) {
+      fetchExternalPrices();
+    }
+    
+    // Dispatch event to update header stats
+    window.dispatchEvent(new CustomEvent('priceSourceChanged', {
+      detail: { priceSource: newSource }
+    }));
+  };
+
+  const updateExternalPrices = async () => {
+    if (priceSource !== "csgoskins") {
+      toast({
+        title: "Error",
+        description: "External prices can only be updated when CSGOSKINS.GG is selected as the price source.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsUpdatingPrices(true);
+    try {
+      const marketHashNames = items.map(item => item.market_hash_name);
+      
+      const response = await fetch("/api/external-prices", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          market_hash_names: marketHashNames,
+        }),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        
+        // Refresh external prices from the API
+        await fetchExternalPrices();
+        
+        toast({
+          title: "Prices Updated",
+          description: `Successfully updated prices for ${result.scraped_count}/${result.total_count} items from CSGOSKINS.GG`,
+        });
+      } else {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to update external prices");
+      }
+    } catch (error) {
+      console.error("Error updating external prices:", error);
+      toast({
+        title: "Error",
+        description: `Failed to update external prices: ${error instanceof Error ? error.message : "Unknown error"}`,
+        variant: "destructive",
+      });
+    } finally {
+      setIsUpdatingPrices(false);
+    }
   };
 
   // Filter and sort logic
@@ -480,6 +565,22 @@ export function ItemsTable() {
     };
   }, []);
 
+  // Fetch initial price source from settings
+  useEffect(() => {
+    const fetchInitialSettings = async () => {
+      try {
+        const response = await fetch("/api/settings");
+        if (response.ok) {
+          const settings = await response.json();
+          setPriceSource(settings.priceSource || "steam");
+        }
+      } catch (error) {
+        console.error("Failed to fetch initial settings for price source:", error);
+      }
+    };
+    fetchInitialSettings();
+  }, []);
+
   if (isLoading) {
     return <div className="text-center py-4">Loading items...</div>;
   }
@@ -579,6 +680,28 @@ export function ItemsTable() {
       <div className="space-y-4 p-4 border rounded-lg bg-muted/30">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
+            <PriceSourceToggle onSourceChange={handlePriceSourceChange} />
+            {priceSource === "csgoskins" && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={updateExternalPrices}
+                disabled={isUpdatingPrices}
+                className="h-8"
+              >
+                {isUpdatingPrices ? (
+                  <>
+                    <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                    Updating...
+                  </>
+                ) : (
+                  <>
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                    Update Prices
+                  </>
+                )}
+              </Button>
+            )}
             <div className="relative flex-1 max-w-sm">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input
@@ -849,17 +972,25 @@ export function ItemsTable() {
                           </div>
                         )}
 
-                        {item.steam_url && (
-                          <a
-                            href={item.steam_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 text-xs text-blue-500 hover:text-blue-700 hover:underline"
-                          >
-                            <ExternalLink className="h-3 w-3" />
-                            Steam Market
-                          </a>
-                        )}
+                        {(() => {
+                          // Determine which URL to use based on price source
+                          const externalPrice = externalPrices[item.market_hash_name];
+                          const shouldUseExternalUrl = priceSource === "csgoskins" && externalPrice?.url;
+                          const linkUrl = shouldUseExternalUrl ? externalPrice.url : item.steam_url;
+                          const linkText = shouldUseExternalUrl ? "CSGOSKINS.GG" : "Steam Market";
+                          
+                          return linkUrl && (
+                            <a
+                              href={linkUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 text-xs text-blue-500 hover:text-blue-700 hover:underline"
+                            >
+                              <ExternalLink className="h-3 w-3" />
+                              {linkText}
+                            </a>
+                          );
+                        })()}
                       </div>
                     </TableCell>
 
@@ -908,66 +1039,102 @@ export function ItemsTable() {
                     </TableCell>
 
                     <TableCell className="w-[12%] min-w-[100px] text-right">
-                      {item.latest_price ? (
-                        <div>
-                          <div className="font-medium">
-                            ${item.latest_price.toFixed(2)}
-                          </div>
+                      {(() => {
+                        const externalPrice = externalPrices[item.market_hash_name];
+                        const currentPrice = priceSource === "csgoskins" && externalPrice 
+                          ? externalPrice.current_price 
+                          : item.latest_price;
+                        const lastUpdated = priceSource === "csgoskins" && externalPrice 
+                          ? externalPrice.last_updated 
+                          : item.last_updated;
 
-                          {item.last_updated && (
-                            <div className="text-xs text-muted-foreground">
-                              {new Date(item.last_updated).toLocaleDateString()}
+                        if (currentPrice) {
+                          return (
+                            <div>
+                              <div className="font-medium">
+                                ${currentPrice.toFixed(2)}
+                              </div>
+                              {priceSource === "csgoskins" && externalPrice && (
+                                <div className="text-xs text-muted-foreground">
+                                  CSGOSKINS.GG
+                                </div>
+                              )}
+                              {lastUpdated && (
+                                <div className="text-xs text-muted-foreground">
+                                  {new Date(lastUpdated).toLocaleDateString()}
+                                </div>
+                              )}
                             </div>
-                          )}
-                        </div>
-                      ) : (
-                        <span className="text-muted-foreground">No data</span>
-                      )}
+                          );
+                        } else {
+                          return <span className="text-muted-foreground">No data</span>;
+                        }
+                      })()}
                     </TableCell>
 
                     <TableCell className="w-[12%] min-w-[100px] text-right">
-                      {item.latest_price ? (
-                        <div className="font-medium">
-                          ${(item.latest_price * item.quantity).toFixed(2)}
-                        </div>
-                      ) : (
-                        <span className="text-muted-foreground">No data</span>
-                      )}
+                      {(() => {
+                        const externalPrice = externalPrices[item.market_hash_name];
+                        const currentPrice = priceSource === "csgoskins" && externalPrice 
+                          ? externalPrice.current_price 
+                          : item.latest_price;
+
+                        if (currentPrice) {
+                          return (
+                            <div className="font-medium">
+                              ${(currentPrice * item.quantity).toFixed(2)}
+                            </div>
+                          );
+                        } else {
+                          return <span className="text-muted-foreground">No data</span>;
+                        }
+                      })()}
                     </TableCell>
 
                     <TableCell className="w-[15%] min-w-[120px] text-right">
-                      {item.profit_loss !== null &&
-                      item.profit_loss !== undefined ? (
-                        <div>
-                          <div
-                            className={`font-medium ${
-                              item.profit_loss >= 0
-                                ? "text-green-600"
-                                : "text-red-600"
-                            }`}
-                          >
-                            {item.profit_loss >= 0 ? "+" : ""}$
-                            {item.profit_loss.toFixed(2)}
-                          </div>
+                      {(() => {
+                        const externalPrice = externalPrices[item.market_hash_name];
+                        const currentPrice = priceSource === "csgoskins" && externalPrice 
+                          ? externalPrice.current_price 
+                          : item.latest_price;
 
-                          {item.profit_loss_percentage !== null && (
-                            <div
-                              className={`text-xs ${
-                                (item.profit_loss_percentage ?? 0) >= 0
-                                  ? "text-green-600"
-                                  : "text-red-600"
-                              }`}
-                            >
-                              {(item.profit_loss_percentage ?? 0) >= 0
-                                ? "+"
-                                : ""}
-                              {(item.profit_loss_percentage ?? 0).toFixed(1)}%
+                        if (currentPrice) {
+                          const totalPurchaseValue = item.purchase_price_usd * item.quantity;
+                          const totalCurrentValue = currentPrice * item.quantity;
+                          const profitLoss = totalCurrentValue - totalPurchaseValue;
+                          const profitLossPercentage = totalPurchaseValue > 0 
+                            ? (profitLoss / totalPurchaseValue) * 100 
+                            : 0;
+
+                          return (
+                            <div>
+                              <div
+                                className={`font-medium ${
+                                  profitLoss >= 0
+                                    ? "text-green-600"
+                                    : "text-red-600"
+                                }`}
+                              >
+                                {profitLoss >= 0 ? "+" : ""}$
+                                {profitLoss.toFixed(2)}
+                              </div>
+
+                              <div
+                                className={`text-xs ${
+                                  profitLossPercentage >= 0
+                                    ? "text-green-600"
+                                    : "text-red-600"
+                                }`}
+                              >
+                                {profitLossPercentage >= 0 ? "+" : ""}
+                                {profitLossPercentage.toFixed(1)}%
+                              </div>
                             </div>
-                          )}
-                        </div>
-                      ) : (
-                        <span className="text-muted-foreground">No data</span>
-                      )}
+                          );
+                        } else {
+                          return <span className="text-muted-foreground">No data</span>;
+                        }
+                      })()}
                     </TableCell>
 
                     <TableCell className="w-[4%] min-w-[80px] text-center">
