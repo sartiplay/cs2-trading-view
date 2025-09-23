@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, RefreshCw } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast"; // Import useToast
 import { CategorySelector } from "@/components/category-selector";
 
@@ -63,6 +63,7 @@ interface Item {
   category_id?: string;
   appid: number;
   steam_url?: string;
+  image_url?: string;
   purchase_price: number;
   purchase_currency: string;
   quantity: number;
@@ -96,6 +97,7 @@ export function EditItemDialog({
   const [includeCustomizationCosts, setIncludeCustomizationCosts] =
     useState(false);
   const [categoryId, setCategoryId] = useState<string | undefined>(undefined);
+  const [isLoadingImage, setIsLoadingImage] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast(); // Declare useToast
@@ -218,6 +220,50 @@ export function EditItemDialog({
     }
 
     setPatches(updated);
+  };
+
+  const reloadImage = async () => {
+    if (!item) return;
+    
+    setIsLoadingImage(true);
+    try {
+      const response = await fetch("/api/items/load-image", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          market_hash_name: item.market_hash_name,
+          appid: item.appid,
+        }),
+      });
+      
+      if (response.ok) {
+        const imageData = await response.json();
+        if (imageData.image_url) {
+          toast({
+            title: "Success",
+            description: "Item image reloaded successfully!",
+          });
+          // The image will be updated when the item is saved
+        } else {
+          toast({
+            title: "Warning",
+            description: "No image found for this item.",
+            variant: "destructive",
+          });
+        }
+      } else {
+        throw new Error("Failed to reload image");
+      }
+    } catch (error) {
+      console.error("Error reloading image:", error);
+      toast({
+        title: "Error",
+        description: "Failed to reload image. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoadingImage(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -667,6 +713,19 @@ export function EditItemDialog({
             </CardContent>
           </Card>
 
+          <div className="flex items-center justify-between pt-4 border-t">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={reloadImage}
+              disabled={isLoadingImage || isLoading}
+              className="flex items-center gap-2"
+            >
+              <RefreshCw className={`h-4 w-4 ${isLoadingImage ? 'animate-spin' : ''}`} />
+              {isLoadingImage ? "Reloading Image..." : "Reload Image"}
+            </Button>
+          </div>
+
           <DialogFooter>
             <Button
               type="button"
@@ -675,7 +734,7 @@ export function EditItemDialog({
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isLoading}>
+            <Button type="submit" disabled={isLoading || isLoadingImage}>
               {isLoading ? "Updating..." : "Update Item"}
             </Button>
           </DialogFooter>

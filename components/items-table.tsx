@@ -44,6 +44,8 @@ import { EditItemDialog } from "@/components/edit-item-dialog";
 
 import { DeleteItemDialog } from "@/components/delete-file-dialog";
 
+import { ImageDialog } from "@/components/image-dialog";
+
 type Customization = {
   name: string;
 
@@ -66,6 +68,8 @@ interface Item {
   appid: number;
 
   steam_url?: string;
+
+  image_url?: string;
 
   purchase_price: number;
 
@@ -224,6 +228,9 @@ export function ItemsTable() {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deletingItem, setDeletingItem] = useState<Item | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [imageDialogOpen, setImageDialogOpen] = useState(false);
+  const [selectedImageUrl, setSelectedImageUrl] = useState("");
+  const [selectedImageItemName, setSelectedImageItemName] = useState("");
   
   // Filter and sort state
   const [filters, setFilters] = useState<FilterState>({
@@ -423,6 +430,12 @@ export function ItemsTable() {
     fetchItems(); // Refresh the items list
 
     window.dispatchEvent(new Event("refreshItems"));
+  };
+
+  const handleImageClick = (imageUrl: string, itemName: string) => {
+    setSelectedImageUrl(imageUrl);
+    setSelectedImageItemName(itemName);
+    setImageDialogOpen(true);
   };
 
   const handleEditItem = (item: Item) => {
@@ -724,8 +737,11 @@ export function ItemsTable() {
           <Table className="min-w-full">
             <TableHeader className="sticky top-0 bg-background z-10">
               <TableRow>
+                <TableHead className="w-[8%] min-w-[80px] text-center">
+                  Image
+                </TableHead>
                 <TableHead 
-                  className="cursor-pointer hover:bg-muted/50 w-[25%] min-w-[200px]"
+                  className="cursor-pointer hover:bg-muted/50 w-[20%] min-w-[180px]"
                   onClick={() => handleSort("label")}
                 >
                   <div className="flex items-center gap-2">
@@ -798,7 +814,27 @@ export function ItemsTable() {
 
                 return (
                   <TableRow key={item.market_hash_name}>
-                    <TableCell className="w-[25%] min-w-[200px]">
+                    <TableCell className="w-[8%] min-w-[80px] text-center">
+                      {item.image_url ? (
+                        <div className="flex items-center justify-center">
+                          <img
+                            src={item.image_url}
+                            alt={item.label}
+                            className="w-12 h-12 object-contain rounded cursor-pointer hover:scale-110 transition-transform border bg-card"
+                            onClick={() => handleImageClick(item.image_url!, item.label)}
+                            onError={(e) => {
+                              // Hide image if it fails to load
+                              (e.target as HTMLImageElement).style.display = 'none';
+                            }}
+                          />
+                        </div>
+                      ) : (
+                        <div className="w-12 h-12 flex items-center justify-center text-muted-foreground text-xs border rounded bg-muted">
+                          No Image
+                        </div>
+                      )}
+                    </TableCell>
+                    <TableCell className="w-[20%] min-w-[180px]">
                       <div className="space-y-1">
                         <div className="font-medium truncate" title={item.label}>
                           {item.label}
@@ -992,6 +1028,13 @@ export function ItemsTable() {
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
         onItemDeleted={handleItemDeleted}
+      />
+
+      <ImageDialog
+        open={imageDialogOpen}
+        onOpenChange={setImageDialogOpen}
+        imageUrl={selectedImageUrl}
+        itemName={selectedImageItemName}
       />
     </div>
   );

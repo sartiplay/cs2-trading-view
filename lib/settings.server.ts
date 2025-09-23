@@ -27,6 +27,7 @@ export async function getSettings() {
     marketListingsFetchLimit: 5,
     schedulerEnabled: true,
     schedulerRunning: false,
+    imageLoadingDelayMs: 3000, // 3 seconds delay between image requests
     categorySettings: {
       showCategoryFilter: true,
       defaultCategoryId: "default-trading",

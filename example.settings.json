@@ -14,6 +14,7 @@
   "marketListingsFetchLimit": 5,
   "schedulerEnabled": true,
   "schedulerRunning": true,
+  "imageLoadingDelayMs": 3000,
   "categorySettings": {
     "showCategoryFilter": true,
     "defaultCategoryId": "default-trading",

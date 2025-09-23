@@ -100,6 +100,7 @@ export async function GET() {
           category_id: item.category_id,
           appid: item.appid,
           steam_url: item.steam_url,
+          image_url: item.image_url,
           purchase_price: item.purchase_price,
           purchase_price_usd: totalPurchaseCostUSD, // Include customization costs in displayed purchase price
           purchase_currency: item.purchase_currency || "USD",
@@ -138,6 +139,7 @@ export async function POST(request: NextRequest) {
       label,
       appid = 730,
       steam_url,
+      image_url,
       purchase_price,
       quantity,
       purchase_currency,
@@ -205,6 +207,7 @@ export async function POST(request: NextRequest) {
       label,
       appid,
       steam_url,
+      image_url,
       purchase_price,
       quantity,
       purchase_currency: purchase_currency || "USD",

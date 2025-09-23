@@ -34,7 +34,8 @@ import {
   Palette,
   Download,
   Check,
-  X
+  X,
+  RefreshCw
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { DEFAULT_PINNED_PROVIDERS } from "@/lib/trade-providers";
@@ -84,6 +85,7 @@ export interface AppSettings {
   marketListingsFetchLimit: number;
   schedulerEnabled: boolean;
   schedulerRunning: boolean;
+  imageLoadingDelayMs: number;
   categorySettings: {
     showCategoryFilter: boolean;
     defaultCategoryId: string;
@@ -106,6 +108,7 @@ const defaultSettings: AppSettings = {
   schedulerEnabled: false,
   schedulerRunning: false,
   displayCurrency: "USD",
+  imageLoadingDelayMs: 3000, // 3 seconds delay between image requests
   categorySettings: {
     showCategoryFilter: true,
     defaultCategoryId: "default-trading",
@@ -180,6 +183,7 @@ export function SettingsDialog() {
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
   const [importLoading, setImportLoading] = useState(false);
   const [importStep, setImportStep] = useState<"url" | "select" | "importing">("url");
+  const [isReloadingImages, setIsReloadingImages] = useState(false);
   
   const { toast } = useToast();
 
@@ -706,6 +710,40 @@ export function SettingsDialog() {
     setSteamInventoryUrl("");
     setSteamItems([]);
     setSelectedItems(new Set());
+  };
+
+  const reloadAllImages = async () => {
+    setIsReloadingImages(true);
+    try {
+      const response = await fetch("/api/items/reload-images", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          imageLoadingDelayMs: settings.imageLoadingDelayMs,
+        }),
+      });
+      
+      if (response.ok) {
+        const result = await response.json();
+        toast({
+          title: "Image Reload Complete",
+          description: `Successfully loaded ${result.success} images. ${result.failed > 0 ? `${result.failed} failed.` : ''}`,
+        });
+      } else {
+        throw new Error("Failed to reload images");
+      }
+    } catch (error) {
+      console.error("Error reloading images:", error);
+      toast({
+        title: "Error",
+        description: "Failed to reload images. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsReloadingImages(false);
+    }
   };
 
   return (
@@ -1333,6 +1371,54 @@ export function SettingsDialog() {
               <p className="text-sm text-muted-foreground">
                 Automatically fetch price updates based on the interval set in General settings
               </p>
+
+              <div className="space-y-2">
+                <Label htmlFor="image-loading-delay">Image Loading Delay (milliseconds)</Label>
+                <Input
+                  id="image-loading-delay"
+                  type="number"
+                  min="1000"
+                  max="10000"
+                  step="500"
+                  value={settings.imageLoadingDelayMs}
+                  onChange={(e) =>
+                    setSettings({
+                      ...settings,
+                      imageLoadingDelayMs: Number.parseInt(e.target.value) || 3000,
+                    })
+                  }
+                />
+                <p className="text-sm text-muted-foreground">
+                  Delay between image requests to avoid rate limiting (1000-10000ms). Recommended: 3000ms (3 seconds)
+                </p>
+              </div>
+
+              <div className="space-y-4 pt-4 border-t">
+                <h4 className="font-medium">Item Images</h4>
+                <div className="space-y-2">
+                  <Button
+                    variant="outline"
+                    onClick={reloadAllImages}
+                    disabled={isReloadingImages}
+                    className="w-full"
+                  >
+                    {isReloadingImages ? (
+                      <>
+                        <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                        Reloading Images...
+                      </>
+                    ) : (
+                      <>
+                        <RefreshCw className="h-4 w-4 mr-2" />
+                        Reload All Item Images
+                      </>
+                    )}
+                  </Button>
+                  <p className="text-sm text-muted-foreground">
+                    Load images for all items that don't have them yet. This may take a while.
+                  </p>
+                </div>
+              </div>
             </div>
           </TabsContent>
         </Tabs>

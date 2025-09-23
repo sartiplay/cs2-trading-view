@@ -53,6 +53,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { CategorySelector } from "@/components/category-selector";
+import { ImageDialog } from "@/components/image-dialog";
 import {
   DEFAULT_PINNED_PROVIDERS,
   TRADE_PROVIDERS,
@@ -113,6 +114,7 @@ interface ItemData {
   description?: string;
   category_id?: string;
   steam_url?: string;
+  image_url?: string;
   price_history: PriceEntry[];
   price_alert_config?: PriceAlertConfig;
   stickers?: Customization[];
@@ -245,6 +247,7 @@ export function ItemDetail({ hash }: ItemDetailProps) {
   const [editingCategoryId, setEditingCategoryId] = useState<string | undefined>(undefined);
   const [categorySaving, setCategorySaving] = useState(false);
   const [categories, setCategories] = useState<Array<{id: string; name: string; color?: string}>>([]);
+  const [imageDialogOpen, setImageDialogOpen] = useState(false);
 
   const resetAlertInputs = useCallback(() => {
     const config = item?.price_alert_config;
@@ -1333,13 +1336,29 @@ export function ItemDetail({ hash }: ItemDetailProps) {
             </div>
           </div>
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-            <div className="space-y-2">
-              <h1 className="text-3xl font-bold lg:text-4xl text-foreground">
-                {item.label}
-              </h1>
-              <p className="text-sm text-muted-foreground text-pretty">
-                {item.market_hash_name}
-              </p>
+            <div className="flex items-start gap-4">
+              {item.image_url && (
+                <div className="flex-shrink-0">
+                  <img
+                    src={item.image_url}
+                    alt={item.label}
+                    className="w-16 h-16 lg:w-20 lg:h-20 object-contain rounded-lg border bg-card cursor-pointer hover:scale-105 transition-transform"
+                    onClick={() => setImageDialogOpen(true)}
+                    onError={(e) => {
+                      // Hide image if it fails to load
+                      (e.target as HTMLImageElement).style.display = 'none';
+                    }}
+                  />
+                </div>
+              )}
+              <div className="space-y-2">
+                <h1 className="text-3xl font-bold lg:text-4xl text-foreground">
+                  {item.label}
+                </h1>
+                <p className="text-sm text-muted-foreground text-pretty">
+                  {item.market_hash_name}
+                </p>
+              </div>
             </div>
           </div>
           {item.description && (
@@ -2555,6 +2574,13 @@ export function ItemDetail({ hash }: ItemDetailProps) {
           </CardContent>
         </Card>
       )}
+
+      <ImageDialog
+        open={imageDialogOpen}
+        onOpenChange={setImageDialogOpen}
+        imageUrl={item?.image_url || ""}
+        itemName={item?.label || ""}
+      />
     </div>
   );
 }

@@ -40,6 +40,7 @@ export interface Item {
   category_id?: string; // Reference to category in the categories object
   appid: number;
   steam_url: string;
+  image_url?: string; // URL to the item's image from Steam
   purchase_price: number;
   quantity: number;
   purchase_currency: string;
@@ -71,6 +72,7 @@ export interface SoldItem {
   category_id?: string; // Reference to category in the categories object
   appid: number;
   steam_url: string;
+  image_url?: string; // URL to the item's image from Steam
   purchase_price: number;
   purchase_price_usd: number;
   purchase_currency: string;
@@ -244,6 +246,7 @@ export async function addOrUpdateItem(item: Item): Promise<void> {
     existingItem.category_id = item.category_id;
     existingItem.appid = item.appid;
     existingItem.steam_url = item.steam_url;
+    existingItem.image_url = item.image_url !== undefined ? item.image_url : existingItem.image_url;
     existingItem.purchase_price = item.purchase_price;
     existingItem.quantity = item.quantity;
     existingItem.purchase_currency = item.purchase_currency;
@@ -1211,4 +1214,82 @@ export async function getItemsByCategory(categoryId: string): Promise<ItemWithHi
 export async function getSoldItemsByCategory(categoryId: string): Promise<SoldItem[]> {
   const data = await readData();
   return data.sold_items.filter(item => item.category_id === categoryId);
+}
+
+/**
+ * Reloads image URL for a specific item
+ */
+export async function reloadItemImage(marketHashName: string): Promise<string | null> {
+  console.log(`[DEBUG] reloadItemImage called for: ${marketHashName}`);
+  const imageLoaderModule = await import('./image-loader.server');
+  console.log(`[DEBUG] Image loader module imported:`, Object.keys(imageLoaderModule));
+  const { getItemImageUrl } = imageLoaderModule;
+  console.log(`[DEBUG] getItemImageUrl function:`, typeof getItemImageUrl);
+  console.log(`[DEBUG] Calling getItemImageUrl now...`);
+  const imageUrl = await getItemImageUrl(marketHashName);
+  console.log(`[DEBUG] getItemImageUrl returned: ${imageUrl}`);
+  
+  if (imageUrl) {
+    await updateData((data) => {
+      if (data.items[marketHashName]) {
+        data.items[marketHashName].image_url = imageUrl;
+      }
+    });
+  }
+  
+  return imageUrl;
+}
+
+/**
+ * Reloads image URLs for all items that don't have images
+ */
+export async function reloadAllItemImages(imageLoadingDelayMs: number = 3000): Promise<{ success: number; failed: number; errors: string[] }> {
+  console.log(`[DEBUG] reloadAllItemImages called`);
+  const imageLoaderModule = await import('./image-loader.server');
+  console.log(`[DEBUG] Image loader module imported in reloadAllItemImages:`, Object.keys(imageLoaderModule));
+  const { getItemImageUrl } = imageLoaderModule;
+  console.log(`[DEBUG] getItemImageUrl function in reloadAllItemImages:`, typeof getItemImageUrl);
+  const data = await readData();
+  const itemsWithoutImages = Object.values(data.items).filter(item => !item.image_url);
+  
+  let success = 0;
+  let failed = 0;
+  const errors: string[] = [];
+  
+  console.log(`Reloading images for ${itemsWithoutImages.length} items...`);
+  
+  for (const item of itemsWithoutImages) {
+    try {
+      console.log(`[DEBUG] Calling getItemImageUrl for: ${item.market_hash_name}`);
+      const imageUrl = await getItemImageUrl(item.market_hash_name, item.appid);
+      console.log(`[DEBUG] getItemImageUrl returned for ${item.market_hash_name}: ${imageUrl}`);
+      if (imageUrl) {
+        await updateData((data) => {
+          if (data.items[item.market_hash_name]) {
+            data.items[item.market_hash_name].image_url = imageUrl;
+          }
+        });
+        success++;
+        console.log(`✓ Loaded image for: ${item.market_hash_name}`);
+      } else {
+        failed++;
+        errors.push(`No image found for: ${item.market_hash_name}`);
+        console.log(`✗ No image found for: ${item.market_hash_name}`);
+      }
+      
+      // Add a configurable delay to avoid overwhelming Steam's servers
+      if (itemsWithoutImages.indexOf(item) < itemsWithoutImages.length - 1) {
+        console.log(`Waiting ${imageLoadingDelayMs}ms before next image request...`);
+        await new Promise(resolve => setTimeout(resolve, imageLoadingDelayMs));
+      }
+    } catch (error) {
+      failed++;
+      const errorMsg = `Error loading image for ${item.market_hash_name}: ${error}`;
+      errors.push(errorMsg);
+      console.error(errorMsg);
+    }
+  }
+  
+  console.log(`Image reload complete: ${success} success, ${failed} failed`);
+  return { success, failed, errors };
 }

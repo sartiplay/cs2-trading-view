@@ -92,6 +92,7 @@ export function ItemForm() {
   const [includeCustomizationsInPrice, setIncludeCustomizationsInPrice] =
     useState(false);
   const [categoryId, setCategoryId] = useState<string | undefined>(undefined);
+  const [isLoadingImage, setIsLoadingImage] = useState(false);
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -151,6 +152,47 @@ export function ItemForm() {
 
     setIsLoading(true);
     try {
+      // Load item image first
+      setIsLoadingImage(true);
+      let imageUrl: string | undefined;
+      
+      try {
+        const imageResponse = await fetch("/api/items/load-image", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            market_hash_name: marketHashName,
+            appid: 730,
+          }),
+        });
+        
+        if (imageResponse.ok) {
+          const imageData = await imageResponse.json();
+          imageUrl = imageData.image_url;
+          if (imageUrl) {
+            toast({
+              title: "Success",
+              description: "Item image loaded successfully!",
+            });
+          } else {
+            toast({
+              title: "Warning",
+              description: "Item image could not be loaded, but item will still be added.",
+              variant: "destructive",
+            });
+          }
+        }
+      } catch (imageError) {
+        console.error("Error loading item image:", imageError);
+        toast({
+          title: "Warning",
+          description: "Could not load item image, but item will still be added.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoadingImage(false);
+      }
+
       const response = await fetch("/api/items", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -160,6 +202,7 @@ export function ItemForm() {
           description: description.trim() || undefined,
           appid: 730,
           steam_url: steamUrl.trim(),
+          image_url: imageUrl,
           purchase_price: price,
           quantity: qty,
           purchase_currency: purchaseCurrency,
@@ -740,7 +783,7 @@ export function ItemForm() {
       </Card>
 
       <Button type="submit" disabled={isLoading} className="w-full">
-        {isLoading ? "Adding..." : "Add Item"}
+        {isLoadingImage ? "Loading image..." : isLoading ? "Adding..." : "Add Item"}
       </Button>
     </form>
   );
