@@ -1,4 +1,5 @@
 import { readData, writeData } from "./data-storage.server";
+import { startWorkerTask, updateWorkerTaskProgress, completeWorkerTask } from "./worker-storage.server";
 
 // Generate a unique ID for items (same function as in data-storage.server.ts)
 function generateItemId(): string {
@@ -26,12 +27,25 @@ export async function migrateDataToUseIds(): Promise<void> {
     return;
   }
   
+  // Start worker task
+  const taskId = await startWorkerTask(
+    "data_migration",
+    "Data Migration",
+    `Migrating ${itemsArray.length} items to use unique IDs`,
+    { totalItems: itemsArray.length }
+  );
+  
   console.log("[Migration] Migration needed - adding IDs to existing items...");
   
   // Create new items object with IDs as keys
   const newItems: Record<string, any> = {};
   
-  for (const [oldKey, item] of itemsArray) {
+  for (let i = 0; i < itemsArray.length; i++) {
+    const [oldKey, item] = itemsArray[i];
+    
+    // Update progress
+    await updateWorkerTaskProgress(taskId, { current: i, total: itemsArray.length });
+    
     // Generate new ID if item doesn't have one
     const itemId = item.id || generateItemId();
     
@@ -62,6 +76,9 @@ export async function migrateDataToUseIds(): Promise<void> {
   };
   
   await writeData(updatedData);
+  
+  // Complete worker task
+  await completeWorkerTask(taskId, true);
   
   console.log(`[Migration] Successfully migrated ${itemsArray.length} items to use IDs`);
 }

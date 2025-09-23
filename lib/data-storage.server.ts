@@ -6,6 +6,7 @@ import {
   type PriceSpikeNotificationPayload,
   sendPriceAlertNotification,
 } from "./discord-webhook.server";
+import { startWorkerTask, updateWorkerTaskProgress, completeWorkerTask } from "./worker-storage.server";
 
 interface PriceEntry {
   date: string;
@@ -1263,28 +1264,46 @@ export async function getSoldItemsByCategory(categoryId: string): Promise<SoldIt
  */
 export async function reloadItemImage(marketHashName: string): Promise<string | null> {
   console.log(`[DEBUG] reloadItemImage called for: ${marketHashName}`);
-  const imageLoaderModule = await import('./image-loader.server');
-  console.log(`[DEBUG] Image loader module imported:`, Object.keys(imageLoaderModule));
-  const { getItemImageUrl } = imageLoaderModule;
-  console.log(`[DEBUG] getItemImageUrl function:`, typeof getItemImageUrl);
-  console.log(`[DEBUG] Calling getItemImageUrl now...`);
-  const imageUrl = await getItemImageUrl(marketHashName);
-  console.log(`[DEBUG] getItemImageUrl returned: ${imageUrl}`);
   
-  if (imageUrl) {
-    await updateData((data) => {
-      // Find all items with this market hash name and update their images
-      const itemsWithHashName = Object.values(data.items).filter(
-        item => item.market_hash_name === marketHashName
-      );
-      
-      for (const item of itemsWithHashName) {
-        item.image_url = imageUrl;
-      }
-    });
+  // Start worker task for individual image loading
+  const taskId = await startWorkerTask(
+    "image_fetch",
+    "Loading Item Image",
+    `Fetching image for ${marketHashName}`,
+    { marketHashName }
+  );
+  
+  try {
+    const imageLoaderModule = await import('./image-loader.server');
+    console.log(`[DEBUG] Image loader module imported:`, Object.keys(imageLoaderModule));
+    const { getItemImageUrl } = imageLoaderModule;
+    console.log(`[DEBUG] getItemImageUrl function:`, typeof getItemImageUrl);
+    console.log(`[DEBUG] Calling getItemImageUrl now...`);
+    const imageUrl = await getItemImageUrl(marketHashName);
+    console.log(`[DEBUG] getItemImageUrl returned: ${imageUrl}`);
+    
+    if (imageUrl) {
+      await updateData((data) => {
+        // Find all items with this market hash name and update their images
+        const itemsWithHashName = Object.values(data.items).filter(
+          item => item.market_hash_name === marketHashName
+        );
+        
+        for (const item of itemsWithHashName) {
+          item.image_url = imageUrl;
+        }
+      });
+    }
+    
+    // Complete worker task
+    await completeWorkerTask(taskId, true);
+    
+    return imageUrl;
+  } catch (error) {
+    // Complete worker task with error
+    await completeWorkerTask(taskId, false, error instanceof Error ? error.message : String(error));
+    throw error;
   }
-  
-  return imageUrl;
 }
 
 /**
@@ -1303,17 +1322,34 @@ export async function reloadAllItemImages(imageLoadingDelayMs: number = 3000): P
   let failed = 0;
   const errors: string[] = [];
   
+  // Start worker task
+  const taskId = await startWorkerTask(
+    "bulk_image_reload",
+    "Reloading Item Images",
+    `Loading images for ${itemsWithoutImages.length} items with ${imageLoadingDelayMs}ms delay`,
+    { totalItems: itemsWithoutImages.length, delayMs: imageLoadingDelayMs }
+  );
+  
   console.log(`Reloading images for ${itemsWithoutImages.length} items...`);
   
-  for (const item of itemsWithoutImages) {
+  for (let i = 0; i < itemsWithoutImages.length; i++) {
+    const item = itemsWithoutImages[i];
     try {
+      // Update progress
+      await updateWorkerTaskProgress(taskId, { current: i, total: itemsWithoutImages.length });
+      
       console.log(`[DEBUG] Calling getItemImageUrl for: ${item.market_hash_name}`);
       const imageUrl = await getItemImageUrl(item.market_hash_name, item.appid);
       console.log(`[DEBUG] getItemImageUrl returned for ${item.market_hash_name}: ${imageUrl}`);
       if (imageUrl) {
         await updateData((data) => {
-          if (data.items[item.market_hash_name]) {
-            data.items[item.market_hash_name].image_url = imageUrl;
+          // Find all items with this market hash name and update their images
+          const itemsWithHashName = Object.values(data.items).filter(
+            itemToUpdate => itemToUpdate.market_hash_name === item.market_hash_name
+          );
+          
+          for (const itemToUpdate of itemsWithHashName) {
+            itemToUpdate.image_url = imageUrl;
           }
         });
         success++;
@@ -1325,7 +1361,7 @@ export async function reloadAllItemImages(imageLoadingDelayMs: number = 3000): P
       }
       
       // Add a configurable delay to avoid overwhelming Steam's servers
-      if (itemsWithoutImages.indexOf(item) < itemsWithoutImages.length - 1) {
+      if (i < itemsWithoutImages.length - 1) {
         console.log(`Waiting ${imageLoadingDelayMs}ms before next image request...`);
         await new Promise(resolve => setTimeout(resolve, imageLoadingDelayMs));
       }
@@ -1336,6 +1372,9 @@ export async function reloadAllItemImages(imageLoadingDelayMs: number = 3000): P
       console.error(errorMsg);
     }
   }
+  
+  // Complete worker task
+  await completeWorkerTask(taskId, true);
   
   console.log(`Image reload complete: ${success} success, ${failed} failed`);
   return { success, failed, errors };

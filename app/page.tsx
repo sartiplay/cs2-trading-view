@@ -3,6 +3,7 @@ import { ItemsTable } from "@/components/items-table";
 import { CaptureStats } from "@/components/capture-stats";
 import { SettingsDialog } from "@/components/settings-dialog";
 import { PortfolioChart } from "@/components/portfolio-chart";
+import { WorkerStatus } from "@/components/worker-status";
 import {
   Card,
   CardContent,
@@ -38,36 +39,57 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <CaptureStats />
+        <div className="space-y-8">
+          <CaptureStats />
 
-        <Accordion type="multiple" className="w-full">
-          <AccordionItem value="add-item">
-            <AccordionTrigger className="text-lg font-semibold">
-              Add New Item
-            </AccordionTrigger>
-            <AccordionContent>
-              <Card className="border-0 shadow-none">
-                <CardContent className="pt-4">
-                  <p className="text-muted-foreground mb-4 text-pretty">
-                    Add CS2 items to track their Steam Market prices
-                  </p>
-                  <ItemForm />
-                </CardContent>
-              </Card>
-            </AccordionContent>
-          </AccordionItem>
+          {/* Worker Status - Mobile/Tablet: In accordion */}
+          <div className="xl:hidden">
+            <Accordion type="multiple" className="w-full">
+              <AccordionItem value="worker-status">
+                <AccordionTrigger className="text-lg font-semibold">
+                  Worker Status
+                </AccordionTrigger>
+                <AccordionContent>
+                  <WorkerStatus />
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          </div>
 
-          <AccordionItem value="scheduler">
-            <SchedulerAccordionTrigger />
-            <AccordionContent>
-              <Card className="border-0 shadow-none">
-                <CardContent className="pt-4">
-                  <SchedulerStatus />
-                </CardContent>
-              </Card>
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
+          <Accordion type="multiple" className="w-full">
+            <AccordionItem value="add-item">
+              <AccordionTrigger className="text-lg font-semibold">
+                Add New Item
+              </AccordionTrigger>
+              <AccordionContent>
+                <Card className="border-0 shadow-none">
+                  <CardContent className="pt-4">
+                    <p className="text-muted-foreground mb-4 text-pretty">
+                      Add CS2 items to track their Steam Market prices
+                    </p>
+                    <ItemForm />
+                  </CardContent>
+                </Card>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="scheduler">
+              <SchedulerAccordionTrigger />
+              <AccordionContent>
+                <Card className="border-0 shadow-none">
+                  <CardContent className="pt-4">
+                    <SchedulerStatus />
+                  </CardContent>
+                </Card>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </div>
+
+        {/* Worker Status - Desktop: Floating sidebar */}
+        <div className="hidden xl:block fixed top-24 right-6 w-80 z-10">
+          <WorkerStatus />
+        </div>
 
         <Card>
           <CardHeader>

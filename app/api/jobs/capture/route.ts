@@ -13,6 +13,7 @@ import {
   sendDiscordNotification,
   getDiscordSettings,
 } from "@/lib/discord-webhook.server";
+import { startWorkerTask, updateWorkerTaskProgress, completeWorkerTask } from "@/lib/worker-storage.server";
 
 export async function POST(request: NextRequest) {
   let market_hash_name: string | undefined;
@@ -33,7 +34,16 @@ export async function POST(request: NextRequest) {
         `[Capture Job] Capturing price for single item: ${market_hash_name}`
       );
 
-      const price = await fetchSteamPrice(market_hash_name, 730);
+      // Start worker task for individual item capture
+      const taskId = await startWorkerTask(
+        "price_fetch",
+        "Price Capture",
+        `Capturing price for ${market_hash_name}`,
+        { marketHashName: market_hash_name }
+      );
+
+      try {
+        const price = await fetchSteamPrice(market_hash_name, 730);
 
       if (price !== null) {
         await addPriceEntry(market_hash_name, price);
@@ -80,6 +90,9 @@ export async function POST(request: NextRequest) {
           );
         }
 
+        // Complete worker task
+        await completeWorkerTask(taskId, true);
+
         return NextResponse.json({
           success: true,
           message: `Price captured for ${market_hash_name}: $${price.toFixed(
@@ -91,10 +104,18 @@ export async function POST(request: NextRequest) {
           }`,
         });
       } else {
+        // Complete worker task with error
+        await completeWorkerTask(taskId, false, "Failed to fetch price from Steam API");
+        
         return NextResponse.json(
           { error: "Failed to fetch price from Steam API" },
           { status: 400 }
         );
+      }
+      } catch (error) {
+        // Complete worker task with error
+        await completeWorkerTask(taskId, false, error instanceof Error ? error.message : String(error));
+        throw error;
       }
     } else {
       // Capture prices for all items
@@ -114,6 +135,15 @@ export async function POST(request: NextRequest) {
         });
       }
 
+      // Start worker task for price capture
+      const totalItems = items.length + customizations.length;
+      const taskId = await startWorkerTask(
+        "scheduled_capture",
+        "Price Capture",
+        `Capturing prices for ${items.length} items and ${customizations.length} customizations`,
+        { totalItems: totalItems, items: items.length, customizations: customizations.length }
+      );
+
       const previousPrices = await getLatestPrices();
       const previousInventoryValue = await getInventoryValue();
 
@@ -125,6 +155,9 @@ export async function POST(request: NextRequest) {
         })),
         1000 // 1 second delay between requests
       );
+
+      // Update progress after main items
+      await updateWorkerTaskProgress(taskId, { current: items.length, total: totalItems });
 
       // Save successful price captures for main items
       for (const result of results) {
@@ -231,6 +264,9 @@ export async function POST(request: NextRequest) {
         );
         // Don't fail the entire capture job if Discord fails
       }
+
+      // Complete worker task
+      await completeWorkerTask(taskId, true);
 
       return NextResponse.json({
         success: true,
