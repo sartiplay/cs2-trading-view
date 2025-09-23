@@ -5,6 +5,7 @@ import {
   removeItem,
   addOrUpdateItem,
 } from "@/lib/data-storage.server";
+import { convertCurrency } from "@/lib/currency-converter.server";
 
 interface RouteParams {
   params: Promise<{ hash: string }>;
@@ -14,6 +15,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
     const { hash } = await params;
     const marketHashName = decodeURIComponent(hash);
+    const { searchParams } = new URL(request.url);
+    const displayCurrency = searchParams.get("display_currency") || "USD";
 
     const item = await getItemByMarketHashName(marketHashName);
 
@@ -21,7 +24,26 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: "Item not found" }, { status: 404 });
     }
 
-    return NextResponse.json(item);
+    // Convert price history to display currency if needed
+    if (displayCurrency !== "USD" && item.price_history) {
+      try {
+        const convertedPriceHistory = await Promise.all(
+          item.price_history.map(async (entry) => ({
+            ...entry,
+            median_price: await convertCurrency(entry.median_price, "USD", displayCurrency)
+          }))
+        );
+        item.price_history = convertedPriceHistory;
+      } catch (error) {
+        console.error("Failed to convert price history:", error);
+        // If conversion fails, return original data
+      }
+    }
+
+    return NextResponse.json({
+      ...item,
+      display_currency: displayCurrency
+    });
   } catch (error) {
     console.error("Failed to fetch item:", error);
     return NextResponse.json(

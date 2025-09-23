@@ -1,4 +1,5 @@
 import { ItemDetail } from "@/components/item-detail"
+import { CurrencyProvider } from "@/contexts/currency-context"
 import { notFound } from "next/navigation"
 
 interface ItemPageProps {
@@ -13,10 +14,12 @@ export default async function ItemPage({ params }: ItemPageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="mx-auto max-w-4xl">
-        <ItemDetail hash={decodeURIComponent(hash)} />
+    <CurrencyProvider>
+      <div className="min-h-screen bg-background p-6">
+        <div className="mx-auto max-w-4xl">
+          <ItemDetail hash={decodeURIComponent(hash)} />
+        </div>
       </div>
-    </div>
+    </CurrencyProvider>
   )
 }

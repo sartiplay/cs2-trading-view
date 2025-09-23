@@ -60,6 +60,8 @@ import {
   TRADE_PROVIDERS,
   type TradeProviderMeta,
 } from "@/lib/trade-providers";
+import { useCurrency } from "@/contexts/currency-context";
+import { getClientCurrencySymbol } from "@/lib/currency-utils";
 
 const CURRENCIES = [
   { code: "USD", name: "US Dollar", symbol: "$" },
@@ -173,6 +175,7 @@ const getConditionBadgeClass = (condition: string): string => {
 export function ItemDetail({ hash }: ItemDetailProps) {
   const settings = useSettings();
   const [effectiveSettings, setEffectiveSettings] = useState(settings);
+  const { displayCurrency } = useCurrency();
 
   useEffect(() => {
     setEffectiveSettings(settings);
@@ -764,7 +767,7 @@ export function ItemDetail({ hash }: ItemDetailProps) {
 
   const fetchItem = async () => {
     try {
-      const response = await fetch(`/api/items/${encodeURIComponent(hash)}`);
+      const response = await fetch(`/api/items/${encodeURIComponent(hash)}?display_currency=${displayCurrency}`);
       if (response.ok) {
         const data = await response.json();
         setItem(data);
@@ -1269,7 +1272,7 @@ export function ItemDetail({ hash }: ItemDetailProps) {
   useEffect(() => {
     fetchItem();
     fetchCategories();
-  }, [hash]);
+  }, [hash, displayCurrency]);
 
   useEffect(() => {
     setMarketListings([]);
@@ -1456,13 +1459,13 @@ export function ItemDetail({ hash }: ItemDetailProps) {
             <div className="flex flex-wrap gap-2 text-xs">
               {item.price_alert_config?.lowerThreshold != null && (
                 <span className="inline-flex items-center gap-1 rounded-full bg-red-500/10 px-3 py-1 font-medium text-red-300">
-                  Stop Loss: $
+                  Stop Loss: {getClientCurrencySymbol(displayCurrency)}
                   {item.price_alert_config.lowerThreshold.toFixed(2)}
                 </span>
               )}
               {item.price_alert_config?.upperThreshold != null && (
                 <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-3 py-1 font-medium text-emerald-300">
-                  Take Profit: $
+                  Take Profit: {getClientCurrencySymbol(displayCurrency)}
                   {item.price_alert_config.upperThreshold.toFixed(2)}
                 </span>
               )}
@@ -1492,7 +1495,7 @@ export function ItemDetail({ hash }: ItemDetailProps) {
             {latestPrice ? (
               <div>
                 <div className="text-2xl font-bold text-card-foreground">
-                  ${latestPrice.median_price.toFixed(2)}
+                  {getClientCurrencySymbol(displayCurrency)}{latestPrice.median_price.toFixed(2)}
                 </div>
                 <div className="flex items-center gap-2 text-sm">
                   <span className="text-muted-foreground">
@@ -1530,7 +1533,7 @@ export function ItemDetail({ hash }: ItemDetailProps) {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-card-foreground">
-              ${avgPrice.toFixed(2)}
+              {getClientCurrencySymbol(displayCurrency)}{avgPrice.toFixed(2)}
             </div>
             <div className="text-sm text-muted-foreground">
               All-time average
@@ -1549,13 +1552,13 @@ export function ItemDetail({ hash }: ItemDetailProps) {
               <div className="text-sm">
                 <span className="text-muted-foreground">High:</span>{" "}
                 <span className="font-medium text-green-400">
-                  ${maxPrice.toFixed(2)}
+                  {getClientCurrencySymbol(displayCurrency)}{maxPrice.toFixed(2)}
                 </span>
               </div>
               <div className="text-sm">
                 <span className="text-muted-foreground">Low:</span>{" "}
                 <span className="font-medium text-red-400">
-                  ${minPrice.toFixed(2)}
+                  {getClientCurrencySymbol(displayCurrency)}{minPrice.toFixed(2)}
                 </span>
               </div>
             </div>
@@ -1626,7 +1629,7 @@ export function ItemDetail({ hash }: ItemDetailProps) {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="dev-current-price">Current price (USD)</Label>
+                <Label htmlFor="dev-current-price">Current price ({displayCurrency})</Label>
                 <Input
                   id="dev-current-price"
                   type="number"
