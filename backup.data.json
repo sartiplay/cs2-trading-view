@@ -1,0 +1,6173 @@
+{
+  "categories": {
+    "default-playing": {
+      "id": "default-playing",
+      "name": "Playing",
+      "color": "#10B981",
+      "includeInInventoryValue": true,
+      "includeInProfitLoss": true,
+      "created_at": "2025-01-27T00:00:00.000Z",
+      "updated_at": "2025-09-23T04:34:38.169Z"
+    },
+    "default-collecting": {
+      "id": "default-collecting",
+      "name": "Collecting",
+      "color": "#8B5CF6",
+      "includeInInventoryValue": true,
+      "includeInProfitLoss": true,
+      "created_at": "2025-01-27T00:00:00.000Z",
+      "updated_at": "2025-01-27T00:00:00.000Z"
+    },
+    "default-other": {
+      "id": "default-other",
+      "name": "Other",
+      "color": "#6B7280",
+      "includeInInventoryValue": true,
+      "includeInProfitLoss": true,
+      "created_at": "2025-01-27T00:00:00.000Z",
+      "updated_at": "2025-01-27T00:00:00.000Z"
+    }
+  },
+  "items": {
+    "item_1758608386964_hotxkbhe1": {
+      "market_hash_name": "★ Survival Knife",
+      "label": "★ Survival Knife",
+      "appid": 730,
+      "steam_url": "https://steamcommunity.com/market/listings/730/%E2%98%85%20Survival%20Knife",
+      "purchase_price": 175.21,
+      "quantity": 1,
+      "purchase_currency": "USD",
+      "price_history": [
+        {
+          "date": "2025-09-18T07:51:38.962Z",
+          "median_price": 180.98
+        },
+        {
+          "date": "2025-09-20T04:29:24.553Z",
+          "median_price": 175.02
+        },
+        {
+          "date": "2025-09-20T04:30:01.472Z",
+          "median_price": 175.02
+        },
+        {
+          "date": "2025-09-20T04:30:01.872Z",
+          "median_price": 175.02
+        },
+        {
+          "date": "2025-09-20T04:30:01.944Z",
+          "median_price": 175.02
+        },
+        {
+          "date": "2025-09-20T20:42:04.893Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-20T20:44:18.823Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-20T20:45:03.072Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-20T20:50:03.032Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-20T20:55:04.373Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-20T21:00:03.034Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-20T21:05:03.064Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-20T21:10:03.033Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-20T21:15:03.066Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-20T21:20:03.979Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-20T21:25:03.103Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-20T21:40:03.073Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-20T21:45:03.627Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-20T21:50:03.627Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-20T21:55:03.205Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-20T22:00:03.772Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-20T22:05:03.147Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-20T22:05:03.161Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-20T22:20:03.118Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-20T22:25:03.013Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-20T22:35:03.395Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-20T22:40:03.056Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-20T22:45:03.090Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-20T22:50:03.581Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-20T22:55:03.088Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-20T23:00:03.102Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-20T23:00:03.168Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-20T23:05:03.051Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-20T23:05:03.116Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-20T23:10:03.104Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-20T23:10:03.162Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-20T23:15:03.038Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-20T23:15:03.100Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-20T23:20:03.063Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-20T23:20:03.107Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-20T23:25:03.166Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-20T23:25:03.211Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-20T23:30:03.063Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-20T23:30:03.129Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-20T23:35:03.117Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-20T23:35:03.179Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-20T23:40:03.062Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-20T23:40:03.124Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-20T23:45:03.040Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-20T23:45:03.055Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-20T23:50:03.136Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-20T23:50:03.706Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-20T23:55:03.153Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-20T23:55:03.286Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-21T00:00:03.880Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-21T00:00:03.930Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-21T00:05:03.151Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-21T00:05:03.200Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-21T00:10:03.415Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-21T00:10:03.499Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-21T00:15:03.208Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-21T00:15:03.276Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-21T00:20:03.111Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-21T00:20:03.129Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-21T00:25:03.712Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-21T00:25:03.951Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-21T00:30:03.137Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-21T00:30:03.186Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-21T00:30:03.285Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-21T00:35:03.308Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-21T00:35:03.323Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-21T00:35:03.430Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-21T00:40:03.115Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-21T00:40:03.176Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-21T00:40:03.218Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-21T00:45:03.191Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-21T00:45:03.269Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-21T00:45:03.309Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-21T00:50:03.136Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-21T00:50:03.207Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-21T00:50:03.306Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-21T01:00:03.207Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-21T01:00:03.278Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-21T01:00:03.295Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-21T04:30:03.662Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-21T05:00:03.032Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-21T05:30:02.949Z",
+          "median_price": 172.93
+        },
+        {
+          "date": "2025-09-21T20:45:03.427Z",
+          "median_price": 175.24
+        },
+        {
+          "date": "2025-09-21T20:55:31.315Z",
+          "median_price": 175.24
+        },
+        {
+          "date": "2025-09-21T21:00:06.818Z",
+          "median_price": 175.24
+        },
+        {
+          "date": "2025-09-22T00:00:07.917Z",
+          "median_price": 171.13
+        },
+        {
+          "date": "2025-09-22T00:30:08.529Z",
+          "median_price": 171.13
+        },
+        {
+          "date": "2025-09-22T00:30:08.615Z",
+          "median_price": 171.13
+        },
+        {
+          "date": "2025-09-22T01:00:07.924Z",
+          "median_price": 171.13
+        },
+        {
+          "date": "2025-09-22T01:00:08.039Z",
+          "median_price": 171.13
+        },
+        {
+          "date": "2025-09-22T01:30:08.008Z",
+          "median_price": 171.13
+        },
+        {
+          "date": "2025-09-22T01:30:08.339Z",
+          "median_price": 171.13
+        },
+        {
+          "date": "2025-09-22T02:00:08.182Z",
+          "median_price": 171.13
+        },
+        {
+          "date": "2025-09-22T02:00:08.201Z",
+          "median_price": 171.13
+        },
+        {
+          "date": "2025-09-22T06:00:08.170Z",
+          "median_price": 171.13
+        },
+        {
+          "date": "2025-09-22T06:30:08.497Z",
+          "median_price": 171.13
+        },
+        {
+          "date": "2025-09-22T06:30:08.624Z",
+          "median_price": 171.13
+        },
+        {
+          "date": "2025-09-22T07:00:08.810Z",
+          "median_price": 171.13
+        },
+        {
+          "date": "2025-09-22T07:00:08.979Z",
+          "median_price": 171.13
+        },
+        {
+          "date": "2025-09-22T07:30:08.492Z",
+          "median_price": 171.13
+        },
+        {
+          "date": "2025-09-22T07:30:08.546Z",
+          "median_price": 171.13
+        },
+        {
+          "date": "2025-09-22T07:40:08.149Z",
+          "median_price": 171.13
+        },
+        {
+          "date": "2025-09-22T07:45:07.834Z",
+          "median_price": 171.13
+        },
+        {
+          "date": "2025-09-22T07:50:07.843Z",
+          "median_price": 171.13
+        },
+        {
+          "date": "2025-09-22T07:55:07.822Z",
+          "median_price": 171.13
+        },
+        {
+          "date": "2025-09-22T08:00:07.922Z",
+          "median_price": 171.13
+        },
+        {
+          "date": "2025-09-22T08:05:07.789Z",
+          "median_price": 171.13
+        },
+        {
+          "date": "2025-09-22T08:10:07.848Z",
+          "median_price": 171.13
+        },
+        {
+          "date": "2025-09-22T08:15:07.833Z",
+          "median_price": 171.13
+        },
+        {
+          "date": "2025-09-22T08:20:07.749Z",
+          "median_price": 171.13
+        },
+        {
+          "date": "2025-09-22T08:25:07.836Z",
+          "median_price": 171.13
+        },
+        {
+          "date": "2025-09-22T08:30:08.414Z",
+          "median_price": 171.13
+        },
+        {
+          "date": "2025-09-22T08:35:08.004Z",
+          "median_price": 171.13
+        },
+        {
+          "date": "2025-09-22T08:40:08.618Z",
+          "median_price": 171.13
+        },
+        {
+          "date": "2025-09-22T08:45:08.121Z",
+          "median_price": 171.13
+        },
+        {
+          "date": "2025-09-22T08:50:07.740Z",
+          "median_price": 171.13
+        },
+        {
+          "date": "2025-09-22T08:55:07.783Z",
+          "median_price": 171.13
+        },
+        {
+          "date": "2025-09-22T09:00:07.838Z",
+          "median_price": 171.13
+        },
+        {
+          "date": "2025-09-22T09:05:07.908Z",
+          "median_price": 171.13
+        },
+        {
+          "date": "2025-09-22T09:10:07.846Z",
+          "median_price": 171.13
+        },
+        {
+          "date": "2025-09-22T09:15:08.082Z",
+          "median_price": 171.13
+        },
+        {
+          "date": "2025-09-22T09:20:07.803Z",
+          "median_price": 171.13
+        },
+        {
+          "date": "2025-09-22T09:25:07.751Z",
+          "median_price": 171.13
+        },
+        {
+          "date": "2025-09-22T09:30:08.250Z",
+          "median_price": 171.13
+        },
+        {
+          "date": "2025-09-22T09:35:07.864Z",
+          "median_price": 171.13
+        },
+        {
+          "date": "2025-09-22T09:40:08.315Z",
+          "median_price": 171.13
+        },
+        {
+          "date": "2025-09-22T09:45:07.961Z",
+          "median_price": 171.13
+        },
+        {
+          "date": "2025-09-22T09:50:07.778Z",
+          "median_price": 171.13
+        },
+        {
+          "date": "2025-09-22T09:55:07.994Z",
+          "median_price": 171.13
+        },
+        {
+          "date": "2025-09-22T10:00:07.814Z",
+          "median_price": 171.13
+        },
+        {
+          "date": "2025-09-22T10:05:07.763Z",
+          "median_price": 171.13
+        },
+        {
+          "date": "2025-09-22T10:10:07.872Z",
+          "median_price": 171.13
+        },
+        {
+          "date": "2025-09-22T10:15:07.843Z",
+          "median_price": 174.23
+        },
+        {
+          "date": "2025-09-22T10:20:07.851Z",
+          "median_price": 174.23
+        },
+        {
+          "date": "2025-09-22T10:25:07.787Z",
+          "median_price": 174.23
+        },
+        {
+          "date": "2025-09-22T10:30:07.846Z",
+          "median_price": 174.23
+        },
+        {
+          "date": "2025-09-22T10:35:07.775Z",
+          "median_price": 174.23
+        },
+        {
+          "date": "2025-09-22T10:40:08.526Z",
+          "median_price": 174.23
+        },
+        {
+          "date": "2025-09-22T10:45:07.727Z",
+          "median_price": 174.23
+        },
+        {
+          "date": "2025-09-22T10:50:07.805Z",
+          "median_price": 174.23
+        },
+        {
+          "date": "2025-09-22T10:55:07.805Z",
+          "median_price": 174.23
+        },
+        {
+          "date": "2025-09-22T11:00:07.833Z",
+          "median_price": 174.23
+        },
+        {
+          "date": "2025-09-22T11:05:07.780Z",
+          "median_price": 174.23
+        },
+        {
+          "date": "2025-09-22T11:10:07.853Z",
+          "median_price": 174.23
+        },
+        {
+          "date": "2025-09-22T11:15:07.800Z",
+          "median_price": 174.23
+        },
+        {
+          "date": "2025-09-22T11:20:07.842Z",
+          "median_price": 174.23
+        },
+        {
+          "date": "2025-09-22T11:25:07.928Z",
+          "median_price": 174.23
+        },
+        {
+          "date": "2025-09-22T11:30:08.229Z",
+          "median_price": 174.23
+        },
+        {
+          "date": "2025-09-22T11:35:07.767Z",
+          "median_price": 174.23
+        },
+        {
+          "date": "2025-09-22T11:40:08.387Z",
+          "median_price": 174.23
+        },
+        {
+          "date": "2025-09-22T11:45:07.897Z",
+          "median_price": 174.23
+        },
+        {
+          "date": "2025-09-22T11:50:07.825Z",
+          "median_price": 174.23
+        },
+        {
+          "date": "2025-09-22T11:55:07.828Z",
+          "median_price": 174.23
+        },
+        {
+          "date": "2025-09-22T12:00:07.863Z",
+          "median_price": 174.23
+        },
+        {
+          "date": "2025-09-22T12:05:11.924Z",
+          "median_price": 174.23
+        },
+        {
+          "date": "2025-09-22T12:10:11.387Z",
+          "median_price": 174.23
+        },
+        {
+          "date": "2025-09-22T12:15:11.656Z",
+          "median_price": 174.23
+        },
+        {
+          "date": "2025-09-22T12:20:12.084Z",
+          "median_price": 174.23
+        },
+        {
+          "date": "2025-09-22T12:25:11.591Z",
+          "median_price": 174.23
+        },
+        {
+          "date": "2025-09-22T12:30:11.832Z",
+          "median_price": 174.23
+        },
+        {
+          "date": "2025-09-22T12:35:11.721Z",
+          "median_price": 174.23
+        },
+        {
+          "date": "2025-09-22T12:40:11.589Z",
+          "median_price": 174.23
+        },
+        {
+          "date": "2025-09-22T12:45:11.645Z",
+          "median_price": 174.23
+        },
+        {
+          "date": "2025-09-22T12:50:11.747Z",
+          "median_price": 174.23
+        },
+        {
+          "date": "2025-09-22T12:55:11.592Z",
+          "median_price": 174.23
+        },
+        {
+          "date": "2025-09-22T13:00:11.730Z",
+          "median_price": 174.23
+        },
+        {
+          "date": "2025-09-22T13:05:11.738Z",
+          "median_price": 174.23
+        },
+        {
+          "date": "2025-09-22T13:10:11.583Z",
+          "median_price": 174.23
+        },
+        {
+          "date": "2025-09-22T13:15:11.613Z",
+          "median_price": 180.01
+        },
+        {
+          "date": "2025-09-22T21:14:12.265Z",
+          "median_price": 182.65
+        },
+        {
+          "date": "2025-09-23T01:00:12.279Z",
+          "median_price": 171.16
+        },
+        {
+          "date": "2025-09-23T03:17:34.646Z",
+          "median_price": 171.16
+        },
+        {
+          "date": "2025-09-23T05:00:10.805Z",
+          "median_price": 171.93
+        },
+        {
+          "date": "2025-09-23T06:22:42.301Z",
+          "median_price": 171.93
+        },
+        {
+          "date": "2025-09-23T06:22:42.301Z",
+          "median_price": 171.93
+        },
+        {
+          "date": "2025-09-23T06:44:13.936Z",
+          "median_price": 171.93
+        },
+        {
+          "date": "2025-09-23T06:44:13.936Z",
+          "median_price": 171.93
+        },
+        {
+          "date": "2025-09-23T06:45:59.625Z",
+          "median_price": 171.93
+        },
+        {
+          "date": "2025-09-23T06:45:59.625Z",
+          "median_price": 171.93
+        },
+        {
+          "date": "2025-09-23T06:50:31.651Z",
+          "median_price": 171.93
+        },
+        {
+          "date": "2025-09-23T06:50:31.651Z",
+          "median_price": 171.93
+        }
+      ],
+      "price_alert_config": {
+        "lowerTriggered": false,
+        "lastTriggeredLower": null,
+        "upperTriggered": false,
+        "lastTriggeredUpper": null,
+        "updatedAt": "2025-09-23T06:50:31.651Z"
+      },
+      "category_id": "default-playing",
+      "include_customizations_in_price": false,
+      "stickers": [],
+      "charms": [],
+      "patches": [],
+      "image_url": "https://steamcommunity-a.akamaihd.net/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XuWbwcuyMESA4Fdl-4nnpU7iQA3-kKnr8ytd6s2taapkM77CDzbIlrsms-NsHHGxzUwj5G6En4yuIy_BbQAjC5VxQLRc5hm8x4HvKaq8sEukLuHu",
+      "id": "item_1758608386964_hotxkbhe1",
+      "created_at": "2025-09-23T06:19:46.964Z"
+    },
+    "item_1758608386964_jpb31n994": {
+      "market_hash_name": "Fracture Case",
+      "label": "Fracture Case",
+      "appid": 730,
+      "steam_url": "https://steamcommunity.com/market/listings/730/Fracture%20Case",
+      "purchase_price": 0.8,
+      "quantity": 98,
+      "purchase_currency": "CHF",
+      "stickers": [],
+      "charms": [],
+      "patches": [],
+      "include_customizations_in_price": false,
+      "price_history": [
+        {
+          "date": "2025-09-20T20:41:57.299Z",
+          "median_price": 0.83
+        },
+        {
+          "date": "2025-09-20T20:42:04.908Z",
+          "median_price": 0.83
+        },
+        {
+          "date": "2025-09-20T20:44:18.839Z",
+          "median_price": 0.83
+        },
+        {
+          "date": "2025-09-20T20:45:03.089Z",
+          "median_price": 0.83
+        },
+        {
+          "date": "2025-09-20T20:50:03.049Z",
+          "median_price": 0.83
+        },
+        {
+          "date": "2025-09-20T20:55:04.387Z",
+          "median_price": 0.83
+        },
+        {
+          "date": "2025-09-20T21:00:03.049Z",
+          "median_price": 0.83
+        },
+        {
+          "date": "2025-09-20T21:05:03.076Z",
+          "median_price": 0.83
+        },
+        {
+          "date": "2025-09-20T21:10:03.048Z",
+          "median_price": 0.83
+        },
+        {
+          "date": "2025-09-20T21:15:03.081Z",
+          "median_price": 0.83
+        },
+        {
+          "date": "2025-09-20T21:20:03.994Z",
+          "median_price": 0.83
+        },
+        {
+          "date": "2025-09-20T21:25:03.118Z",
+          "median_price": 0.83
+        },
+        {
+          "date": "2025-09-20T21:40:03.088Z",
+          "median_price": 0.83
+        },
+        {
+          "date": "2025-09-20T21:45:03.644Z",
+          "median_price": 0.83
+        },
+        {
+          "date": "2025-09-20T21:50:03.644Z",
+          "median_price": 0.83
+        },
+        {
+          "date": "2025-09-20T21:55:03.219Z",
+          "median_price": 0.83
+        },
+        {
+          "date": "2025-09-20T22:00:03.787Z",
+          "median_price": 0.83
+        },
+        {
+          "date": "2025-09-20T22:05:03.174Z",
+          "median_price": 0.83
+        },
+        {
+          "date": "2025-09-20T22:05:03.189Z",
+          "median_price": 0.83
+        },
+        {
+          "date": "2025-09-20T22:20:03.138Z",
+          "median_price": 0.84
+        },
+        {
+          "date": "2025-09-20T22:25:03.028Z",
+          "median_price": 0.84
+        },
+        {
+          "date": "2025-09-20T22:35:03.411Z",
+          "median_price": 0.84
+        },
+        {
+          "date": "2025-09-20T22:40:03.072Z",
+          "median_price": 0.84
+        },
+        {
+          "date": "2025-09-20T22:45:03.107Z",
+          "median_price": 0.84
+        },
+        {
+          "date": "2025-09-20T22:50:03.598Z",
+          "median_price": 0.84
+        },
+        {
+          "date": "2025-09-20T22:55:03.104Z",
+          "median_price": 0.84
+        },
+        {
+          "date": "2025-09-20T23:00:03.120Z",
+          "median_price": 0.84
+        },
+        {
+          "date": "2025-09-20T23:00:03.184Z",
+          "median_price": 0.84
+        },
+        {
+          "date": "2025-09-20T23:05:03.067Z",
+          "median_price": 0.84
+        },
+        {
+          "date": "2025-09-20T23:05:03.136Z",
+          "median_price": 0.84
+        },
+        {
+          "date": "2025-09-20T23:10:03.118Z",
+          "median_price": 0.84
+        },
+        {
+          "date": "2025-09-20T23:10:03.177Z",
+          "median_price": 0.84
+        },
+        {
+          "date": "2025-09-20T23:15:03.052Z",
+          "median_price": 0.84
+        },
+        {
+          "date": "2025-09-20T23:15:03.117Z",
+          "median_price": 0.84
+        },
+        {
+          "date": "2025-09-20T23:20:03.092Z",
+          "median_price": 0.84
+        },
+        {
+          "date": "2025-09-20T23:20:03.140Z",
+          "median_price": 0.84
+        },
+        {
+          "date": "2025-09-20T23:25:03.196Z",
+          "median_price": 0.84
+        },
+        {
+          "date": "2025-09-20T23:25:03.245Z",
+          "median_price": 0.84
+        },
+        {
+          "date": "2025-09-20T23:30:03.082Z",
+          "median_price": 0.84
+        },
+        {
+          "date": "2025-09-20T23:30:03.147Z",
+          "median_price": 0.84
+        },
+        {
+          "date": "2025-09-20T23:35:03.131Z",
+          "median_price": 0.84
+        },
+        {
+          "date": "2025-09-20T23:35:03.195Z",
+          "median_price": 0.84
+        },
+        {
+          "date": "2025-09-20T23:40:03.079Z",
+          "median_price": 0.84
+        },
+        {
+          "date": "2025-09-20T23:40:03.141Z",
+          "median_price": 0.84
+        },
+        {
+          "date": "2025-09-20T23:45:03.070Z",
+          "median_price": 0.84
+        },
+        {
+          "date": "2025-09-20T23:45:03.084Z",
+          "median_price": 0.84
+        },
+        {
+          "date": "2025-09-20T23:50:03.156Z",
+          "median_price": 0.84
+        },
+        {
+          "date": "2025-09-20T23:50:03.723Z",
+          "median_price": 0.84
+        },
+        {
+          "date": "2025-09-20T23:55:03.171Z",
+          "median_price": 0.84
+        },
+        {
+          "date": "2025-09-20T23:55:03.306Z",
+          "median_price": 0.84
+        },
+        {
+          "date": "2025-09-21T00:00:03.914Z",
+          "median_price": 0.84
+        },
+        {
+          "date": "2025-09-21T00:00:03.969Z",
+          "median_price": 0.84
+        },
+        {
+          "date": "2025-09-21T00:05:03.184Z",
+          "median_price": 0.84
+        },
+        {
+          "date": "2025-09-21T00:05:03.251Z",
+          "median_price": 0.84
+        },
+        {
+          "date": "2025-09-21T00:10:03.432Z",
+          "median_price": 0.84
+        },
+        {
+          "date": "2025-09-21T00:10:03.526Z",
+          "median_price": 0.84
+        },
+        {
+          "date": "2025-09-21T00:15:03.224Z",
+          "median_price": 0.84
+        },
+        {
+          "date": "2025-09-21T00:15:03.297Z",
+          "median_price": 0.84
+        },
+        {
+          "date": "2025-09-21T00:20:03.143Z",
+          "median_price": 0.84
+        },
+        {
+          "date": "2025-09-21T00:20:03.161Z",
+          "median_price": 0.84
+        },
+        {
+          "date": "2025-09-21T00:25:03.739Z",
+          "median_price": 0.84
+        },
+        {
+          "date": "2025-09-21T00:25:03.966Z",
+          "median_price": 0.84
+        },
+        {
+          "date": "2025-09-21T00:30:03.168Z",
+          "median_price": 0.84
+        },
+        {
+          "date": "2025-09-21T00:30:03.221Z",
+          "median_price": 0.84
+        },
+        {
+          "date": "2025-09-21T00:30:03.310Z",
+          "median_price": 0.84
+        },
+        {
+          "date": "2025-09-21T00:35:03.338Z",
+          "median_price": 0.84
+        },
+        {
+          "date": "2025-09-21T00:35:03.352Z",
+          "median_price": 0.84
+        },
+        {
+          "date": "2025-09-21T00:35:03.453Z",
+          "median_price": 0.84
+        },
+        {
+          "date": "2025-09-21T00:40:03.143Z",
+          "median_price": 0.84
+        },
+        {
+          "date": "2025-09-21T00:40:03.243Z",
+          "median_price": 0.84
+        },
+        {
+          "date": "2025-09-21T00:40:03.267Z",
+          "median_price": 0.84
+        },
+        {
+          "date": "2025-09-21T00:45:03.232Z",
+          "median_price": 0.84
+        },
+        {
+          "date": "2025-09-21T00:45:03.329Z",
+          "median_price": 0.84
+        },
+        {
+          "date": "2025-09-21T00:45:03.352Z",
+          "median_price": 0.84
+        },
+        {
+          "date": "2025-09-21T00:50:03.153Z",
+          "median_price": 0.84
+        },
+        {
+          "date": "2025-09-21T00:50:03.228Z",
+          "median_price": 0.84
+        },
+        {
+          "date": "2025-09-21T00:50:03.333Z",
+          "median_price": 0.84
+        },
+        {
+          "date": "2025-09-21T01:00:03.257Z",
+          "median_price": 0.84
+        },
+        {
+          "date": "2025-09-21T01:00:03.331Z",
+          "median_price": 0.84
+        },
+        {
+          "date": "2025-09-21T01:00:03.347Z",
+          "median_price": 0.84
+        },
+        {
+          "date": "2025-09-21T04:30:03.677Z",
+          "median_price": 0.81
+        },
+        {
+          "date": "2025-09-21T05:00:03.047Z",
+          "median_price": 0.81
+        },
+        {
+          "date": "2025-09-21T05:30:02.963Z",
+          "median_price": 0.82
+        },
+        {
+          "date": "2025-09-21T20:45:03.446Z",
+          "median_price": 0.8
+        },
+        {
+          "date": "2025-09-21T20:55:31.333Z",
+          "median_price": 0.8
+        },
+        {
+          "date": "2025-09-21T21:00:06.835Z",
+          "median_price": 0.8
+        },
+        {
+          "date": "2025-09-22T00:00:07.936Z",
+          "median_price": 0.81
+        },
+        {
+          "date": "2025-09-22T00:30:08.548Z",
+          "median_price": 0.81
+        },
+        {
+          "date": "2025-09-22T00:30:08.651Z",
+          "median_price": 0.81
+        },
+        {
+          "date": "2025-09-22T01:00:07.941Z",
+          "median_price": 0.81
+        },
+        {
+          "date": "2025-09-22T01:00:08.079Z",
+          "median_price": 0.81
+        },
+        {
+          "date": "2025-09-22T01:30:08.027Z",
+          "median_price": 0.81
+        },
+        {
+          "date": "2025-09-22T01:30:08.357Z",
+          "median_price": 0.81
+        },
+        {
+          "date": "2025-09-22T02:00:08.220Z",
+          "median_price": 0.81
+        },
+        {
+          "date": "2025-09-22T02:00:08.239Z",
+          "median_price": 0.81
+        },
+        {
+          "date": "2025-09-22T06:00:08.195Z",
+          "median_price": 0.78
+        },
+        {
+          "date": "2025-09-22T06:30:08.522Z",
+          "median_price": 0.78
+        },
+        {
+          "date": "2025-09-22T06:30:08.682Z",
+          "median_price": 0.78
+        },
+        {
+          "date": "2025-09-22T07:00:08.832Z",
+          "median_price": 0.78
+        },
+        {
+          "date": "2025-09-22T07:00:09.001Z",
+          "median_price": 0.78
+        },
+        {
+          "date": "2025-09-22T07:30:08.528Z",
+          "median_price": 0.79
+        },
+        {
+          "date": "2025-09-22T07:30:08.581Z",
+          "median_price": 0.79
+        },
+        {
+          "date": "2025-09-22T07:35:18.335Z",
+          "median_price": 0.79
+        },
+        {
+          "date": "2025-09-22T07:40:08.168Z",
+          "median_price": 0.79
+        },
+        {
+          "date": "2025-09-22T07:45:07.852Z",
+          "median_price": 0.79
+        },
+        {
+          "date": "2025-09-22T07:50:07.861Z",
+          "median_price": 0.79
+        },
+        {
+          "date": "2025-09-22T07:55:07.840Z",
+          "median_price": 0.79
+        },
+        {
+          "date": "2025-09-22T08:00:07.941Z",
+          "median_price": 0.79
+        },
+        {
+          "date": "2025-09-22T08:05:07.807Z",
+          "median_price": 0.79
+        },
+        {
+          "date": "2025-09-22T08:10:07.864Z",
+          "median_price": 0.79
+        },
+        {
+          "date": "2025-09-22T08:15:07.851Z",
+          "median_price": 0.78
+        },
+        {
+          "date": "2025-09-22T08:20:07.765Z",
+          "median_price": 0.78
+        },
+        {
+          "date": "2025-09-22T08:25:07.855Z",
+          "median_price": 0.78
+        },
+        {
+          "date": "2025-09-22T08:30:08.432Z",
+          "median_price": 0.78
+        },
+        {
+          "date": "2025-09-22T08:35:08.024Z",
+          "median_price": 0.78
+        },
+        {
+          "date": "2025-09-22T08:40:08.636Z",
+          "median_price": 0.78
+        },
+        {
+          "date": "2025-09-22T08:45:08.139Z",
+          "median_price": 0.78
+        },
+        {
+          "date": "2025-09-22T08:50:07.761Z",
+          "median_price": 0.78
+        },
+        {
+          "date": "2025-09-22T08:55:07.802Z",
+          "median_price": 0.78
+        },
+        {
+          "date": "2025-09-22T09:00:07.858Z",
+          "median_price": 0.78
+        },
+        {
+          "date": "2025-09-22T09:05:07.926Z",
+          "median_price": 0.78
+        },
+        {
+          "date": "2025-09-22T09:10:07.864Z",
+          "median_price": 0.78
+        },
+        {
+          "date": "2025-09-22T09:15:08.107Z",
+          "median_price": 0.77
+        },
+        {
+          "date": "2025-09-22T09:20:07.822Z",
+          "median_price": 0.77
+        },
+        {
+          "date": "2025-09-22T09:25:07.768Z",
+          "median_price": 0.77
+        },
+        {
+          "date": "2025-09-22T09:30:08.268Z",
+          "median_price": 0.77
+        },
+        {
+          "date": "2025-09-22T09:35:07.883Z",
+          "median_price": 0.77
+        },
+        {
+          "date": "2025-09-22T09:40:08.333Z",
+          "median_price": 0.77
+        },
+        {
+          "date": "2025-09-22T09:45:07.981Z",
+          "median_price": 0.77
+        },
+        {
+          "date": "2025-09-22T09:50:07.799Z",
+          "median_price": 0.77
+        },
+        {
+          "date": "2025-09-22T09:55:08.013Z",
+          "median_price": 0.77
+        },
+        {
+          "date": "2025-09-22T10:00:07.832Z",
+          "median_price": 0.77
+        },
+        {
+          "date": "2025-09-22T10:05:07.781Z",
+          "median_price": 0.77
+        },
+        {
+          "date": "2025-09-22T10:10:07.890Z",
+          "median_price": 0.77
+        },
+        {
+          "date": "2025-09-22T10:15:08.715Z",
+          "median_price": 0.76
+        },
+        {
+          "date": "2025-09-22T10:20:07.871Z",
+          "median_price": 0.76
+        },
+        {
+          "date": "2025-09-22T10:25:07.810Z",
+          "median_price": 0.76
+        },
+        {
+          "date": "2025-09-22T10:30:07.865Z",
+          "median_price": 0.76
+        },
+        {
+          "date": "2025-09-22T10:35:07.794Z",
+          "median_price": 0.76
+        },
+        {
+          "date": "2025-09-22T10:40:08.546Z",
+          "median_price": 0.76
+        },
+        {
+          "date": "2025-09-22T10:45:07.746Z",
+          "median_price": 0.76
+        },
+        {
+          "date": "2025-09-22T10:50:07.823Z",
+          "median_price": 0.76
+        },
+        {
+          "date": "2025-09-22T10:55:07.829Z",
+          "median_price": 0.76
+        },
+        {
+          "date": "2025-09-22T11:00:07.853Z",
+          "median_price": 0.76
+        },
+        {
+          "date": "2025-09-22T11:05:07.799Z",
+          "median_price": 0.76
+        },
+        {
+          "date": "2025-09-22T11:10:07.870Z",
+          "median_price": 0.76
+        },
+        {
+          "date": "2025-09-22T11:15:07.821Z",
+          "median_price": 0.75
+        },
+        {
+          "date": "2025-09-22T11:20:07.865Z",
+          "median_price": 0.75
+        },
+        {
+          "date": "2025-09-22T11:25:07.947Z",
+          "median_price": 0.75
+        },
+        {
+          "date": "2025-09-22T11:30:08.248Z",
+          "median_price": 0.75
+        },
+        {
+          "date": "2025-09-22T11:35:07.788Z",
+          "median_price": 0.75
+        },
+        {
+          "date": "2025-09-22T11:40:08.418Z",
+          "median_price": 0.75
+        },
+        {
+          "date": "2025-09-22T11:45:07.915Z",
+          "median_price": 0.75
+        },
+        {
+          "date": "2025-09-22T11:48:26.531Z",
+          "median_price": 0.75
+        },
+        {
+          "date": "2025-09-22T11:50:07.842Z",
+          "median_price": 0.75
+        },
+        {
+          "date": "2025-09-22T11:55:07.849Z",
+          "median_price": 0.75
+        },
+        {
+          "date": "2025-09-22T12:00:07.879Z",
+          "median_price": 0.75
+        },
+        {
+          "date": "2025-09-22T12:04:48.603Z",
+          "median_price": 0.75
+        },
+        {
+          "date": "2025-09-22T12:05:11.952Z",
+          "median_price": 0.75
+        },
+        {
+          "date": "2025-09-22T12:10:11.418Z",
+          "median_price": 0.75
+        },
+        {
+          "date": "2025-09-22T12:15:11.674Z",
+          "median_price": 0.74
+        },
+        {
+          "date": "2025-09-22T12:20:12.106Z",
+          "median_price": 0.74
+        },
+        {
+          "date": "2025-09-22T12:25:11.610Z",
+          "median_price": 0.74
+        },
+        {
+          "date": "2025-09-22T12:30:11.851Z",
+          "median_price": 0.74
+        },
+        {
+          "date": "2025-09-22T12:35:11.743Z",
+          "median_price": 0.74
+        },
+        {
+          "date": "2025-09-22T12:40:11.608Z",
+          "median_price": 0.74
+        },
+        {
+          "date": "2025-09-22T12:45:11.664Z",
+          "median_price": 0.74
+        },
+        {
+          "date": "2025-09-22T12:50:11.764Z",
+          "median_price": 0.74
+        },
+        {
+          "date": "2025-09-22T12:55:11.609Z",
+          "median_price": 0.74
+        },
+        {
+          "date": "2025-09-22T13:00:11.746Z",
+          "median_price": 0.74
+        },
+        {
+          "date": "2025-09-22T13:05:11.756Z",
+          "median_price": 0.74
+        },
+        {
+          "date": "2025-09-22T13:10:11.604Z",
+          "median_price": 0.74
+        },
+        {
+          "date": "2025-09-22T13:15:12.455Z",
+          "median_price": 0.74
+        },
+        {
+          "date": "2025-09-22T21:14:12.286Z",
+          "median_price": 0.76
+        },
+        {
+          "date": "2025-09-23T01:00:12.304Z",
+          "median_price": 0.75
+        },
+        {
+          "date": "2025-09-23T03:17:34.666Z",
+          "median_price": 0.72
+        },
+        {
+          "date": "2025-09-23T05:00:10.826Z",
+          "median_price": 0.72
+        },
+        {
+          "date": "2025-09-23T06:22:42.324Z",
+          "median_price": 0.72
+        },
+        {
+          "date": "2025-09-23T06:22:42.324Z",
+          "median_price": 0.72
+        },
+        {
+          "date": "2025-09-23T06:44:13.959Z",
+          "median_price": 0.72
+        },
+        {
+          "date": "2025-09-23T06:44:13.959Z",
+          "median_price": 0.72
+        },
+        {
+          "date": "2025-09-23T06:45:59.646Z",
+          "median_price": 0.72
+        },
+        {
+          "date": "2025-09-23T06:45:59.646Z",
+          "median_price": 0.72
+        },
+        {
+          "date": "2025-09-23T06:50:31.672Z",
+          "median_price": 0.72
+        },
+        {
+          "date": "2025-09-23T06:50:31.672Z",
+          "median_price": 0.72
+        }
+      ],
+      "price_alert_config": {
+        "lowerTriggered": false,
+        "lastTriggeredLower": null,
+        "upperTriggered": false,
+        "lastTriggeredUpper": null,
+        "updatedAt": "2025-09-23T06:50:31.672Z",
+        "lowerThreshold": null,
+        "upperThreshold": null
+      },
+      "category_id": "default-collecting",
+      "image_url": "https://steamcommunity-a.akamaihd.net/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bj35VTqVBP4io_fr3QV7aD7OP01IfbGDzPCmbsm4LU5GnvkzUsi4WvUmIqtci_CPQNyApsjE_lK7EfrhW545A",
+      "id": "item_1758608386964_jpb31n994",
+      "created_at": "2025-09-23T06:19:46.964Z"
+    },
+    "item_1758608386964_wzz3x2jii": {
+      "market_hash_name": "M4A1-S | Black Lotus (Field-Tested)",
+      "label": "M4A1-S | Black Lotus (Field-Tested)",
+      "appid": 730,
+      "steam_url": "https://steamcommunity.com/market/listings/730/M4A1-S%20%7C%20Black%20Lotus%20%28Field-Tested%29",
+      "purchase_price": 10.64,
+      "quantity": 1,
+      "purchase_currency": "USD",
+      "stickers": [],
+      "charms": [],
+      "patches": [],
+      "include_customizations_in_price": false,
+      "price_history": [
+        {
+          "date": "2025-09-21T20:50:59.546Z",
+          "median_price": 9.87
+        },
+        {
+          "date": "2025-09-21T20:55:31.350Z",
+          "median_price": 9.87
+        },
+        {
+          "date": "2025-09-21T21:00:06.853Z",
+          "median_price": 9.87
+        },
+        {
+          "date": "2025-09-22T00:00:07.956Z",
+          "median_price": 9.66
+        },
+        {
+          "date": "2025-09-22T00:30:08.593Z",
+          "median_price": 10.12
+        },
+        {
+          "date": "2025-09-22T00:30:08.691Z",
+          "median_price": 10.12
+        },
+        {
+          "date": "2025-09-22T01:00:07.958Z",
+          "median_price": 10.12
+        },
+        {
+          "date": "2025-09-22T01:00:08.097Z",
+          "median_price": 10.12
+        },
+        {
+          "date": "2025-09-22T01:30:08.045Z",
+          "median_price": 10.49
+        },
+        {
+          "date": "2025-09-22T01:30:08.376Z",
+          "median_price": 10.49
+        },
+        {
+          "date": "2025-09-22T02:00:08.260Z",
+          "median_price": 10.49
+        },
+        {
+          "date": "2025-09-22T02:00:08.275Z",
+          "median_price": 10.49
+        },
+        {
+          "date": "2025-09-22T06:00:08.229Z",
+          "median_price": 10.16
+        },
+        {
+          "date": "2025-09-22T06:30:08.541Z",
+          "median_price": 9.99
+        },
+        {
+          "date": "2025-09-22T06:30:08.712Z",
+          "median_price": 9.99
+        },
+        {
+          "date": "2025-09-22T07:00:08.853Z",
+          "median_price": 9.99
+        },
+        {
+          "date": "2025-09-22T07:00:09.024Z",
+          "median_price": 9.99
+        },
+        {
+          "date": "2025-09-22T07:30:08.563Z",
+          "median_price": 10.13
+        },
+        {
+          "date": "2025-09-22T07:30:08.618Z",
+          "median_price": 10.13
+        },
+        {
+          "date": "2025-09-22T07:40:08.186Z",
+          "median_price": 10.13
+        },
+        {
+          "date": "2025-09-22T07:45:07.870Z",
+          "median_price": 10.13
+        },
+        {
+          "date": "2025-09-22T07:50:07.879Z",
+          "median_price": 10.13
+        },
+        {
+          "date": "2025-09-22T07:55:07.860Z",
+          "median_price": 10.13
+        },
+        {
+          "date": "2025-09-22T08:00:07.958Z",
+          "median_price": 10.13
+        },
+        {
+          "date": "2025-09-22T08:05:07.823Z",
+          "median_price": 10.13
+        },
+        {
+          "date": "2025-09-22T08:10:07.883Z",
+          "median_price": 10.13
+        },
+        {
+          "date": "2025-09-22T08:15:09.157Z",
+          "median_price": 9.46
+        },
+        {
+          "date": "2025-09-22T08:20:07.785Z",
+          "median_price": 9.46
+        },
+        {
+          "date": "2025-09-22T08:25:07.871Z",
+          "median_price": 9.46
+        },
+        {
+          "date": "2025-09-22T08:30:08.450Z",
+          "median_price": 9.46
+        },
+        {
+          "date": "2025-09-22T08:35:08.041Z",
+          "median_price": 9.46
+        },
+        {
+          "date": "2025-09-22T08:40:08.656Z",
+          "median_price": 9.46
+        },
+        {
+          "date": "2025-09-22T08:45:08.156Z",
+          "median_price": 9.46
+        },
+        {
+          "date": "2025-09-22T08:50:07.779Z",
+          "median_price": 9.46
+        },
+        {
+          "date": "2025-09-22T08:55:07.821Z",
+          "median_price": 9.46
+        },
+        {
+          "date": "2025-09-22T09:00:07.875Z",
+          "median_price": 9.46
+        },
+        {
+          "date": "2025-09-22T09:05:07.944Z",
+          "median_price": 9.46
+        },
+        {
+          "date": "2025-09-22T09:10:07.883Z",
+          "median_price": 9.46
+        },
+        {
+          "date": "2025-09-22T09:15:08.127Z",
+          "median_price": 9.48
+        },
+        {
+          "date": "2025-09-22T09:20:07.842Z",
+          "median_price": 9.48
+        },
+        {
+          "date": "2025-09-22T09:25:07.785Z",
+          "median_price": 9.48
+        },
+        {
+          "date": "2025-09-22T09:30:08.288Z",
+          "median_price": 9.48
+        },
+        {
+          "date": "2025-09-22T09:35:07.902Z",
+          "median_price": 9.48
+        },
+        {
+          "date": "2025-09-22T09:40:08.351Z",
+          "median_price": 9.48
+        },
+        {
+          "date": "2025-09-22T09:45:08.000Z",
+          "median_price": 9.48
+        },
+        {
+          "date": "2025-09-22T09:50:07.815Z",
+          "median_price": 9.48
+        },
+        {
+          "date": "2025-09-22T09:55:08.033Z",
+          "median_price": 9.48
+        },
+        {
+          "date": "2025-09-22T10:00:07.848Z",
+          "median_price": 9.48
+        },
+        {
+          "date": "2025-09-22T10:05:07.800Z",
+          "median_price": 9.48
+        },
+        {
+          "date": "2025-09-22T10:10:07.908Z",
+          "median_price": 9.48
+        },
+        {
+          "date": "2025-09-22T10:15:08.732Z",
+          "median_price": 9.52
+        },
+        {
+          "date": "2025-09-22T10:20:07.889Z",
+          "median_price": 9.52
+        },
+        {
+          "date": "2025-09-22T10:25:07.834Z",
+          "median_price": 9.52
+        },
+        {
+          "date": "2025-09-22T10:30:07.884Z",
+          "median_price": 9.52
+        },
+        {
+          "date": "2025-09-22T10:35:07.814Z",
+          "median_price": 9.52
+        },
+        {
+          "date": "2025-09-22T10:40:08.562Z",
+          "median_price": 9.52
+        },
+        {
+          "date": "2025-09-22T10:45:07.765Z",
+          "median_price": 9.52
+        },
+        {
+          "date": "2025-09-22T10:50:07.843Z",
+          "median_price": 9.52
+        },
+        {
+          "date": "2025-09-22T10:55:07.847Z",
+          "median_price": 9.52
+        },
+        {
+          "date": "2025-09-22T11:00:07.871Z",
+          "median_price": 9.52
+        },
+        {
+          "date": "2025-09-22T11:05:07.821Z",
+          "median_price": 9.52
+        },
+        {
+          "date": "2025-09-22T11:10:07.890Z",
+          "median_price": 9.52
+        },
+        {
+          "date": "2025-09-22T11:15:07.840Z",
+          "median_price": 9.78
+        },
+        {
+          "date": "2025-09-22T11:20:07.885Z",
+          "median_price": 9.78
+        },
+        {
+          "date": "2025-09-22T11:25:07.966Z",
+          "median_price": 9.78
+        },
+        {
+          "date": "2025-09-22T11:30:08.266Z",
+          "median_price": 9.78
+        },
+        {
+          "date": "2025-09-22T11:35:07.809Z",
+          "median_price": 9.78
+        },
+        {
+          "date": "2025-09-22T11:40:08.446Z",
+          "median_price": 9.78
+        },
+        {
+          "date": "2025-09-22T11:45:07.932Z",
+          "median_price": 9.78
+        },
+        {
+          "date": "2025-09-22T11:50:07.861Z",
+          "median_price": 9.78
+        },
+        {
+          "date": "2025-09-22T11:55:07.872Z",
+          "median_price": 9.78
+        },
+        {
+          "date": "2025-09-22T12:00:07.897Z",
+          "median_price": 9.78
+        },
+        {
+          "date": "2025-09-22T12:05:11.978Z",
+          "median_price": 9.78
+        },
+        {
+          "date": "2025-09-22T12:10:11.441Z",
+          "median_price": 9.78
+        },
+        {
+          "date": "2025-09-22T12:15:12.657Z",
+          "median_price": 9.54
+        },
+        {
+          "date": "2025-09-22T12:20:12.129Z",
+          "median_price": 9.54
+        },
+        {
+          "date": "2025-09-22T12:25:11.630Z",
+          "median_price": 9.54
+        },
+        {
+          "date": "2025-09-22T12:30:11.870Z",
+          "median_price": 9.54
+        },
+        {
+          "date": "2025-09-22T12:35:11.764Z",
+          "median_price": 9.54
+        },
+        {
+          "date": "2025-09-22T12:40:11.633Z",
+          "median_price": 9.54
+        },
+        {
+          "date": "2025-09-22T12:45:11.683Z",
+          "median_price": 9.54
+        },
+        {
+          "date": "2025-09-22T12:50:11.785Z",
+          "median_price": 9.54
+        },
+        {
+          "date": "2025-09-22T12:55:11.627Z",
+          "median_price": 9.54
+        },
+        {
+          "date": "2025-09-22T13:00:11.767Z",
+          "median_price": 9.54
+        },
+        {
+          "date": "2025-09-22T13:05:11.773Z",
+          "median_price": 9.54
+        },
+        {
+          "date": "2025-09-22T13:10:11.623Z",
+          "median_price": 9.54
+        },
+        {
+          "date": "2025-09-22T13:15:12.474Z",
+          "median_price": 9.69
+        },
+        {
+          "date": "2025-09-22T21:14:13.220Z",
+          "median_price": 9.56
+        },
+        {
+          "date": "2025-09-23T01:00:12.328Z",
+          "median_price": 9.73
+        },
+        {
+          "date": "2025-09-23T03:17:34.684Z",
+          "median_price": 10.03
+        },
+        {
+          "date": "2025-09-23T05:00:10.850Z",
+          "median_price": 10.01
+        },
+        {
+          "date": "2025-09-23T06:22:42.348Z",
+          "median_price": 9.38
+        },
+        {
+          "date": "2025-09-23T06:22:42.348Z",
+          "median_price": 9.38
+        },
+        {
+          "date": "2025-09-23T06:44:13.982Z",
+          "median_price": 9.38
+        },
+        {
+          "date": "2025-09-23T06:44:13.982Z",
+          "median_price": 9.38
+        },
+        {
+          "date": "2025-09-23T06:45:59.667Z",
+          "median_price": 9.38
+        },
+        {
+          "date": "2025-09-23T06:45:59.667Z",
+          "median_price": 9.38
+        },
+        {
+          "date": "2025-09-23T06:50:31.692Z",
+          "median_price": 9.38
+        },
+        {
+          "date": "2025-09-23T06:50:31.692Z",
+          "median_price": 9.38
+        }
+      ],
+      "price_alert_config": {
+        "lowerTriggered": false,
+        "lastTriggeredLower": null,
+        "upperTriggered": false,
+        "lastTriggeredUpper": null,
+        "updatedAt": "2025-09-23T06:50:31.692Z"
+      },
+      "category_id": "default-playing",
+      "image_url": "https://steamcommunity-a.akamaihd.net/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL8ypexwjFS4_ega6F_H_3HDzaD_ux6seJicCW8gQg0jDCAnobsLGWTbQQnDsN3QuYOtELqkIazZeLm7lPYj9gQzyj72y8du31i6ulQA6Rx5OSJ2CPXrFUp",
+      "id": "item_1758608386964_wzz3x2jii",
+      "created_at": "2025-09-23T06:19:46.964Z"
+    },
+    "item_1758608386964_fb598f5nw": {
+      "market_hash_name": "USP-S | Black Lotus (Minimal Wear)",
+      "label": "USP-S | Black Lotus (Minimal Wear)",
+      "appid": 730,
+      "steam_url": "https://steamcommunity.com/market/listings/730/USP-S%20%7C%20Black%20Lotus%20%28Minimal%20Wear%29?filter=usps",
+      "purchase_price": 12.57,
+      "quantity": 1,
+      "purchase_currency": "USD",
+      "stickers": [],
+      "charms": [],
+      "patches": [],
+      "include_customizations_in_price": false,
+      "price_history": [
+        {
+          "date": "2025-09-21T20:51:41.504Z",
+          "median_price": 3.9
+        },
+        {
+          "date": "2025-09-21T20:55:31.366Z",
+          "median_price": 3.9
+        },
+        {
+          "date": "2025-09-21T21:00:06.885Z",
+          "median_price": 3.9
+        },
+        {
+          "date": "2025-09-22T00:00:07.973Z",
+          "median_price": 3.74
+        },
+        {
+          "date": "2025-09-22T00:30:08.632Z",
+          "median_price": 3.65
+        },
+        {
+          "date": "2025-09-22T00:30:08.726Z",
+          "median_price": 3.65
+        },
+        {
+          "date": "2025-09-22T01:00:07.975Z",
+          "median_price": 3.65
+        },
+        {
+          "date": "2025-09-22T01:00:08.115Z",
+          "median_price": 3.65
+        },
+        {
+          "date": "2025-09-22T01:30:08.063Z",
+          "median_price": 4
+        },
+        {
+          "date": "2025-09-22T01:30:08.395Z",
+          "median_price": 4
+        },
+        {
+          "date": "2025-09-22T02:00:08.298Z",
+          "median_price": 4
+        },
+        {
+          "date": "2025-09-22T02:00:08.318Z",
+          "median_price": 4
+        },
+        {
+          "date": "2025-09-22T06:00:08.246Z",
+          "median_price": 3.76
+        },
+        {
+          "date": "2025-09-22T06:30:08.561Z",
+          "median_price": 3.76
+        },
+        {
+          "date": "2025-09-22T06:30:08.763Z",
+          "median_price": 3.76
+        },
+        {
+          "date": "2025-09-22T07:00:08.872Z",
+          "median_price": 3.76
+        },
+        {
+          "date": "2025-09-22T07:00:09.044Z",
+          "median_price": 3.76
+        },
+        {
+          "date": "2025-09-22T07:30:08.598Z",
+          "median_price": 3.75
+        },
+        {
+          "date": "2025-09-22T07:30:08.656Z",
+          "median_price": 3.75
+        },
+        {
+          "date": "2025-09-22T07:40:08.205Z",
+          "median_price": 3.75
+        },
+        {
+          "date": "2025-09-22T07:45:07.888Z",
+          "median_price": 3.75
+        },
+        {
+          "date": "2025-09-22T07:50:07.895Z",
+          "median_price": 3.75
+        },
+        {
+          "date": "2025-09-22T07:55:07.877Z",
+          "median_price": 3.75
+        },
+        {
+          "date": "2025-09-22T08:00:07.974Z",
+          "median_price": 3.75
+        },
+        {
+          "date": "2025-09-22T08:05:07.838Z",
+          "median_price": 3.75
+        },
+        {
+          "date": "2025-09-22T08:10:07.901Z",
+          "median_price": 3.75
+        },
+        {
+          "date": "2025-09-22T08:15:09.176Z",
+          "median_price": 3.72
+        },
+        {
+          "date": "2025-09-22T08:20:07.805Z",
+          "median_price": 3.72
+        },
+        {
+          "date": "2025-09-22T08:25:07.891Z",
+          "median_price": 3.72
+        },
+        {
+          "date": "2025-09-22T08:30:08.467Z",
+          "median_price": 3.72
+        },
+        {
+          "date": "2025-09-22T08:35:08.058Z",
+          "median_price": 3.72
+        },
+        {
+          "date": "2025-09-22T08:40:08.675Z",
+          "median_price": 3.72
+        },
+        {
+          "date": "2025-09-22T08:45:08.171Z",
+          "median_price": 3.72
+        },
+        {
+          "date": "2025-09-22T08:50:07.797Z",
+          "median_price": 3.72
+        },
+        {
+          "date": "2025-09-22T08:55:07.838Z",
+          "median_price": 3.72
+        },
+        {
+          "date": "2025-09-22T09:00:07.894Z",
+          "median_price": 3.72
+        },
+        {
+          "date": "2025-09-22T09:05:07.960Z",
+          "median_price": 3.72
+        },
+        {
+          "date": "2025-09-22T09:10:07.900Z",
+          "median_price": 3.72
+        },
+        {
+          "date": "2025-09-22T09:15:08.153Z",
+          "median_price": 3.66
+        },
+        {
+          "date": "2025-09-22T09:20:07.861Z",
+          "median_price": 3.66
+        },
+        {
+          "date": "2025-09-22T09:25:07.803Z",
+          "median_price": 3.66
+        },
+        {
+          "date": "2025-09-22T09:30:08.306Z",
+          "median_price": 3.66
+        },
+        {
+          "date": "2025-09-22T09:35:07.920Z",
+          "median_price": 3.66
+        },
+        {
+          "date": "2025-09-22T09:40:08.368Z",
+          "median_price": 3.66
+        },
+        {
+          "date": "2025-09-22T09:45:08.021Z",
+          "median_price": 3.66
+        },
+        {
+          "date": "2025-09-22T09:50:07.833Z",
+          "median_price": 3.66
+        },
+        {
+          "date": "2025-09-22T09:55:08.052Z",
+          "median_price": 3.66
+        },
+        {
+          "date": "2025-09-22T10:00:07.865Z",
+          "median_price": 3.66
+        },
+        {
+          "date": "2025-09-22T10:05:07.817Z",
+          "median_price": 3.66
+        },
+        {
+          "date": "2025-09-22T10:10:07.927Z",
+          "median_price": 3.66
+        },
+        {
+          "date": "2025-09-22T10:15:08.750Z",
+          "median_price": 3.3
+        },
+        {
+          "date": "2025-09-22T10:20:07.907Z",
+          "median_price": 3.3
+        },
+        {
+          "date": "2025-09-22T10:25:07.859Z",
+          "median_price": 3.3
+        },
+        {
+          "date": "2025-09-22T10:30:07.903Z",
+          "median_price": 3.3
+        },
+        {
+          "date": "2025-09-22T10:35:07.835Z",
+          "median_price": 3.3
+        },
+        {
+          "date": "2025-09-22T10:40:08.581Z",
+          "median_price": 3.3
+        },
+        {
+          "date": "2025-09-22T10:45:07.783Z",
+          "median_price": 3.3
+        },
+        {
+          "date": "2025-09-22T10:50:07.861Z",
+          "median_price": 3.3
+        },
+        {
+          "date": "2025-09-22T10:55:07.868Z",
+          "median_price": 3.3
+        },
+        {
+          "date": "2025-09-22T11:00:07.889Z",
+          "median_price": 3.3
+        },
+        {
+          "date": "2025-09-22T11:05:07.840Z",
+          "median_price": 3.3
+        },
+        {
+          "date": "2025-09-22T11:10:07.906Z",
+          "median_price": 3.3
+        },
+        {
+          "date": "2025-09-22T11:15:07.865Z",
+          "median_price": 3.33
+        },
+        {
+          "date": "2025-09-22T11:20:07.906Z",
+          "median_price": 3.33
+        },
+        {
+          "date": "2025-09-22T11:25:07.987Z",
+          "median_price": 3.33
+        },
+        {
+          "date": "2025-09-22T11:30:08.284Z",
+          "median_price": 3.33
+        },
+        {
+          "date": "2025-09-22T11:35:07.828Z",
+          "median_price": 3.33
+        },
+        {
+          "date": "2025-09-22T11:40:08.468Z",
+          "median_price": 3.33
+        },
+        {
+          "date": "2025-09-22T11:45:07.950Z",
+          "median_price": 3.33
+        },
+        {
+          "date": "2025-09-22T11:50:07.879Z",
+          "median_price": 3.33
+        },
+        {
+          "date": "2025-09-22T11:55:07.896Z",
+          "median_price": 3.33
+        },
+        {
+          "date": "2025-09-22T12:00:07.916Z",
+          "median_price": 3.33
+        },
+        {
+          "date": "2025-09-22T12:05:12.011Z",
+          "median_price": 3.33
+        },
+        {
+          "date": "2025-09-22T12:10:11.464Z",
+          "median_price": 3.33
+        },
+        {
+          "date": "2025-09-22T12:15:12.686Z",
+          "median_price": 3.41
+        },
+        {
+          "date": "2025-09-22T12:20:12.154Z",
+          "median_price": 3.41
+        },
+        {
+          "date": "2025-09-22T12:25:11.648Z",
+          "median_price": 3.41
+        },
+        {
+          "date": "2025-09-22T12:30:11.887Z",
+          "median_price": 3.41
+        },
+        {
+          "date": "2025-09-22T12:35:11.784Z",
+          "median_price": 3.41
+        },
+        {
+          "date": "2025-09-22T12:40:11.653Z",
+          "median_price": 3.41
+        },
+        {
+          "date": "2025-09-22T12:45:11.706Z",
+          "median_price": 3.41
+        },
+        {
+          "date": "2025-09-22T12:50:11.805Z",
+          "median_price": 3.41
+        },
+        {
+          "date": "2025-09-22T12:55:11.645Z",
+          "median_price": 3.41
+        },
+        {
+          "date": "2025-09-22T13:00:11.783Z",
+          "median_price": 3.41
+        },
+        {
+          "date": "2025-09-22T13:05:11.793Z",
+          "median_price": 3.41
+        },
+        {
+          "date": "2025-09-22T13:10:11.642Z",
+          "median_price": 3.41
+        },
+        {
+          "date": "2025-09-22T13:15:12.495Z",
+          "median_price": 3.75
+        },
+        {
+          "date": "2025-09-22T21:14:13.239Z",
+          "median_price": 3.59
+        },
+        {
+          "date": "2025-09-23T01:00:12.352Z",
+          "median_price": 3.72
+        },
+        {
+          "date": "2025-09-23T03:17:34.703Z",
+          "median_price": 3.65
+        },
+        {
+          "date": "2025-09-23T05:00:10.870Z",
+          "median_price": 3.5
+        },
+        {
+          "date": "2025-09-23T06:22:42.367Z",
+          "median_price": 3.56
+        },
+        {
+          "date": "2025-09-23T06:22:42.367Z",
+          "median_price": 3.56
+        },
+        {
+          "date": "2025-09-23T06:44:14.004Z",
+          "median_price": 3.56
+        },
+        {
+          "date": "2025-09-23T06:44:14.004Z",
+          "median_price": 3.56
+        },
+        {
+          "date": "2025-09-23T06:45:59.689Z",
+          "median_price": 3.56
+        },
+        {
+          "date": "2025-09-23T06:45:59.689Z",
+          "median_price": 3.56
+        },
+        {
+          "date": "2025-09-23T06:50:31.713Z",
+          "median_price": 3.56
+        },
+        {
+          "date": "2025-09-23T06:50:31.713Z",
+          "median_price": 3.56
+        }
+      ],
+      "price_alert_config": {
+        "lowerTriggered": false,
+        "lastTriggeredLower": null,
+        "upperTriggered": false,
+        "lastTriggeredUpper": null,
+        "updatedAt": "2025-09-23T06:50:31.713Z"
+      },
+      "category_id": "default-playing",
+      "image_url": "https://steamcommunity-a.akamaihd.net/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyLkjYbf7itX6vytbbZSI-WsG3SA_ux6seJicCW8gQg0jDGMnYftbynFZg8nXpt2Ru8D5hSwl9PhN7_m7wzdjotFxXr62y4Y6C894OxQVKA7uvqAvobUkb8",
+      "id": "item_1758608386964_fb598f5nw",
+      "created_at": "2025-09-23T06:19:46.964Z"
+    },
+    "item_1758608386964_8wfdbl5nd": {
+      "market_hash_name": "Austin 2025 Challengers Sticker Capsule",
+      "label": "Austin 2025 Challengers Sticker Capsule",
+      "appid": 730,
+      "steam_url": "https://steamcommunity.com/market/listings/730/Austin%202025%20Challengers%20Sticker%20Capsule",
+      "purchase_price": 0.2,
+      "quantity": 20,
+      "purchase_currency": "CHF",
+      "stickers": [],
+      "charms": [],
+      "patches": [],
+      "include_customizations_in_price": false,
+      "price_history": [
+        {
+          "date": "2025-09-22T12:02:06.095Z",
+          "median_price": 0.29
+        },
+        {
+          "date": "2025-09-22T12:05:12.080Z",
+          "median_price": 0.29
+        },
+        {
+          "date": "2025-09-22T12:10:11.526Z",
+          "median_price": 0.29
+        },
+        {
+          "date": "2025-09-22T12:15:12.765Z",
+          "median_price": 0.29
+        },
+        {
+          "date": "2025-09-22T12:20:12.221Z",
+          "median_price": 0.29
+        },
+        {
+          "date": "2025-09-22T12:25:11.708Z",
+          "median_price": 0.29
+        },
+        {
+          "date": "2025-09-22T12:30:11.950Z",
+          "median_price": 0.29
+        },
+        {
+          "date": "2025-09-22T12:35:11.847Z",
+          "median_price": 0.29
+        },
+        {
+          "date": "2025-09-22T12:40:11.718Z",
+          "median_price": 0.29
+        },
+        {
+          "date": "2025-09-22T12:45:11.765Z",
+          "median_price": 0.29
+        },
+        {
+          "date": "2025-09-22T12:50:11.862Z",
+          "median_price": 0.29
+        },
+        {
+          "date": "2025-09-22T12:55:11.699Z",
+          "median_price": 0.29
+        },
+        {
+          "date": "2025-09-22T13:00:11.835Z",
+          "median_price": 0.29
+        },
+        {
+          "date": "2025-09-22T13:05:11.852Z",
+          "median_price": 0.29
+        },
+        {
+          "date": "2025-09-22T13:10:11.702Z",
+          "median_price": 0.29
+        },
+        {
+          "date": "2025-09-22T13:15:12.554Z",
+          "median_price": 0.29
+        },
+        {
+          "date": "2025-09-22T21:14:13.309Z",
+          "median_price": 0.29
+        },
+        {
+          "date": "2025-09-23T01:00:12.429Z",
+          "median_price": 0.29
+        },
+        {
+          "date": "2025-09-23T03:17:34.761Z",
+          "median_price": 0.28
+        },
+        {
+          "date": "2025-09-23T05:00:10.922Z",
+          "median_price": 0.28
+        },
+        {
+          "date": "2025-09-23T06:22:42.385Z",
+          "median_price": 0.28
+        },
+        {
+          "date": "2025-09-23T06:22:42.385Z",
+          "median_price": 0.28
+        },
+        {
+          "date": "2025-09-23T06:44:14.028Z",
+          "median_price": 0.28
+        },
+        {
+          "date": "2025-09-23T06:44:14.028Z",
+          "median_price": 0.28
+        },
+        {
+          "date": "2025-09-23T06:45:59.711Z",
+          "median_price": 0.28
+        },
+        {
+          "date": "2025-09-23T06:45:59.711Z",
+          "median_price": 0.28
+        },
+        {
+          "date": "2025-09-23T06:50:31.733Z",
+          "median_price": 0.28
+        },
+        {
+          "date": "2025-09-23T06:50:31.733Z",
+          "median_price": 0.28
+        }
+      ],
+      "price_alert_config": {
+        "lowerTriggered": false,
+        "lastTriggeredLower": null,
+        "upperTriggered": false,
+        "lastTriggeredUpper": null,
+        "updatedAt": "2025-09-23T06:50:31.733Z"
+      },
+      "category_id": "default-collecting",
+      "image_url": "https://steamcommunity-a.akamaihd.net/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJG5zlm-UfvRzd6yenqC9gQlptK76UvmVRjOjYLp_ile_c2-aadmH_GGHTXAk7tJs-loQyW2mxoioS7Ly9-pcCiebFd2C5NyRbFZtES4mtfhYe634FeKj4tGniiviS1OuChqsfFCD_Tcz9djFA",
+      "id": "item_1758608386964_8wfdbl5nd",
+      "created_at": "2025-09-23T06:19:46.964Z"
+    },
+    "item_1758608386965_u4tx16nx8": {
+      "market_hash_name": "Austin 2025 Contenders Sticker Capsule",
+      "label": "Austin 2025 Contenders Sticker Capsule",
+      "appid": 730,
+      "steam_url": "https://steamcommunity.com/market/listings/730/Austin%202025%20Contenders%20Sticker%20Capsule",
+      "purchase_price": 0.2,
+      "quantity": 100,
+      "purchase_currency": "USD",
+      "stickers": [],
+      "charms": [],
+      "patches": [],
+      "include_customizations_in_price": false,
+      "price_history": [
+        {
+          "date": "2025-09-22T12:03:45.774Z",
+          "median_price": 0.29
+        },
+        {
+          "date": "2025-09-22T12:05:12.103Z",
+          "median_price": 0.29
+        },
+        {
+          "date": "2025-09-22T12:10:11.544Z",
+          "median_price": 0.29
+        },
+        {
+          "date": "2025-09-22T12:15:12.792Z",
+          "median_price": 0.29
+        },
+        {
+          "date": "2025-09-22T12:20:12.248Z",
+          "median_price": 0.29
+        },
+        {
+          "date": "2025-09-22T12:25:11.726Z",
+          "median_price": 0.29
+        },
+        {
+          "date": "2025-09-22T12:30:11.969Z",
+          "median_price": 0.29
+        },
+        {
+          "date": "2025-09-22T12:35:11.867Z",
+          "median_price": 0.29
+        },
+        {
+          "date": "2025-09-22T12:40:11.741Z",
+          "median_price": 0.29
+        },
+        {
+          "date": "2025-09-22T12:45:11.783Z",
+          "median_price": 0.29
+        },
+        {
+          "date": "2025-09-22T12:50:11.881Z",
+          "median_price": 0.29
+        },
+        {
+          "date": "2025-09-22T12:55:11.718Z",
+          "median_price": 0.29
+        },
+        {
+          "date": "2025-09-22T13:00:11.854Z",
+          "median_price": 0.29
+        },
+        {
+          "date": "2025-09-22T13:05:11.871Z",
+          "median_price": 0.29
+        },
+        {
+          "date": "2025-09-22T13:10:11.721Z",
+          "median_price": 0.29
+        },
+        {
+          "date": "2025-09-22T13:15:12.573Z",
+          "median_price": 0.29
+        },
+        {
+          "date": "2025-09-22T21:14:13.334Z",
+          "median_price": 0.29
+        },
+        {
+          "date": "2025-09-23T01:00:12.454Z",
+          "median_price": 0.29
+        },
+        {
+          "date": "2025-09-23T03:17:34.782Z",
+          "median_price": 0.29
+        },
+        {
+          "date": "2025-09-23T05:00:10.944Z",
+          "median_price": 0.29
+        },
+        {
+          "date": "2025-09-23T06:22:42.405Z",
+          "median_price": 0.29
+        },
+        {
+          "date": "2025-09-23T06:22:42.405Z",
+          "median_price": 0.29
+        },
+        {
+          "date": "2025-09-23T06:44:14.055Z",
+          "median_price": 0.29
+        },
+        {
+          "date": "2025-09-23T06:44:14.055Z",
+          "median_price": 0.29
+        },
+        {
+          "date": "2025-09-23T06:45:59.731Z",
+          "median_price": 0.29
+        },
+        {
+          "date": "2025-09-23T06:45:59.731Z",
+          "median_price": 0.29
+        },
+        {
+          "date": "2025-09-23T06:50:31.765Z",
+          "median_price": 0.29
+        },
+        {
+          "date": "2025-09-23T06:50:31.765Z",
+          "median_price": 0.29
+        }
+      ],
+      "price_alert_config": {
+        "lowerTriggered": false,
+        "lastTriggeredLower": null,
+        "upperTriggered": false,
+        "lastTriggeredUpper": null,
+        "updatedAt": "2025-09-23T06:50:31.765Z"
+      },
+      "category_id": "default-collecting",
+      "image_url": "https://steamcommunity-a.akamaihd.net/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJG5zlm-UfvRzd6yenqC9gQlptK76UvmVRjOjYLp_ile_c2-aadmH_GGHTXAk7tJs-5nWyy9kRg1oHOBzon6ciqfaQRxXMRwRrZY4xm8wNPmN-2w7gPa3o5NzX76jykc5iht_a9cBn7eB-5Y",
+      "id": "item_1758608386965_u4tx16nx8",
+      "created_at": "2025-09-23T06:19:46.965Z"
+    },
+    "item_1758608386965_b2cxwcphj": {
+      "market_hash_name": "Austin 2025 Legends Sticker Capsule",
+      "label": "Austin 2025 Legends Sticker Capsule",
+      "appid": 730,
+      "steam_url": "https://steamcommunity.com/market/listings/730/Austin%202025%20Legends%20Sticker%20Capsule",
+      "purchase_price": 0.2,
+      "quantity": 180,
+      "purchase_currency": "USD",
+      "stickers": [],
+      "charms": [],
+      "patches": [],
+      "include_customizations_in_price": false,
+      "price_history": [
+        {
+          "date": "2025-09-22T12:04:18.056Z",
+          "median_price": 0.29
+        },
+        {
+          "date": "2025-09-22T12:05:12.124Z",
+          "median_price": 0.29
+        },
+        {
+          "date": "2025-09-22T12:10:11.566Z",
+          "median_price": 0.29
+        },
+        {
+          "date": "2025-09-22T12:15:12.820Z",
+          "median_price": 0.3
+        },
+        {
+          "date": "2025-09-22T12:20:12.267Z",
+          "median_price": 0.3
+        },
+        {
+          "date": "2025-09-22T12:25:11.747Z",
+          "median_price": 0.3
+        },
+        {
+          "date": "2025-09-22T12:30:11.987Z",
+          "median_price": 0.3
+        },
+        {
+          "date": "2025-09-22T12:35:11.887Z",
+          "median_price": 0.3
+        },
+        {
+          "date": "2025-09-22T12:40:11.761Z",
+          "median_price": 0.3
+        },
+        {
+          "date": "2025-09-22T12:45:11.802Z",
+          "median_price": 0.3
+        },
+        {
+          "date": "2025-09-22T12:50:11.901Z",
+          "median_price": 0.3
+        },
+        {
+          "date": "2025-09-22T12:55:11.737Z",
+          "median_price": 0.3
+        },
+        {
+          "date": "2025-09-22T13:00:11.873Z",
+          "median_price": 0.3
+        },
+        {
+          "date": "2025-09-22T13:05:11.889Z",
+          "median_price": 0.3
+        },
+        {
+          "date": "2025-09-22T13:10:11.739Z",
+          "median_price": 0.3
+        },
+        {
+          "date": "2025-09-22T13:15:12.593Z",
+          "median_price": 0.29
+        },
+        {
+          "date": "2025-09-22T21:14:13.371Z",
+          "median_price": 0.3
+        },
+        {
+          "date": "2025-09-23T01:00:12.478Z",
+          "median_price": 0.29
+        },
+        {
+          "date": "2025-09-23T03:17:34.802Z",
+          "median_price": 0.28
+        },
+        {
+          "date": "2025-09-23T05:00:10.969Z",
+          "median_price": 0.29
+        },
+        {
+          "date": "2025-09-23T06:22:42.426Z",
+          "median_price": 0.3
+        },
+        {
+          "date": "2025-09-23T06:22:42.426Z",
+          "median_price": 0.3
+        },
+        {
+          "date": "2025-09-23T06:44:14.081Z",
+          "median_price": 0.3
+        },
+        {
+          "date": "2025-09-23T06:44:14.081Z",
+          "median_price": 0.3
+        },
+        {
+          "date": "2025-09-23T06:45:59.753Z",
+          "median_price": 0.3
+        },
+        {
+          "date": "2025-09-23T06:45:59.753Z",
+          "median_price": 0.3
+        },
+        {
+          "date": "2025-09-23T06:50:31.790Z",
+          "median_price": 0.3
+        },
+        {
+          "date": "2025-09-23T06:50:31.790Z",
+          "median_price": 0.3
+        }
+      ],
+      "price_alert_config": {
+        "lowerTriggered": false,
+        "lastTriggeredLower": null,
+        "upperTriggered": false,
+        "lastTriggeredUpper": null,
+        "updatedAt": "2025-09-23T06:50:31.790Z"
+      },
+      "category_id": "default-collecting",
+      "image_url": "https://steamcommunity-a.akamaihd.net/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJG5zlm-UfvRzd6yenqC9gQlptK76UvmVRjOjYLp_ile_c2-aadmH_GGHTXAk7tJvORuSie3hlN1sDjSz4r8c3mXZlAkWZEmQbNesRG6lN3uZriw4w2Pi44QmX2tiytA8G81tB5pi67Y",
+      "id": "item_1758608386965_b2cxwcphj",
+      "created_at": "2025-09-23T06:19:46.965Z"
+    },
+    "item_1758608525870_g4rg5yw2r": {
+      "id": "item_1758608525870_g4rg5yw2r",
+      "market_hash_name": "Desert Eagle | Mecha Industries (Factory New)",
+      "label": "Desert Eagle | Mecha Industries (Factory New)",
+      "appid": 730,
+      "steam_url": "https://steamcommunity.com/market/listings/730/Desert%20Eagle%20%7C%20Mecha%20Industries%20%28Factory%20New%29",
+      "purchase_price": 24.45,
+      "quantity": 1,
+      "purchase_currency": "USD",
+      "price_history": [
+        {
+          "date": "2025-09-18T03:27:41.799Z",
+          "median_price": 22.4
+        },
+        {
+          "date": "2025-09-18T03:32:39.707Z",
+          "median_price": 22.4
+        },
+        {
+          "date": "2025-09-18T03:39:26.916Z",
+          "median_price": 22.4
+        },
+        {
+          "date": "2025-09-18T03:39:38.978Z",
+          "median_price": 22.4
+        },
+        {
+          "date": "2025-09-18T03:39:46.535Z",
+          "median_price": 22.4
+        },
+        {
+          "date": "2025-09-18T03:47:11.258Z",
+          "median_price": 22.4
+        },
+        {
+          "date": "2025-09-18T03:57:30.819Z",
+          "median_price": 22.4
+        },
+        {
+          "date": "2025-09-18T04:01:30.712Z",
+          "median_price": 22.4
+        },
+        {
+          "date": "2025-09-18T04:02:56.580Z",
+          "median_price": 22.4
+        },
+        {
+          "date": "2025-09-18T05:25:22.081Z",
+          "median_price": 22.4
+        },
+        {
+          "date": "2025-09-18T05:33:28.461Z",
+          "median_price": 22.4
+        },
+        {
+          "date": "2025-09-18T05:34:43.953Z",
+          "median_price": 22.4
+        },
+        {
+          "date": "2025-09-18T05:38:58.934Z",
+          "median_price": 22.4
+        },
+        {
+          "date": "2025-09-18T05:42:18.488Z",
+          "median_price": 22.4
+        },
+        {
+          "date": "2025-09-18T05:44:48.635Z",
+          "median_price": 22.4
+        },
+        {
+          "date": "2025-09-18T05:47:23.213Z",
+          "median_price": 22.4
+        },
+        {
+          "date": "2025-09-18T05:48:19.020Z",
+          "median_price": 22.4
+        },
+        {
+          "date": "2025-09-18T05:50:07.239Z",
+          "median_price": 22.4
+        },
+        {
+          "date": "2025-09-18T05:52:15.552Z",
+          "median_price": 22.4
+        },
+        {
+          "date": "2025-09-18T05:52:59.872Z",
+          "median_price": 22.4
+        },
+        {
+          "date": "2025-09-18T07:13:50.366Z",
+          "median_price": 22.4
+        },
+        {
+          "date": "2025-09-18T07:20:03.172Z",
+          "median_price": 22.4
+        },
+        {
+          "date": "2025-09-18T07:25:03.034Z",
+          "median_price": 22.4
+        },
+        {
+          "date": "2025-09-18T07:30:03.078Z",
+          "median_price": 22.4
+        },
+        {
+          "date": "2025-09-18T07:40:03.107Z",
+          "median_price": 22.4
+        },
+        {
+          "date": "2025-09-18T07:40:37.651Z",
+          "median_price": 22.4
+        },
+        {
+          "date": "2025-09-18T07:45:00.630Z",
+          "median_price": 22.4
+        },
+        {
+          "date": "2025-09-18T07:50:00.717Z",
+          "median_price": 22.4
+        },
+        {
+          "date": "2025-09-20T04:29:24.538Z",
+          "median_price": 21.5
+        },
+        {
+          "date": "2025-09-20T04:30:01.456Z",
+          "median_price": 21.5
+        },
+        {
+          "date": "2025-09-20T04:30:01.855Z",
+          "median_price": 21.5
+        },
+        {
+          "date": "2025-09-20T04:30:01.912Z",
+          "median_price": 21.5
+        },
+        {
+          "date": "2025-09-20T20:42:04.876Z",
+          "median_price": 21.91
+        },
+        {
+          "date": "2025-09-20T20:44:18.805Z",
+          "median_price": 21.91
+        },
+        {
+          "date": "2025-09-20T20:45:03.056Z",
+          "median_price": 21.91
+        },
+        {
+          "date": "2025-09-20T20:50:03.017Z",
+          "median_price": 21.91
+        },
+        {
+          "date": "2025-09-20T20:55:04.357Z",
+          "median_price": 21.91
+        },
+        {
+          "date": "2025-09-20T21:00:03.015Z",
+          "median_price": 21.91
+        },
+        {
+          "date": "2025-09-20T21:05:03.050Z",
+          "median_price": 21.91
+        },
+        {
+          "date": "2025-09-20T21:10:03.016Z",
+          "median_price": 21.91
+        },
+        {
+          "date": "2025-09-20T21:15:03.050Z",
+          "median_price": 21.91
+        },
+        {
+          "date": "2025-09-20T21:20:03.963Z",
+          "median_price": 21.91
+        },
+        {
+          "date": "2025-09-20T21:25:03.087Z",
+          "median_price": 21.91
+        },
+        {
+          "date": "2025-09-20T21:40:03.057Z",
+          "median_price": 21.91
+        },
+        {
+          "date": "2025-09-20T21:45:03.611Z",
+          "median_price": 21.91
+        },
+        {
+          "date": "2025-09-20T21:50:03.612Z",
+          "median_price": 21.91
+        },
+        {
+          "date": "2025-09-20T21:55:03.188Z",
+          "median_price": 21.91
+        },
+        {
+          "date": "2025-09-20T22:00:03.755Z",
+          "median_price": 21.91
+        },
+        {
+          "date": "2025-09-20T22:05:03.115Z",
+          "median_price": 21.91
+        },
+        {
+          "date": "2025-09-20T22:05:03.132Z",
+          "median_price": 21.91
+        },
+        {
+          "date": "2025-09-20T22:20:03.101Z",
+          "median_price": 21.81
+        },
+        {
+          "date": "2025-09-20T22:25:02.996Z",
+          "median_price": 21.81
+        },
+        {
+          "date": "2025-09-20T22:35:03.371Z",
+          "median_price": 21.81
+        },
+        {
+          "date": "2025-09-20T22:40:03.041Z",
+          "median_price": 21.81
+        },
+        {
+          "date": "2025-09-20T22:45:03.074Z",
+          "median_price": 21.81
+        },
+        {
+          "date": "2025-09-20T22:50:03.562Z",
+          "median_price": 21.81
+        },
+        {
+          "date": "2025-09-20T22:55:03.071Z",
+          "median_price": 21.81
+        },
+        {
+          "date": "2025-09-20T23:00:03.088Z",
+          "median_price": 21.81
+        },
+        {
+          "date": "2025-09-20T23:00:03.135Z",
+          "median_price": 21.81
+        },
+        {
+          "date": "2025-09-20T23:05:03.037Z",
+          "median_price": 21.81
+        },
+        {
+          "date": "2025-09-20T23:05:03.100Z",
+          "median_price": 21.81
+        },
+        {
+          "date": "2025-09-20T23:10:03.089Z",
+          "median_price": 21.81
+        },
+        {
+          "date": "2025-09-20T23:10:03.133Z",
+          "median_price": 21.81
+        },
+        {
+          "date": "2025-09-20T23:15:03.023Z",
+          "median_price": 21.81
+        },
+        {
+          "date": "2025-09-20T23:15:03.084Z",
+          "median_price": 21.81
+        },
+        {
+          "date": "2025-09-20T23:20:03.048Z",
+          "median_price": 21.81
+        },
+        {
+          "date": "2025-09-20T23:20:03.078Z",
+          "median_price": 21.81
+        },
+        {
+          "date": "2025-09-20T23:25:03.150Z",
+          "median_price": 21.81
+        },
+        {
+          "date": "2025-09-20T23:25:03.180Z",
+          "median_price": 21.81
+        },
+        {
+          "date": "2025-09-20T23:30:03.048Z",
+          "median_price": 21.81
+        },
+        {
+          "date": "2025-09-20T23:30:03.099Z",
+          "median_price": 21.81
+        },
+        {
+          "date": "2025-09-20T23:35:03.101Z",
+          "median_price": 21.81
+        },
+        {
+          "date": "2025-09-20T23:35:03.146Z",
+          "median_price": 21.81
+        },
+        {
+          "date": "2025-09-20T23:40:03.048Z",
+          "median_price": 21.81
+        },
+        {
+          "date": "2025-09-20T23:40:03.108Z",
+          "median_price": 21.81
+        },
+        {
+          "date": "2025-09-20T23:45:03.010Z",
+          "median_price": 21.81
+        },
+        {
+          "date": "2025-09-20T23:45:03.025Z",
+          "median_price": 21.81
+        },
+        {
+          "date": "2025-09-20T23:50:03.109Z",
+          "median_price": 21.81
+        },
+        {
+          "date": "2025-09-20T23:50:03.174Z",
+          "median_price": 21.81
+        },
+        {
+          "date": "2025-09-20T23:55:03.135Z",
+          "median_price": 21.81
+        },
+        {
+          "date": "2025-09-20T23:55:03.267Z",
+          "median_price": 21.81
+        },
+        {
+          "date": "2025-09-21T00:00:03.862Z",
+          "median_price": 21.81
+        },
+        {
+          "date": "2025-09-21T00:00:03.897Z",
+          "median_price": 21.81
+        },
+        {
+          "date": "2025-09-21T00:05:03.133Z",
+          "median_price": 21.81
+        },
+        {
+          "date": "2025-09-21T00:05:03.167Z",
+          "median_price": 21.81
+        },
+        {
+          "date": "2025-09-21T00:10:03.392Z",
+          "median_price": 21.81
+        },
+        {
+          "date": "2025-09-21T00:10:03.475Z",
+          "median_price": 21.81
+        },
+        {
+          "date": "2025-09-21T00:15:03.190Z",
+          "median_price": 21.66
+        },
+        {
+          "date": "2025-09-21T00:15:03.242Z",
+          "median_price": 21.66
+        },
+        {
+          "date": "2025-09-21T00:20:03.079Z",
+          "median_price": 21.66
+        },
+        {
+          "date": "2025-09-21T00:20:03.095Z",
+          "median_price": 21.66
+        },
+        {
+          "date": "2025-09-21T00:25:03.687Z",
+          "median_price": 21.66
+        },
+        {
+          "date": "2025-09-21T00:25:03.934Z",
+          "median_price": 21.66
+        },
+        {
+          "date": "2025-09-21T00:30:03.120Z",
+          "median_price": 21.66
+        },
+        {
+          "date": "2025-09-21T00:30:03.153Z",
+          "median_price": 21.66
+        },
+        {
+          "date": "2025-09-21T00:30:03.238Z",
+          "median_price": 21.66
+        },
+        {
+          "date": "2025-09-21T00:35:03.278Z",
+          "median_price": 21.66
+        },
+        {
+          "date": "2025-09-21T00:35:03.294Z",
+          "median_price": 21.66
+        },
+        {
+          "date": "2025-09-21T00:35:03.409Z",
+          "median_price": 21.66
+        },
+        {
+          "date": "2025-09-21T00:40:03.096Z",
+          "median_price": 21.66
+        },
+        {
+          "date": "2025-09-21T00:40:03.129Z",
+          "median_price": 21.66
+        },
+        {
+          "date": "2025-09-21T00:40:03.159Z",
+          "median_price": 21.66
+        },
+        {
+          "date": "2025-09-21T00:45:03.169Z",
+          "median_price": 21.66
+        },
+        {
+          "date": "2025-09-21T00:45:03.211Z",
+          "median_price": 21.66
+        },
+        {
+          "date": "2025-09-21T00:45:03.251Z",
+          "median_price": 21.66
+        },
+        {
+          "date": "2025-09-21T00:50:03.118Z",
+          "median_price": 21.66
+        },
+        {
+          "date": "2025-09-21T00:50:03.173Z",
+          "median_price": 21.66
+        },
+        {
+          "date": "2025-09-21T00:50:03.249Z",
+          "median_price": 21.66
+        },
+        {
+          "date": "2025-09-21T01:00:03.189Z",
+          "median_price": 21.66
+        },
+        {
+          "date": "2025-09-21T01:00:03.224Z",
+          "median_price": 21.66
+        },
+        {
+          "date": "2025-09-21T01:00:03.240Z",
+          "median_price": 21.66
+        },
+        {
+          "date": "2025-09-21T04:30:03.647Z",
+          "median_price": 22.47
+        },
+        {
+          "date": "2025-09-21T05:00:03.017Z",
+          "median_price": 22.47
+        },
+        {
+          "date": "2025-09-21T05:30:02.933Z",
+          "median_price": 22.47
+        },
+        {
+          "date": "2025-09-21T20:45:03.408Z",
+          "median_price": 22.27
+        },
+        {
+          "date": "2025-09-21T20:55:31.298Z",
+          "median_price": 22.27
+        },
+        {
+          "date": "2025-09-21T21:00:06.787Z",
+          "median_price": 22.27
+        },
+        {
+          "date": "2025-09-22T00:00:07.896Z",
+          "median_price": 21.13
+        },
+        {
+          "date": "2025-09-22T00:30:08.509Z",
+          "median_price": 22.3
+        },
+        {
+          "date": "2025-09-22T00:30:08.571Z",
+          "median_price": 22.3
+        },
+        {
+          "date": "2025-09-22T01:00:07.906Z",
+          "median_price": 22.3
+        },
+        {
+          "date": "2025-09-22T01:00:07.994Z",
+          "median_price": 22.3
+        },
+        {
+          "date": "2025-09-22T01:30:07.988Z",
+          "median_price": 22.3
+        },
+        {
+          "date": "2025-09-22T01:30:08.319Z",
+          "median_price": 22.3
+        },
+        {
+          "date": "2025-09-22T02:00:08.142Z",
+          "median_price": 22.3
+        },
+        {
+          "date": "2025-09-22T02:00:08.161Z",
+          "median_price": 22.3
+        },
+        {
+          "date": "2025-09-22T06:00:08.146Z",
+          "median_price": 24.82
+        },
+        {
+          "date": "2025-09-22T06:30:08.476Z",
+          "median_price": 22.05
+        },
+        {
+          "date": "2025-09-22T06:30:08.580Z",
+          "median_price": 22.05
+        },
+        {
+          "date": "2025-09-22T07:00:08.785Z",
+          "median_price": 22.05
+        },
+        {
+          "date": "2025-09-22T07:00:08.954Z",
+          "median_price": 22.05
+        },
+        {
+          "date": "2025-09-22T07:30:08.473Z",
+          "median_price": 22.05
+        },
+        {
+          "date": "2025-09-22T07:30:08.510Z",
+          "median_price": 22.05
+        },
+        {
+          "date": "2025-09-22T07:40:08.131Z",
+          "median_price": 22.05
+        },
+        {
+          "date": "2025-09-22T07:45:07.815Z",
+          "median_price": 22.05
+        },
+        {
+          "date": "2025-09-22T07:50:07.826Z",
+          "median_price": 22.05
+        },
+        {
+          "date": "2025-09-22T07:55:07.803Z",
+          "median_price": 22.05
+        },
+        {
+          "date": "2025-09-22T08:00:07.902Z",
+          "median_price": 22.05
+        },
+        {
+          "date": "2025-09-22T08:05:07.772Z",
+          "median_price": 22.05
+        },
+        {
+          "date": "2025-09-22T08:10:07.823Z",
+          "median_price": 22.05
+        },
+        {
+          "date": "2025-09-22T08:15:07.817Z",
+          "median_price": 22.31
+        },
+        {
+          "date": "2025-09-22T08:20:07.730Z",
+          "median_price": 22.31
+        },
+        {
+          "date": "2025-09-22T08:25:07.819Z",
+          "median_price": 22.31
+        },
+        {
+          "date": "2025-09-22T08:30:08.397Z",
+          "median_price": 22.31
+        },
+        {
+          "date": "2025-09-22T08:35:07.987Z",
+          "median_price": 22.31
+        },
+        {
+          "date": "2025-09-22T08:40:08.600Z",
+          "median_price": 22.31
+        },
+        {
+          "date": "2025-09-22T08:45:08.102Z",
+          "median_price": 22.31
+        },
+        {
+          "date": "2025-09-22T08:50:07.721Z",
+          "median_price": 22.31
+        },
+        {
+          "date": "2025-09-22T08:55:07.764Z",
+          "median_price": 22.31
+        },
+        {
+          "date": "2025-09-22T09:00:07.820Z",
+          "median_price": 22.31
+        },
+        {
+          "date": "2025-09-22T09:05:07.892Z",
+          "median_price": 22.31
+        },
+        {
+          "date": "2025-09-22T09:10:07.829Z",
+          "median_price": 22.31
+        },
+        {
+          "date": "2025-09-22T09:15:08.058Z",
+          "median_price": 22.18
+        },
+        {
+          "date": "2025-09-22T09:20:07.785Z",
+          "median_price": 22.18
+        },
+        {
+          "date": "2025-09-22T09:25:07.732Z",
+          "median_price": 22.18
+        },
+        {
+          "date": "2025-09-22T09:30:08.231Z",
+          "median_price": 22.18
+        },
+        {
+          "date": "2025-09-22T09:35:07.848Z",
+          "median_price": 22.18
+        },
+        {
+          "date": "2025-09-22T09:40:08.296Z",
+          "median_price": 22.18
+        },
+        {
+          "date": "2025-09-22T09:45:07.945Z",
+          "median_price": 22.18
+        },
+        {
+          "date": "2025-09-22T09:50:07.760Z",
+          "median_price": 22.18
+        },
+        {
+          "date": "2025-09-22T09:55:07.975Z",
+          "median_price": 22.18
+        },
+        {
+          "date": "2025-09-22T10:00:07.795Z",
+          "median_price": 22.18
+        },
+        {
+          "date": "2025-09-22T10:05:07.742Z",
+          "median_price": 22.18
+        },
+        {
+          "date": "2025-09-22T10:10:07.852Z",
+          "median_price": 22.18
+        },
+        {
+          "date": "2025-09-22T10:15:07.822Z",
+          "median_price": 21.73
+        },
+        {
+          "date": "2025-09-22T10:20:07.830Z",
+          "median_price": 21.73
+        },
+        {
+          "date": "2025-09-22T10:25:07.764Z",
+          "median_price": 21.73
+        },
+        {
+          "date": "2025-09-22T10:30:07.827Z",
+          "median_price": 21.73
+        },
+        {
+          "date": "2025-09-22T10:35:07.758Z",
+          "median_price": 21.73
+        },
+        {
+          "date": "2025-09-22T10:40:08.507Z",
+          "median_price": 21.73
+        },
+        {
+          "date": "2025-09-22T10:45:07.710Z",
+          "median_price": 21.73
+        },
+        {
+          "date": "2025-09-22T10:50:07.785Z",
+          "median_price": 21.73
+        },
+        {
+          "date": "2025-09-22T10:55:07.783Z",
+          "median_price": 21.73
+        },
+        {
+          "date": "2025-09-22T11:00:07.814Z",
+          "median_price": 21.73
+        },
+        {
+          "date": "2025-09-22T11:05:07.758Z",
+          "median_price": 21.73
+        },
+        {
+          "date": "2025-09-22T11:10:07.834Z",
+          "median_price": 21.73
+        },
+        {
+          "date": "2025-09-22T11:15:07.781Z",
+          "median_price": 21.73
+        },
+        {
+          "date": "2025-09-22T11:20:07.822Z",
+          "median_price": 21.73
+        },
+        {
+          "date": "2025-09-22T11:25:07.906Z",
+          "median_price": 21.73
+        },
+        {
+          "date": "2025-09-22T11:30:08.209Z",
+          "median_price": 21.73
+        },
+        {
+          "date": "2025-09-22T11:35:07.746Z",
+          "median_price": 21.73
+        },
+        {
+          "date": "2025-09-22T11:40:08.353Z",
+          "median_price": 21.73
+        },
+        {
+          "date": "2025-09-22T11:45:07.877Z",
+          "median_price": 21.73
+        },
+        {
+          "date": "2025-09-22T11:50:07.807Z",
+          "median_price": 21.73
+        },
+        {
+          "date": "2025-09-22T11:55:07.807Z",
+          "median_price": 21.73
+        },
+        {
+          "date": "2025-09-22T12:00:07.845Z",
+          "median_price": 21.73
+        },
+        {
+          "date": "2025-09-22T12:05:11.899Z",
+          "median_price": 21.73
+        },
+        {
+          "date": "2025-09-22T12:10:11.357Z",
+          "median_price": 21.73
+        },
+        {
+          "date": "2025-09-22T12:15:11.635Z",
+          "median_price": 21.73
+        },
+        {
+          "date": "2025-09-22T12:20:12.062Z",
+          "median_price": 21.73
+        },
+        {
+          "date": "2025-09-22T12:25:11.570Z",
+          "median_price": 21.73
+        },
+        {
+          "date": "2025-09-22T12:30:11.808Z",
+          "median_price": 21.73
+        },
+        {
+          "date": "2025-09-22T12:35:11.700Z",
+          "median_price": 21.73
+        },
+        {
+          "date": "2025-09-22T12:40:11.568Z",
+          "median_price": 21.73
+        },
+        {
+          "date": "2025-09-22T12:45:11.626Z",
+          "median_price": 21.73
+        },
+        {
+          "date": "2025-09-22T12:50:11.727Z",
+          "median_price": 21.73
+        },
+        {
+          "date": "2025-09-22T12:55:11.575Z",
+          "median_price": 21.73
+        },
+        {
+          "date": "2025-09-22T13:00:11.713Z",
+          "median_price": 21.73
+        },
+        {
+          "date": "2025-09-22T13:05:11.721Z",
+          "median_price": 21.73
+        },
+        {
+          "date": "2025-09-22T13:10:11.563Z",
+          "median_price": 21.73
+        },
+        {
+          "date": "2025-09-22T13:15:11.595Z",
+          "median_price": 21.76
+        },
+        {
+          "date": "2025-09-22T21:14:12.244Z",
+          "median_price": 22.2
+        },
+        {
+          "date": "2025-09-23T01:00:12.255Z",
+          "median_price": 21.67
+        },
+        {
+          "date": "2025-09-23T03:17:34.626Z",
+          "median_price": 21.73
+        },
+        {
+          "date": "2025-09-23T05:00:10.779Z",
+          "median_price": 22.28
+        },
+        {
+          "date": "2025-09-23T06:44:14.106Z",
+          "median_price": 22.11
+        },
+        {
+          "date": "2025-09-23T06:44:14.106Z",
+          "median_price": 22.11
+        },
+        {
+          "date": "2025-09-23T06:45:59.776Z",
+          "median_price": 22.11
+        },
+        {
+          "date": "2025-09-23T06:45:59.776Z",
+          "median_price": 22.11
+        },
+        {
+          "date": "2025-09-23T06:50:31.818Z",
+          "median_price": 22.11
+        },
+        {
+          "date": "2025-09-23T06:50:31.818Z",
+          "median_price": 22.11
+        }
+      ],
+      "include_customizations_in_price": false,
+      "stickers": [
+        {
+          "name": "Sticker | FaZe Clan (Glitter) | Shanghai 2024",
+          "steam_url": "https://steamcommunity.com/market/listings/730/Sticker%20%7C%20FaZe%20Clan%20(Glitter)%20%7C%20Shanghai%202024",
+          "price": 0,
+          "currency": "USD",
+          "price_history": [
+            {
+              "date": "2025-09-21T20:55:34.039Z",
+              "median_price": 0.42
+            },
+            {
+              "date": "2025-09-21T21:00:09.529Z",
+              "median_price": 0.42
+            },
+            {
+              "date": "2025-09-22T00:00:10.617Z",
+              "median_price": 0.42
+            },
+            {
+              "date": "2025-09-22T00:30:11.287Z",
+              "median_price": 0.42
+            },
+            {
+              "date": "2025-09-22T00:30:11.388Z",
+              "median_price": 0.42
+            },
+            {
+              "date": "2025-09-22T01:00:10.783Z",
+              "median_price": 0.42
+            },
+            {
+              "date": "2025-09-22T01:00:10.820Z",
+              "median_price": 0.42
+            },
+            {
+              "date": "2025-09-22T01:30:10.707Z",
+              "median_price": 0.4
+            },
+            {
+              "date": "2025-09-22T01:30:11.140Z",
+              "median_price": 0.4
+            },
+            {
+              "date": "2025-09-22T02:00:10.963Z",
+              "median_price": 0.4
+            },
+            {
+              "date": "2025-09-22T02:00:11.368Z",
+              "median_price": 0.4
+            },
+            {
+              "date": "2025-09-22T06:00:11.190Z",
+              "median_price": 0.41
+            },
+            {
+              "date": "2025-09-22T06:30:11.273Z",
+              "median_price": 0.4
+            },
+            {
+              "date": "2025-09-22T06:30:11.424Z",
+              "median_price": 0.4
+            },
+            {
+              "date": "2025-09-22T07:00:11.566Z",
+              "median_price": 0.4
+            },
+            {
+              "date": "2025-09-22T07:00:11.712Z",
+              "median_price": 0.4
+            },
+            {
+              "date": "2025-09-22T07:30:11.300Z",
+              "median_price": 0.41
+            },
+            {
+              "date": "2025-09-22T07:30:12.054Z",
+              "median_price": 0.41
+            },
+            {
+              "date": "2025-09-22T07:40:10.848Z",
+              "median_price": 0.41
+            },
+            {
+              "date": "2025-09-22T07:45:10.544Z",
+              "median_price": 0.41
+            },
+            {
+              "date": "2025-09-22T07:50:10.578Z",
+              "median_price": 0.41
+            },
+            {
+              "date": "2025-09-22T07:55:10.491Z",
+              "median_price": 0.41
+            },
+            {
+              "date": "2025-09-22T08:00:10.686Z",
+              "median_price": 0.41
+            },
+            {
+              "date": "2025-09-22T08:05:10.477Z",
+              "median_price": 0.41
+            },
+            {
+              "date": "2025-09-22T08:10:10.584Z",
+              "median_price": 0.41
+            },
+            {
+              "date": "2025-09-22T08:15:11.790Z",
+              "median_price": 0.42
+            },
+            {
+              "date": "2025-09-22T08:20:10.425Z",
+              "median_price": 0.42
+            },
+            {
+              "date": "2025-09-22T08:25:10.563Z",
+              "median_price": 0.42
+            },
+            {
+              "date": "2025-09-22T08:30:11.128Z",
+              "median_price": 0.42
+            },
+            {
+              "date": "2025-09-22T08:35:10.668Z",
+              "median_price": 0.42
+            },
+            {
+              "date": "2025-09-22T08:40:11.569Z",
+              "median_price": 0.42
+            },
+            {
+              "date": "2025-09-22T08:45:10.854Z",
+              "median_price": 0.42
+            },
+            {
+              "date": "2025-09-22T08:50:10.433Z",
+              "median_price": 0.42
+            },
+            {
+              "date": "2025-09-22T08:55:10.465Z",
+              "median_price": 0.42
+            },
+            {
+              "date": "2025-09-22T09:00:10.531Z",
+              "median_price": 0.42
+            },
+            {
+              "date": "2025-09-22T09:05:10.547Z",
+              "median_price": 0.42
+            },
+            {
+              "date": "2025-09-22T09:10:10.527Z",
+              "median_price": 0.42
+            },
+            {
+              "date": "2025-09-22T09:15:11.605Z",
+              "median_price": 0.42
+            },
+            {
+              "date": "2025-09-22T09:20:10.500Z",
+              "median_price": 0.42
+            },
+            {
+              "date": "2025-09-22T09:25:10.455Z",
+              "median_price": 0.42
+            },
+            {
+              "date": "2025-09-22T09:30:10.913Z",
+              "median_price": 0.42
+            },
+            {
+              "date": "2025-09-22T09:35:10.558Z",
+              "median_price": 0.42
+            },
+            {
+              "date": "2025-09-22T09:40:11.008Z",
+              "median_price": 0.42
+            },
+            {
+              "date": "2025-09-22T09:45:10.661Z",
+              "median_price": 0.42
+            },
+            {
+              "date": "2025-09-22T09:50:10.746Z",
+              "median_price": 0.42
+            },
+            {
+              "date": "2025-09-22T09:55:10.688Z",
+              "median_price": 0.42
+            },
+            {
+              "date": "2025-09-22T10:00:10.531Z",
+              "median_price": 0.42
+            },
+            {
+              "date": "2025-09-22T10:05:10.455Z",
+              "median_price": 0.42
+            },
+            {
+              "date": "2025-09-22T10:10:10.543Z",
+              "median_price": 0.42
+            },
+            {
+              "date": "2025-09-22T10:15:12.256Z",
+              "median_price": 0.42
+            },
+            {
+              "date": "2025-09-22T10:20:10.568Z",
+              "median_price": 0.42
+            },
+            {
+              "date": "2025-09-22T10:25:10.466Z",
+              "median_price": 0.42
+            },
+            {
+              "date": "2025-09-22T10:30:10.581Z",
+              "median_price": 0.42
+            },
+            {
+              "date": "2025-09-22T10:35:10.463Z",
+              "median_price": 0.42
+            },
+            {
+              "date": "2025-09-22T10:40:11.170Z",
+              "median_price": 0.42
+            },
+            {
+              "date": "2025-09-22T10:45:10.415Z",
+              "median_price": 0.42
+            },
+            {
+              "date": "2025-09-22T10:50:10.484Z",
+              "median_price": 0.42
+            },
+            {
+              "date": "2025-09-22T10:55:10.531Z",
+              "median_price": 0.42
+            },
+            {
+              "date": "2025-09-22T11:00:10.556Z",
+              "median_price": 0.42
+            },
+            {
+              "date": "2025-09-22T11:05:10.452Z",
+              "median_price": 0.42
+            },
+            {
+              "date": "2025-09-22T11:10:10.551Z",
+              "median_price": 0.42
+            },
+            {
+              "date": "2025-09-22T11:15:10.489Z",
+              "median_price": 0.36
+            },
+            {
+              "date": "2025-09-22T11:20:10.562Z",
+              "median_price": 0.36
+            },
+            {
+              "date": "2025-09-22T11:25:10.622Z",
+              "median_price": 0.36
+            },
+            {
+              "date": "2025-09-22T11:30:10.958Z",
+              "median_price": 0.36
+            },
+            {
+              "date": "2025-09-22T11:35:10.501Z",
+              "median_price": 0.36
+            },
+            {
+              "date": "2025-09-22T11:40:11.133Z",
+              "median_price": 0.36
+            },
+            {
+              "date": "2025-09-22T11:45:10.575Z",
+              "median_price": 0.36
+            },
+            {
+              "date": "2025-09-22T11:50:10.497Z",
+              "median_price": 0.36
+            },
+            {
+              "date": "2025-09-22T11:55:10.544Z",
+              "median_price": 0.36
+            },
+            {
+              "date": "2025-09-22T12:00:10.812Z",
+              "median_price": 0.36
+            },
+            {
+              "date": "2025-09-22T12:05:14.819Z",
+              "median_price": 0.36
+            },
+            {
+              "date": "2025-09-22T12:10:14.138Z",
+              "median_price": 0.36
+            },
+            {
+              "date": "2025-09-22T12:15:15.406Z",
+              "median_price": 0.34
+            },
+            {
+              "date": "2025-09-22T12:20:14.837Z",
+              "median_price": 0.34
+            },
+            {
+              "date": "2025-09-22T12:25:14.443Z",
+              "median_price": 0.34
+            },
+            {
+              "date": "2025-09-22T12:30:14.655Z",
+              "median_price": 0.34
+            },
+            {
+              "date": "2025-09-22T12:35:14.507Z",
+              "median_price": 0.34
+            },
+            {
+              "date": "2025-09-22T12:40:14.708Z",
+              "median_price": 0.34
+            },
+            {
+              "date": "2025-09-22T12:45:14.713Z",
+              "median_price": 0.34
+            },
+            {
+              "date": "2025-09-22T12:50:14.601Z",
+              "median_price": 0.34
+            },
+            {
+              "date": "2025-09-22T12:55:14.383Z",
+              "median_price": 0.34
+            },
+            {
+              "date": "2025-09-22T13:00:14.584Z",
+              "median_price": 0.34
+            },
+            {
+              "date": "2025-09-22T13:05:14.535Z",
+              "median_price": 0.34
+            },
+            {
+              "date": "2025-09-22T13:10:14.438Z",
+              "median_price": 0.34
+            },
+            {
+              "date": "2025-09-22T13:15:15.445Z",
+              "median_price": 0.42
+            },
+            {
+              "date": "2025-09-22T21:14:16.098Z",
+              "median_price": 0.4
+            },
+            {
+              "date": "2025-09-23T01:00:15.193Z",
+              "median_price": 0.36
+            },
+            {
+              "date": "2025-09-23T03:17:37.369Z",
+              "median_price": 0.36
+            },
+            {
+              "date": "2025-09-23T05:00:13.552Z",
+              "median_price": 0.42
+            }
+          ]
+        },
+        {
+          "name": "Sticker | karrigan (Glitter) | Shanghai 2024",
+          "steam_url": "https://steamcommunity.com/market/listings/730/Sticker%20%7C%20karrigan%20(Glitter)%20%7C%20Shanghai%202024",
+          "price": 0,
+          "currency": "USD",
+          "price_history": [
+            {
+              "date": "2025-09-21T20:55:34.057Z",
+              "median_price": 0.1
+            },
+            {
+              "date": "2025-09-21T21:00:09.550Z",
+              "median_price": 0.1
+            },
+            {
+              "date": "2025-09-22T00:00:10.634Z",
+              "median_price": 0.09
+            },
+            {
+              "date": "2025-09-22T00:30:11.305Z",
+              "median_price": 0.09
+            },
+            {
+              "date": "2025-09-22T00:30:11.413Z",
+              "median_price": 0.09
+            },
+            {
+              "date": "2025-09-22T01:00:10.801Z",
+              "median_price": 0.09
+            },
+            {
+              "date": "2025-09-22T01:00:10.854Z",
+              "median_price": 0.09
+            },
+            {
+              "date": "2025-09-22T01:30:10.724Z",
+              "median_price": 0.09
+            },
+            {
+              "date": "2025-09-22T01:30:11.158Z",
+              "median_price": 0.09
+            },
+            {
+              "date": "2025-09-22T02:00:10.981Z",
+              "median_price": 0.09
+            },
+            {
+              "date": "2025-09-22T02:00:11.395Z",
+              "median_price": 0.09
+            },
+            {
+              "date": "2025-09-22T06:00:11.209Z",
+              "median_price": 0.09
+            },
+            {
+              "date": "2025-09-22T06:30:11.298Z",
+              "median_price": 0.09
+            },
+            {
+              "date": "2025-09-22T06:30:11.447Z",
+              "median_price": 0.09
+            },
+            {
+              "date": "2025-09-22T07:00:11.591Z",
+              "median_price": 0.09
+            },
+            {
+              "date": "2025-09-22T07:00:11.735Z",
+              "median_price": 0.09
+            },
+            {
+              "date": "2025-09-22T07:30:11.320Z",
+              "median_price": 0.09
+            },
+            {
+              "date": "2025-09-22T07:30:12.070Z",
+              "median_price": 0.09
+            },
+            {
+              "date": "2025-09-22T07:40:10.866Z",
+              "median_price": 0.09
+            },
+            {
+              "date": "2025-09-22T07:45:10.561Z",
+              "median_price": 0.09
+            },
+            {
+              "date": "2025-09-22T07:50:10.595Z",
+              "median_price": 0.09
+            },
+            {
+              "date": "2025-09-22T07:55:10.513Z",
+              "median_price": 0.09
+            },
+            {
+              "date": "2025-09-22T08:00:10.704Z",
+              "median_price": 0.09
+            },
+            {
+              "date": "2025-09-22T08:05:10.497Z",
+              "median_price": 0.09
+            },
+            {
+              "date": "2025-09-22T08:10:10.603Z",
+              "median_price": 0.09
+            },
+            {
+              "date": "2025-09-22T08:15:11.808Z",
+              "median_price": 0.1
+            },
+            {
+              "date": "2025-09-22T08:20:10.444Z",
+              "median_price": 0.1
+            },
+            {
+              "date": "2025-09-22T08:25:10.581Z",
+              "median_price": 0.1
+            },
+            {
+              "date": "2025-09-22T08:30:11.143Z",
+              "median_price": 0.1
+            },
+            {
+              "date": "2025-09-22T08:35:10.692Z",
+              "median_price": 0.1
+            },
+            {
+              "date": "2025-09-22T08:40:11.588Z",
+              "median_price": 0.1
+            },
+            {
+              "date": "2025-09-22T08:45:10.872Z",
+              "median_price": 0.1
+            },
+            {
+              "date": "2025-09-22T08:50:10.451Z",
+              "median_price": 0.1
+            },
+            {
+              "date": "2025-09-22T08:55:10.488Z",
+              "median_price": 0.1
+            },
+            {
+              "date": "2025-09-22T09:00:10.549Z",
+              "median_price": 0.1
+            },
+            {
+              "date": "2025-09-22T09:05:10.563Z",
+              "median_price": 0.1
+            },
+            {
+              "date": "2025-09-22T09:10:10.545Z",
+              "median_price": 0.1
+            },
+            {
+              "date": "2025-09-22T09:15:11.625Z",
+              "median_price": 0.08
+            },
+            {
+              "date": "2025-09-22T09:20:10.519Z",
+              "median_price": 0.08
+            },
+            {
+              "date": "2025-09-22T09:25:10.474Z",
+              "median_price": 0.08
+            },
+            {
+              "date": "2025-09-22T09:30:10.931Z",
+              "median_price": 0.08
+            },
+            {
+              "date": "2025-09-22T09:35:10.578Z",
+              "median_price": 0.08
+            },
+            {
+              "date": "2025-09-22T09:40:11.024Z",
+              "median_price": 0.08
+            },
+            {
+              "date": "2025-09-22T09:45:10.679Z",
+              "median_price": 0.08
+            },
+            {
+              "date": "2025-09-22T09:50:10.764Z",
+              "median_price": 0.08
+            },
+            {
+              "date": "2025-09-22T09:55:10.707Z",
+              "median_price": 0.08
+            },
+            {
+              "date": "2025-09-22T10:00:10.550Z",
+              "median_price": 0.08
+            },
+            {
+              "date": "2025-09-22T10:05:10.473Z",
+              "median_price": 0.08
+            },
+            {
+              "date": "2025-09-22T10:10:10.560Z",
+              "median_price": 0.08
+            },
+            {
+              "date": "2025-09-22T10:15:12.276Z",
+              "median_price": 0.08
+            },
+            {
+              "date": "2025-09-22T10:20:10.586Z",
+              "median_price": 0.08
+            },
+            {
+              "date": "2025-09-22T10:25:10.482Z",
+              "median_price": 0.08
+            },
+            {
+              "date": "2025-09-22T10:30:10.602Z",
+              "median_price": 0.08
+            },
+            {
+              "date": "2025-09-22T10:35:10.482Z",
+              "median_price": 0.08
+            },
+            {
+              "date": "2025-09-22T10:40:11.188Z",
+              "median_price": 0.08
+            },
+            {
+              "date": "2025-09-22T10:45:10.431Z",
+              "median_price": 0.08
+            },
+            {
+              "date": "2025-09-22T10:50:10.503Z",
+              "median_price": 0.08
+            },
+            {
+              "date": "2025-09-22T10:55:10.548Z",
+              "median_price": 0.08
+            },
+            {
+              "date": "2025-09-22T11:00:10.577Z",
+              "median_price": 0.08
+            },
+            {
+              "date": "2025-09-22T11:05:10.470Z",
+              "median_price": 0.08
+            },
+            {
+              "date": "2025-09-22T11:10:10.574Z",
+              "median_price": 0.08
+            },
+            {
+              "date": "2025-09-22T11:15:10.507Z",
+              "median_price": 0.08
+            },
+            {
+              "date": "2025-09-22T11:20:10.585Z",
+              "median_price": 0.08
+            },
+            {
+              "date": "2025-09-22T11:25:10.643Z",
+              "median_price": 0.08
+            },
+            {
+              "date": "2025-09-22T11:30:10.992Z",
+              "median_price": 0.08
+            },
+            {
+              "date": "2025-09-22T11:35:10.524Z",
+              "median_price": 0.08
+            },
+            {
+              "date": "2025-09-22T11:40:11.158Z",
+              "median_price": 0.08
+            },
+            {
+              "date": "2025-09-22T11:45:10.596Z",
+              "median_price": 0.08
+            },
+            {
+              "date": "2025-09-22T11:50:10.514Z",
+              "median_price": 0.08
+            },
+            {
+              "date": "2025-09-22T11:55:10.564Z",
+              "median_price": 0.08
+            },
+            {
+              "date": "2025-09-22T12:00:10.839Z",
+              "median_price": 0.08
+            },
+            {
+              "date": "2025-09-22T12:05:14.837Z",
+              "median_price": 0.08
+            },
+            {
+              "date": "2025-09-22T12:10:14.158Z",
+              "median_price": 0.08
+            },
+            {
+              "date": "2025-09-22T12:15:15.428Z",
+              "median_price": 0.09
+            },
+            {
+              "date": "2025-09-22T12:20:14.858Z",
+              "median_price": 0.09
+            },
+            {
+              "date": "2025-09-22T12:25:14.467Z",
+              "median_price": 0.09
+            },
+            {
+              "date": "2025-09-22T12:30:14.675Z",
+              "median_price": 0.09
+            },
+            {
+              "date": "2025-09-22T12:35:14.527Z",
+              "median_price": 0.09
+            },
+            {
+              "date": "2025-09-22T12:40:14.727Z",
+              "median_price": 0.09
+            },
+            {
+              "date": "2025-09-22T12:45:14.733Z",
+              "median_price": 0.09
+            },
+            {
+              "date": "2025-09-22T12:50:14.627Z",
+              "median_price": 0.09
+            },
+            {
+              "date": "2025-09-22T12:55:14.400Z",
+              "median_price": 0.09
+            },
+            {
+              "date": "2025-09-22T13:00:14.605Z",
+              "median_price": 0.09
+            },
+            {
+              "date": "2025-09-22T13:05:14.555Z",
+              "median_price": 0.09
+            },
+            {
+              "date": "2025-09-22T13:10:14.456Z",
+              "median_price": 0.09
+            },
+            {
+              "date": "2025-09-22T13:15:15.471Z",
+              "median_price": 0.09
+            },
+            {
+              "date": "2025-09-22T21:14:16.121Z",
+              "median_price": 0.07
+            },
+            {
+              "date": "2025-09-23T01:00:15.219Z",
+              "median_price": 0.06
+            },
+            {
+              "date": "2025-09-23T03:17:37.389Z",
+              "median_price": 0.07
+            },
+            {
+              "date": "2025-09-23T05:00:13.574Z",
+              "median_price": 0.07
+            }
+          ]
+        },
+        {
+          "name": "Sticker | ropz | Shanghai 2024",
+          "steam_url": "https://steamcommunity.com/market/listings/730/Sticker%20%7C%20ropz%20%7C%20Shanghai%202024",
+          "price": 0,
+          "currency": "USD",
+          "price_history": [
+            {
+              "date": "2025-09-21T20:55:34.075Z",
+              "median_price": 0.03
+            },
+            {
+              "date": "2025-09-21T21:00:09.567Z",
+              "median_price": 0.03
+            },
+            {
+              "date": "2025-09-22T00:00:10.653Z",
+              "median_price": 0.05
+            },
+            {
+              "date": "2025-09-22T00:30:11.321Z",
+              "median_price": 0.03
+            },
+            {
+              "date": "2025-09-22T00:30:11.451Z",
+              "median_price": 0.03
+            },
+            {
+              "date": "2025-09-22T01:00:10.837Z",
+              "median_price": 0.03
+            },
+            {
+              "date": "2025-09-22T01:00:10.891Z",
+              "median_price": 0.03
+            },
+            {
+              "date": "2025-09-22T01:30:10.743Z",
+              "median_price": 0.03
+            },
+            {
+              "date": "2025-09-22T01:30:11.183Z",
+              "median_price": 0.03
+            },
+            {
+              "date": "2025-09-22T02:00:10.998Z",
+              "median_price": 0.03
+            },
+            {
+              "date": "2025-09-22T02:00:11.419Z",
+              "median_price": 0.03
+            },
+            {
+              "date": "2025-09-22T06:00:11.228Z",
+              "median_price": 0.04
+            },
+            {
+              "date": "2025-09-22T06:30:11.318Z",
+              "median_price": 0.04
+            },
+            {
+              "date": "2025-09-22T06:30:11.470Z",
+              "median_price": 0.04
+            },
+            {
+              "date": "2025-09-22T07:00:11.618Z",
+              "median_price": 0.04
+            },
+            {
+              "date": "2025-09-22T07:00:11.761Z",
+              "median_price": 0.04
+            },
+            {
+              "date": "2025-09-22T07:30:11.337Z",
+              "median_price": 0.04
+            },
+            {
+              "date": "2025-09-22T07:30:12.087Z",
+              "median_price": 0.04
+            },
+            {
+              "date": "2025-09-22T07:40:10.886Z",
+              "median_price": 0.04
+            },
+            {
+              "date": "2025-09-22T07:45:10.578Z",
+              "median_price": 0.04
+            },
+            {
+              "date": "2025-09-22T07:50:10.613Z",
+              "median_price": 0.04
+            },
+            {
+              "date": "2025-09-22T07:55:10.535Z",
+              "median_price": 0.04
+            },
+            {
+              "date": "2025-09-22T08:00:10.722Z",
+              "median_price": 0.04
+            },
+            {
+              "date": "2025-09-22T08:05:10.515Z",
+              "median_price": 0.04
+            },
+            {
+              "date": "2025-09-22T08:10:10.622Z",
+              "median_price": 0.04
+            },
+            {
+              "date": "2025-09-22T08:15:11.827Z",
+              "median_price": 0.04
+            },
+            {
+              "date": "2025-09-22T08:20:10.462Z",
+              "median_price": 0.04
+            },
+            {
+              "date": "2025-09-22T08:25:10.603Z",
+              "median_price": 0.04
+            },
+            {
+              "date": "2025-09-22T08:30:11.161Z",
+              "median_price": 0.04
+            },
+            {
+              "date": "2025-09-22T08:35:10.711Z",
+              "median_price": 0.04
+            },
+            {
+              "date": "2025-09-22T08:40:11.607Z",
+              "median_price": 0.04
+            },
+            {
+              "date": "2025-09-22T08:45:10.889Z",
+              "median_price": 0.04
+            },
+            {
+              "date": "2025-09-22T08:50:10.467Z",
+              "median_price": 0.04
+            },
+            {
+              "date": "2025-09-22T08:55:10.506Z",
+              "median_price": 0.04
+            },
+            {
+              "date": "2025-09-22T09:00:10.568Z",
+              "median_price": 0.04
+            },
+            {
+              "date": "2025-09-22T09:05:10.580Z",
+              "median_price": 0.04
+            },
+            {
+              "date": "2025-09-22T09:10:10.564Z",
+              "median_price": 0.04
+            },
+            {
+              "date": "2025-09-22T09:15:11.644Z",
+              "median_price": 0.05
+            },
+            {
+              "date": "2025-09-22T09:20:10.536Z",
+              "median_price": 0.05
+            },
+            {
+              "date": "2025-09-22T09:25:10.494Z",
+              "median_price": 0.05
+            },
+            {
+              "date": "2025-09-22T09:30:10.950Z",
+              "median_price": 0.05
+            },
+            {
+              "date": "2025-09-22T09:35:10.600Z",
+              "median_price": 0.05
+            },
+            {
+              "date": "2025-09-22T09:40:11.044Z",
+              "median_price": 0.05
+            },
+            {
+              "date": "2025-09-22T09:45:10.697Z",
+              "median_price": 0.05
+            },
+            {
+              "date": "2025-09-22T09:50:10.780Z",
+              "median_price": 0.05
+            },
+            {
+              "date": "2025-09-22T09:55:10.726Z",
+              "median_price": 0.05
+            },
+            {
+              "date": "2025-09-22T10:00:10.568Z",
+              "median_price": 0.05
+            },
+            {
+              "date": "2025-09-22T10:05:10.491Z",
+              "median_price": 0.05
+            },
+            {
+              "date": "2025-09-22T10:10:10.579Z",
+              "median_price": 0.05
+            },
+            {
+              "date": "2025-09-22T10:15:12.294Z",
+              "median_price": 0.04
+            },
+            {
+              "date": "2025-09-22T10:20:10.605Z",
+              "median_price": 0.04
+            },
+            {
+              "date": "2025-09-22T10:25:10.506Z",
+              "median_price": 0.04
+            },
+            {
+              "date": "2025-09-22T10:30:10.620Z",
+              "median_price": 0.04
+            },
+            {
+              "date": "2025-09-22T10:35:10.509Z",
+              "median_price": 0.04
+            },
+            {
+              "date": "2025-09-22T10:40:11.208Z",
+              "median_price": 0.04
+            },
+            {
+              "date": "2025-09-22T10:45:10.452Z",
+              "median_price": 0.04
+            },
+            {
+              "date": "2025-09-22T10:50:10.522Z",
+              "median_price": 0.04
+            },
+            {
+              "date": "2025-09-22T10:55:10.568Z",
+              "median_price": 0.04
+            },
+            {
+              "date": "2025-09-22T11:00:10.598Z",
+              "median_price": 0.04
+            },
+            {
+              "date": "2025-09-22T11:05:10.493Z",
+              "median_price": 0.04
+            },
+            {
+              "date": "2025-09-22T11:10:10.591Z",
+              "median_price": 0.04
+            },
+            {
+              "date": "2025-09-22T11:15:10.529Z",
+              "median_price": 0.03
+            },
+            {
+              "date": "2025-09-22T11:20:10.607Z",
+              "median_price": 0.03
+            },
+            {
+              "date": "2025-09-22T11:25:10.663Z",
+              "median_price": 0.03
+            },
+            {
+              "date": "2025-09-22T11:30:11.019Z",
+              "median_price": 0.03
+            },
+            {
+              "date": "2025-09-22T11:35:10.546Z",
+              "median_price": 0.03
+            },
+            {
+              "date": "2025-09-22T11:40:11.178Z",
+              "median_price": 0.03
+            },
+            {
+              "date": "2025-09-22T11:45:10.619Z",
+              "median_price": 0.03
+            },
+            {
+              "date": "2025-09-22T11:50:10.535Z",
+              "median_price": 0.03
+            },
+            {
+              "date": "2025-09-22T11:55:10.590Z",
+              "median_price": 0.03
+            },
+            {
+              "date": "2025-09-22T12:00:10.856Z",
+              "median_price": 0.03
+            },
+            {
+              "date": "2025-09-22T12:05:14.854Z",
+              "median_price": 0.03
+            },
+            {
+              "date": "2025-09-22T12:10:14.178Z",
+              "median_price": 0.03
+            },
+            {
+              "date": "2025-09-22T12:15:15.444Z",
+              "median_price": 0.02
+            },
+            {
+              "date": "2025-09-22T12:20:14.878Z",
+              "median_price": 0.02
+            },
+            {
+              "date": "2025-09-22T12:25:14.486Z",
+              "median_price": 0.02
+            },
+            {
+              "date": "2025-09-22T12:30:14.697Z",
+              "median_price": 0.02
+            },
+            {
+              "date": "2025-09-22T12:35:14.546Z",
+              "median_price": 0.02
+            },
+            {
+              "date": "2025-09-22T12:40:14.751Z",
+              "median_price": 0.02
+            },
+            {
+              "date": "2025-09-22T12:45:14.755Z",
+              "median_price": 0.02
+            },
+            {
+              "date": "2025-09-22T12:50:14.648Z",
+              "median_price": 0.02
+            },
+            {
+              "date": "2025-09-22T12:55:14.420Z",
+              "median_price": 0.02
+            },
+            {
+              "date": "2025-09-22T13:00:14.621Z",
+              "median_price": 0.02
+            },
+            {
+              "date": "2025-09-22T13:05:14.574Z",
+              "median_price": 0.02
+            },
+            {
+              "date": "2025-09-22T13:10:14.476Z",
+              "median_price": 0.02
+            },
+            {
+              "date": "2025-09-22T13:15:15.495Z",
+              "median_price": 0.03
+            },
+            {
+              "date": "2025-09-22T21:14:16.143Z",
+              "median_price": 0.04
+            },
+            {
+              "date": "2025-09-23T01:00:15.245Z",
+              "median_price": 0.04
+            },
+            {
+              "date": "2025-09-23T03:17:37.410Z",
+              "median_price": 0.04
+            },
+            {
+              "date": "2025-09-23T05:00:13.602Z",
+              "median_price": 0.05
+            }
+          ]
+        }
+      ],
+      "charms": [],
+      "patches": [],
+      "price_alert_config": {
+        "lowerTriggered": false,
+        "lastTriggeredLower": null,
+        "upperTriggered": false,
+        "lastTriggeredUpper": null,
+        "updatedAt": "2025-09-23T06:50:31.818Z"
+      },
+      "category_id": "default-playing",
+      "image_url": "https://steamcommunity-a.akamaihd.net/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL1m5fn8Sdk6OGRbKFsJ_yWMWqVwuZ3j-1gSCGn20h042vSyY2tdyjCZwIlXJBxQeNe4EWxxoHkMOq0sQGIid5Fnyr42HtXrnE8p4gbgvE"
+    }
+  },
+  "sold_items": [],
+  "portfolio_history": [
+    {
+      "timestamp": "2025-09-20T04:05:01.968Z",
+      "date": "2025-09-20",
+      "total_inventory_value": 0,
+      "total_money_invested": 0
+    },
+    {
+      "timestamp": "2025-09-20T04:05:01.988Z",
+      "date": "2025-09-20",
+      "total_inventory_value": 0,
+      "total_money_invested": 0
+    },
+    {
+      "timestamp": "2025-09-20T04:29:24.576Z",
+      "date": "2025-09-20",
+      "total_inventory_value": 196.52,
+      "total_money_invested": 176.46786163522015
+    },
+    {
+      "timestamp": "2025-09-20T04:29:48.175Z",
+      "date": "2025-09-20",
+      "total_inventory_value": 196.52,
+      "total_money_invested": 176.46786163522015
+    },
+    {
+      "timestamp": "2025-09-20T04:30:01.493Z",
+      "date": "2025-09-20",
+      "total_inventory_value": 196.52,
+      "total_money_invested": 176.46786163522015
+    },
+    {
+      "timestamp": "2025-09-20T04:30:01.892Z",
+      "date": "2025-09-20",
+      "total_inventory_value": 196.52,
+      "total_money_invested": 176.46786163522015
+    },
+    {
+      "timestamp": "2025-09-20T04:30:01.971Z",
+      "date": "2025-09-20",
+      "total_inventory_value": 196.52,
+      "total_money_invested": 176.46786163522015
+    },
+    {
+      "timestamp": "2025-09-20T20:42:04.925Z",
+      "date": "2025-09-20",
+      "total_inventory_value": 276.18,
+      "total_money_invested": 254.86786163522015
+    },
+    {
+      "timestamp": "2025-09-20T20:44:18.856Z",
+      "date": "2025-09-20",
+      "total_inventory_value": 276.18,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-20T20:45:03.105Z",
+      "date": "2025-09-20",
+      "total_inventory_value": 276.18,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-20T20:50:03.065Z",
+      "date": "2025-09-20",
+      "total_inventory_value": 276.18,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-20T20:55:04.404Z",
+      "date": "2025-09-20",
+      "total_inventory_value": 276.18,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-20T21:00:03.064Z",
+      "date": "2025-09-20",
+      "total_inventory_value": 276.18,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-20T21:05:03.090Z",
+      "date": "2025-09-20",
+      "total_inventory_value": 276.18,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-20T21:10:03.063Z",
+      "date": "2025-09-20",
+      "total_inventory_value": 276.18,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-20T21:15:03.098Z",
+      "date": "2025-09-20",
+      "total_inventory_value": 276.18,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-20T21:20:04.009Z",
+      "date": "2025-09-20",
+      "total_inventory_value": 276.18,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-20T21:25:03.132Z",
+      "date": "2025-09-20",
+      "total_inventory_value": 276.18,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-20T21:40:03.105Z",
+      "date": "2025-09-20",
+      "total_inventory_value": 276.18,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-20T21:45:03.660Z",
+      "date": "2025-09-20",
+      "total_inventory_value": 276.18,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-20T21:50:03.658Z",
+      "date": "2025-09-20",
+      "total_inventory_value": 276.18,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-20T21:55:03.235Z",
+      "date": "2025-09-20",
+      "total_inventory_value": 276.18,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-20T22:00:03.803Z",
+      "date": "2025-09-20",
+      "total_inventory_value": 276.18,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-20T22:05:03.206Z",
+      "date": "2025-09-20",
+      "total_inventory_value": 276.18,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-20T22:05:03.226Z",
+      "date": "2025-09-20",
+      "total_inventory_value": 276.18,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-20T22:20:03.154Z",
+      "date": "2025-09-20",
+      "total_inventory_value": 277.06,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-20T22:25:03.044Z",
+      "date": "2025-09-20",
+      "total_inventory_value": 277.06,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-20T22:35:03.427Z",
+      "date": "2025-09-20",
+      "total_inventory_value": 277.06,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-20T22:40:03.087Z",
+      "date": "2025-09-20",
+      "total_inventory_value": 277.06,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-20T22:45:03.122Z",
+      "date": "2025-09-20",
+      "total_inventory_value": 277.06,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-20T22:50:03.629Z",
+      "date": "2025-09-20",
+      "total_inventory_value": 277.06,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-20T22:55:03.122Z",
+      "date": "2025-09-20",
+      "total_inventory_value": 277.06,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-20T23:00:03.151Z",
+      "date": "2025-09-20",
+      "total_inventory_value": 277.06,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-20T23:00:03.204Z",
+      "date": "2025-09-20",
+      "total_inventory_value": 277.06,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-20T23:05:03.084Z",
+      "date": "2025-09-20",
+      "total_inventory_value": 277.06,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-20T23:05:03.156Z",
+      "date": "2025-09-20",
+      "total_inventory_value": 277.06,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-20T23:10:03.148Z",
+      "date": "2025-09-20",
+      "total_inventory_value": 277.06,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-20T23:10:03.198Z",
+      "date": "2025-09-20",
+      "total_inventory_value": 277.06,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-20T23:15:03.067Z",
+      "date": "2025-09-20",
+      "total_inventory_value": 277.06,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-20T23:15:03.134Z",
+      "date": "2025-09-20",
+      "total_inventory_value": 277.06,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-20T23:20:03.123Z",
+      "date": "2025-09-20",
+      "total_inventory_value": 277.06,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-20T23:20:03.161Z",
+      "date": "2025-09-20",
+      "total_inventory_value": 277.06,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-20T23:25:03.228Z",
+      "date": "2025-09-20",
+      "total_inventory_value": 277.06,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-20T23:25:03.265Z",
+      "date": "2025-09-20",
+      "total_inventory_value": 277.06,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-20T23:30:03.114Z",
+      "date": "2025-09-20",
+      "total_inventory_value": 277.06,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-20T23:30:03.177Z",
+      "date": "2025-09-20",
+      "total_inventory_value": 277.06,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-20T23:35:03.162Z",
+      "date": "2025-09-20",
+      "total_inventory_value": 277.06,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-20T23:35:03.213Z",
+      "date": "2025-09-20",
+      "total_inventory_value": 277.06,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-20T23:40:03.093Z",
+      "date": "2025-09-20",
+      "total_inventory_value": 277.06,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-20T23:40:03.159Z",
+      "date": "2025-09-20",
+      "total_inventory_value": 277.06,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-20T23:45:03.103Z",
+      "date": "2025-09-20",
+      "total_inventory_value": 277.06,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-20T23:45:03.118Z",
+      "date": "2025-09-20",
+      "total_inventory_value": 277.06,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-20T23:50:03.689Z",
+      "date": "2025-09-20",
+      "total_inventory_value": 277.06,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-20T23:50:03.740Z",
+      "date": "2025-09-20",
+      "total_inventory_value": 277.06,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-20T23:55:03.187Z",
+      "date": "2025-09-20",
+      "total_inventory_value": 277.06,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-20T23:55:03.329Z",
+      "date": "2025-09-20",
+      "total_inventory_value": 277.06,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-21T00:00:03.948Z",
+      "date": "2025-09-21",
+      "total_inventory_value": 277.06,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-21T00:00:03.995Z",
+      "date": "2025-09-21",
+      "total_inventory_value": 277.06,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-21T00:05:03.223Z",
+      "date": "2025-09-21",
+      "total_inventory_value": 277.06,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-21T00:05:03.275Z",
+      "date": "2025-09-21",
+      "total_inventory_value": 277.06,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-21T00:10:03.452Z",
+      "date": "2025-09-21",
+      "total_inventory_value": 277.06,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-21T00:10:03.549Z",
+      "date": "2025-09-21",
+      "total_inventory_value": 277.06,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-21T00:15:03.258Z",
+      "date": "2025-09-21",
+      "total_inventory_value": 276.90999999999997,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-21T00:15:03.316Z",
+      "date": "2025-09-21",
+      "total_inventory_value": 276.90999999999997,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-21T00:20:03.176Z",
+      "date": "2025-09-21",
+      "total_inventory_value": 276.90999999999997,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-21T00:20:03.204Z",
+      "date": "2025-09-21",
+      "total_inventory_value": 276.90999999999997,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-21T00:25:03.759Z",
+      "date": "2025-09-21",
+      "total_inventory_value": 276.90999999999997,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-21T00:25:03.986Z",
+      "date": "2025-09-21",
+      "total_inventory_value": 276.90999999999997,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-21T00:30:03.202Z",
+      "date": "2025-09-21",
+      "total_inventory_value": 276.90999999999997,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-21T00:30:03.259Z",
+      "date": "2025-09-21",
+      "total_inventory_value": 276.90999999999997,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-21T00:30:03.338Z",
+      "date": "2025-09-21",
+      "total_inventory_value": 276.90999999999997,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-21T00:35:03.367Z",
+      "date": "2025-09-21",
+      "total_inventory_value": 276.90999999999997,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-21T00:35:03.387Z",
+      "date": "2025-09-21",
+      "total_inventory_value": 276.90999999999997,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-21T00:35:03.474Z",
+      "date": "2025-09-21",
+      "total_inventory_value": 276.90999999999997,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-21T00:40:03.194Z",
+      "date": "2025-09-21",
+      "total_inventory_value": 276.90999999999997,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-21T00:40:03.291Z",
+      "date": "2025-09-21",
+      "total_inventory_value": 276.90999999999997,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-21T00:40:03.311Z",
+      "date": "2025-09-21",
+      "total_inventory_value": 276.90999999999997,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-21T00:45:03.287Z",
+      "date": "2025-09-21",
+      "total_inventory_value": 276.90999999999997,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-21T00:45:03.370Z",
+      "date": "2025-09-21",
+      "total_inventory_value": 276.90999999999997,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-21T00:45:03.393Z",
+      "date": "2025-09-21",
+      "total_inventory_value": 276.90999999999997,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-21T00:50:03.189Z",
+      "date": "2025-09-21",
+      "total_inventory_value": 276.90999999999997,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-21T00:50:03.276Z",
+      "date": "2025-09-21",
+      "total_inventory_value": 276.90999999999997,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-21T00:50:03.357Z",
+      "date": "2025-09-21",
+      "total_inventory_value": 276.90999999999997,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-21T00:50:59.003Z",
+      "date": "2025-09-21",
+      "total_inventory_value": 276.90999999999997,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-21T01:00:03.312Z",
+      "date": "2025-09-21",
+      "total_inventory_value": 276.90999999999997,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-21T01:00:03.366Z",
+      "date": "2025-09-21",
+      "total_inventory_value": 276.90999999999997,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-21T01:00:03.388Z",
+      "date": "2025-09-21",
+      "total_inventory_value": 276.90999999999997,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-21T04:30:03.693Z",
+      "date": "2025-09-21",
+      "total_inventory_value": 274.78000000000003,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-21T05:00:03.063Z",
+      "date": "2025-09-21",
+      "total_inventory_value": 274.78000000000003,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-21T05:30:03.497Z",
+      "date": "2025-09-21",
+      "total_inventory_value": 275.76,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-21T20:45:03.466Z",
+      "date": "2025-09-21",
+      "total_inventory_value": 275.91,
+      "total_money_invested": 291.78690951821386
+    },
+    {
+      "timestamp": "2025-09-21T20:55:34.094Z",
+      "date": "2025-09-21",
+      "total_inventory_value": 309.68,
+      "total_money_invested": 317.5126327886541
+    },
+    {
+      "timestamp": "2025-09-21T21:00:09.585Z",
+      "date": "2025-09-21",
+      "total_inventory_value": 309.68,
+      "total_money_invested": 317.5126327886541
+    },
+    {
+      "timestamp": "2025-09-22T00:00:10.672Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 309.96000000000004,
+      "total_money_invested": 325.60068310311954
+    },
+    {
+      "timestamp": "2025-09-22T00:30:11.350Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 312.57,
+      "total_money_invested": 325.47923160402956
+    },
+    {
+      "timestamp": "2025-09-22T00:30:11.476Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 312.57,
+      "total_money_invested": 325.47923160402956
+    },
+    {
+      "timestamp": "2025-09-22T01:00:10.872Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 312.57,
+      "total_money_invested": 325.47923160402956
+    },
+    {
+      "timestamp": "2025-09-22T01:00:10.912Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 312.57,
+      "total_money_invested": 325.47923160402956
+    },
+    {
+      "timestamp": "2025-09-22T01:30:10.762Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 314.07000000000005,
+      "total_money_invested": 325.47923160402956
+    },
+    {
+      "timestamp": "2025-09-22T01:30:11.203Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 314.07000000000005,
+      "total_money_invested": 325.47923160402956
+    },
+    {
+      "timestamp": "2025-09-22T02:00:11.016Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 314.07000000000005,
+      "total_money_invested": 325.47923160402956
+    },
+    {
+      "timestamp": "2025-09-22T02:00:11.444Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 314.07000000000005,
+      "total_money_invested": 325.47923160402956
+    },
+    {
+      "timestamp": "2025-09-22T06:00:11.251Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 311.41,
+      "total_money_invested": 325.47923160402956
+    },
+    {
+      "timestamp": "2025-09-22T06:30:11.343Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 307.32,
+      "total_money_invested": 331.9529145728643
+    },
+    {
+      "timestamp": "2025-09-22T06:30:11.496Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 307.32,
+      "total_money_invested": 331.9529145728643
+    },
+    {
+      "timestamp": "2025-09-22T07:00:11.642Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 307.32,
+      "total_money_invested": 331.9529145728643
+    },
+    {
+      "timestamp": "2025-09-22T07:00:11.790Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 307.32,
+      "total_money_invested": 331.9529145728643
+    },
+    {
+      "timestamp": "2025-09-22T07:30:11.357Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 312.78999999999996,
+      "total_money_invested": 331.9529145728643
+    },
+    {
+      "timestamp": "2025-09-22T07:30:12.106Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 312.78999999999996,
+      "total_money_invested": 331.9529145728643
+    },
+    {
+      "timestamp": "2025-09-22T07:40:10.902Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 312.78999999999996,
+      "total_money_invested": 331.9529145728643
+    },
+    {
+      "timestamp": "2025-09-22T07:45:10.597Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 312.78999999999996,
+      "total_money_invested": 331.9529145728643
+    },
+    {
+      "timestamp": "2025-09-22T07:50:10.632Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 312.78999999999996,
+      "total_money_invested": 331.9529145728643
+    },
+    {
+      "timestamp": "2025-09-22T07:55:10.559Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 312.78999999999996,
+      "total_money_invested": 331.9529145728643
+    },
+    {
+      "timestamp": "2025-09-22T08:00:10.747Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 312.78999999999996,
+      "total_money_invested": 331.9529145728643
+    },
+    {
+      "timestamp": "2025-09-22T08:05:10.534Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 312.78999999999996,
+      "total_money_invested": 331.9529145728643
+    },
+    {
+      "timestamp": "2025-09-22T08:10:10.642Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 312.78999999999996,
+      "total_money_invested": 331.9529145728643
+    },
+    {
+      "timestamp": "2025-09-22T08:15:11.844Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 311.02000000000004,
+      "total_money_invested": 331.9529145728643
+    },
+    {
+      "timestamp": "2025-09-22T08:20:10.484Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 311.02000000000004,
+      "total_money_invested": 331.9529145728643
+    },
+    {
+      "timestamp": "2025-09-22T08:25:10.624Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 311.02000000000004,
+      "total_money_invested": 331.9529145728643
+    },
+    {
+      "timestamp": "2025-09-22T08:30:11.180Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 311.02000000000004,
+      "total_money_invested": 331.9529145728643
+    },
+    {
+      "timestamp": "2025-09-22T08:35:10.731Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 311.02000000000004,
+      "total_money_invested": 331.9529145728643
+    },
+    {
+      "timestamp": "2025-09-22T08:40:11.631Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 311.02000000000004,
+      "total_money_invested": 331.9529145728643
+    },
+    {
+      "timestamp": "2025-09-22T08:45:10.910Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 311.02000000000004,
+      "total_money_invested": 331.9529145728643
+    },
+    {
+      "timestamp": "2025-09-22T08:50:10.485Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 311.02000000000004,
+      "total_money_invested": 331.9529145728643
+    },
+    {
+      "timestamp": "2025-09-22T08:55:10.526Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 311.02000000000004,
+      "total_money_invested": 331.9529145728643
+    },
+    {
+      "timestamp": "2025-09-22T09:00:10.590Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 311.02000000000004,
+      "total_money_invested": 331.9529145728643
+    },
+    {
+      "timestamp": "2025-09-22T09:05:10.603Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 311.02000000000004,
+      "total_money_invested": 331.9529145728643
+    },
+    {
+      "timestamp": "2025-09-22T09:10:10.585Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 311.02000000000004,
+      "total_money_invested": 331.9529145728643
+    },
+    {
+      "timestamp": "2025-09-22T09:15:11.662Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 306.90000000000003,
+      "total_money_invested": 331.9529145728643
+    },
+    {
+      "timestamp": "2025-09-22T09:20:10.556Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 306.90000000000003,
+      "total_money_invested": 331.9529145728643
+    },
+    {
+      "timestamp": "2025-09-22T09:25:10.513Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 306.90000000000003,
+      "total_money_invested": 331.9529145728643
+    },
+    {
+      "timestamp": "2025-09-22T09:30:10.974Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 306.90000000000003,
+      "total_money_invested": 331.9529145728643
+    },
+    {
+      "timestamp": "2025-09-22T09:35:10.623Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 306.90000000000003,
+      "total_money_invested": 331.9529145728643
+    },
+    {
+      "timestamp": "2025-09-22T09:40:11.061Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 306.90000000000003,
+      "total_money_invested": 331.9529145728643
+    },
+    {
+      "timestamp": "2025-09-22T09:45:10.716Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 306.90000000000003,
+      "total_money_invested": 331.9529145728643
+    },
+    {
+      "timestamp": "2025-09-22T09:50:10.800Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 306.90000000000003,
+      "total_money_invested": 331.9529145728643
+    },
+    {
+      "timestamp": "2025-09-22T09:55:10.745Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 306.90000000000003,
+      "total_money_invested": 331.9529145728643
+    },
+    {
+      "timestamp": "2025-09-22T10:00:10.589Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 306.90000000000003,
+      "total_money_invested": 331.9529145728643
+    },
+    {
+      "timestamp": "2025-09-22T10:05:10.512Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 306.90000000000003,
+      "total_money_invested": 331.9529145728643
+    },
+    {
+      "timestamp": "2025-09-22T10:10:10.608Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 306.90000000000003,
+      "total_money_invested": 331.9529145728643
+    },
+    {
+      "timestamp": "2025-09-22T10:15:12.313Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 309.8,
+      "total_money_invested": 331.9529145728643
+    },
+    {
+      "timestamp": "2025-09-22T10:20:10.627Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 309.8,
+      "total_money_invested": 331.9529145728643
+    },
+    {
+      "timestamp": "2025-09-22T10:25:10.525Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 309.8,
+      "total_money_invested": 331.9529145728643
+    },
+    {
+      "timestamp": "2025-09-22T10:30:10.639Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 309.8,
+      "total_money_invested": 331.9529145728643
+    },
+    {
+      "timestamp": "2025-09-22T10:35:10.531Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 309.8,
+      "total_money_invested": 331.9529145728643
+    },
+    {
+      "timestamp": "2025-09-22T10:40:11.227Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 309.8,
+      "total_money_invested": 331.9529145728643
+    },
+    {
+      "timestamp": "2025-09-22T10:45:10.476Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 309.8,
+      "total_money_invested": 331.9529145728643
+    },
+    {
+      "timestamp": "2025-09-22T10:50:10.543Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 309.8,
+      "total_money_invested": 331.9529145728643
+    },
+    {
+      "timestamp": "2025-09-22T10:55:10.592Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 309.8,
+      "total_money_invested": 331.9529145728643
+    },
+    {
+      "timestamp": "2025-09-22T11:00:10.619Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 309.8,
+      "total_money_invested": 331.9529145728643
+    },
+    {
+      "timestamp": "2025-09-22T11:05:10.514Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 309.8,
+      "total_money_invested": 331.9529145728643
+    },
+    {
+      "timestamp": "2025-09-22T11:10:10.614Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 309.8,
+      "total_money_invested": 331.9529145728643
+    },
+    {
+      "timestamp": "2025-09-22T11:15:10.552Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 308.29999999999995,
+      "total_money_invested": 331.9529145728643
+    },
+    {
+      "timestamp": "2025-09-22T11:20:10.631Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 308.29999999999995,
+      "total_money_invested": 331.9529145728643
+    },
+    {
+      "timestamp": "2025-09-22T11:25:10.684Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 308.29999999999995,
+      "total_money_invested": 331.9529145728643
+    },
+    {
+      "timestamp": "2025-09-22T11:30:11.047Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 308.29999999999995,
+      "total_money_invested": 331.9529145728643
+    },
+    {
+      "timestamp": "2025-09-22T11:35:10.570Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 308.29999999999995,
+      "total_money_invested": 331.9529145728643
+    },
+    {
+      "timestamp": "2025-09-22T11:40:11.197Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 308.29999999999995,
+      "total_money_invested": 331.9529145728643
+    },
+    {
+      "timestamp": "2025-09-22T11:45:10.645Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 308.29999999999995,
+      "total_money_invested": 331.9529145728643
+    },
+    {
+      "timestamp": "2025-09-22T11:50:10.555Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 308.29999999999995,
+      "total_money_invested": 331.9529145728643
+    },
+    {
+      "timestamp": "2025-09-22T11:55:10.621Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 308.29999999999995,
+      "total_money_invested": 331.9529145728643
+    },
+    {
+      "timestamp": "2025-09-22T12:00:10.877Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 308.29999999999995,
+      "total_money_invested": 331.9529145728643
+    },
+    {
+      "timestamp": "2025-09-22T12:05:14.874Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 348.9,
+      "total_money_invested": 360.978040201005
+    },
+    {
+      "timestamp": "2025-09-22T12:10:14.197Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 348.9,
+      "total_money_invested": 360.978040201005
+    },
+    {
+      "timestamp": "2025-09-22T12:15:15.463Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 348.56000000000006,
+      "total_money_invested": 360.978040201005
+    },
+    {
+      "timestamp": "2025-09-22T12:20:14.900Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 348.56000000000006,
+      "total_money_invested": 360.978040201005
+    },
+    {
+      "timestamp": "2025-09-22T12:25:14.505Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 348.56000000000006,
+      "total_money_invested": 360.978040201005
+    },
+    {
+      "timestamp": "2025-09-22T12:30:14.717Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 348.56000000000006,
+      "total_money_invested": 360.978040201005
+    },
+    {
+      "timestamp": "2025-09-22T12:35:14.567Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 348.56000000000006,
+      "total_money_invested": 360.978040201005
+    },
+    {
+      "timestamp": "2025-09-22T12:40:14.772Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 348.56000000000006,
+      "total_money_invested": 360.978040201005
+    },
+    {
+      "timestamp": "2025-09-22T12:45:14.777Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 348.56000000000006,
+      "total_money_invested": 360.978040201005
+    },
+    {
+      "timestamp": "2025-09-22T12:50:14.676Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 348.56000000000006,
+      "total_money_invested": 360.978040201005
+    },
+    {
+      "timestamp": "2025-09-22T12:55:14.443Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 348.56000000000006,
+      "total_money_invested": 360.978040201005
+    },
+    {
+      "timestamp": "2025-09-22T13:00:14.640Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 348.56000000000006,
+      "total_money_invested": 360.978040201005
+    },
+    {
+      "timestamp": "2025-09-22T13:05:14.595Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 348.56000000000006,
+      "total_money_invested": 360.978040201005
+    },
+    {
+      "timestamp": "2025-09-22T13:10:14.502Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 348.56000000000006,
+      "total_money_invested": 360.978040201005
+    },
+    {
+      "timestamp": "2025-09-22T13:15:15.521Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 353.46999999999997,
+      "total_money_invested": 360.978040201005
+    },
+    {
+      "timestamp": "2025-09-22T13:20:15.013Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 353.46999999999997,
+      "total_money_invested": 360.978040201005
+    },
+    {
+      "timestamp": "2025-09-22T13:25:14.173Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 353.46999999999997,
+      "total_money_invested": 360.978040201005
+    },
+    {
+      "timestamp": "2025-09-22T13:30:14.196Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 353.46999999999997,
+      "total_money_invested": 360.978040201005
+    },
+    {
+      "timestamp": "2025-09-22T13:35:13.978Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 353.46999999999997,
+      "total_money_invested": 360.978040201005
+    },
+    {
+      "timestamp": "2025-09-22T13:40:13.996Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 353.46999999999997,
+      "total_money_invested": 360.978040201005
+    },
+    {
+      "timestamp": "2025-09-22T13:45:14.357Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 353.46999999999997,
+      "total_money_invested": 360.978040201005
+    },
+    {
+      "timestamp": "2025-09-22T13:50:13.965Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 353.46999999999997,
+      "total_money_invested": 360.978040201005
+    },
+    {
+      "timestamp": "2025-09-22T13:55:13.994Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 353.46999999999997,
+      "total_money_invested": 360.978040201005
+    },
+    {
+      "timestamp": "2025-09-22T14:00:14.395Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 353.46999999999997,
+      "total_money_invested": 360.978040201005
+    },
+    {
+      "timestamp": "2025-09-22T14:05:14.234Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 353.46999999999997,
+      "total_money_invested": 360.978040201005
+    },
+    {
+      "timestamp": "2025-09-22T14:10:13.863Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 353.46999999999997,
+      "total_money_invested": 360.978040201005
+    },
+    {
+      "timestamp": "2025-09-22T14:15:13.918Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 353.46999999999997,
+      "total_money_invested": 360.978040201005
+    },
+    {
+      "timestamp": "2025-09-22T14:20:14.079Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 353.46999999999997,
+      "total_money_invested": 360.978040201005
+    },
+    {
+      "timestamp": "2025-09-22T14:25:14.730Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 353.46999999999997,
+      "total_money_invested": 360.978040201005
+    },
+    {
+      "timestamp": "2025-09-22T14:30:13.919Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 353.46999999999997,
+      "total_money_invested": 360.978040201005
+    },
+    {
+      "timestamp": "2025-09-22T14:35:14.037Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 353.46999999999997,
+      "total_money_invested": 360.978040201005
+    },
+    {
+      "timestamp": "2025-09-22T14:40:14.076Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 353.46999999999997,
+      "total_money_invested": 360.978040201005
+    },
+    {
+      "timestamp": "2025-09-22T14:45:14.090Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 353.46999999999997,
+      "total_money_invested": 360.978040201005
+    },
+    {
+      "timestamp": "2025-09-22T14:50:14.072Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 353.46999999999997,
+      "total_money_invested": 360.978040201005
+    },
+    {
+      "timestamp": "2025-09-22T14:55:14.327Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 353.46999999999997,
+      "total_money_invested": 360.978040201005
+    },
+    {
+      "timestamp": "2025-09-22T15:00:14.246Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 353.46999999999997,
+      "total_money_invested": 360.978040201005
+    },
+    {
+      "timestamp": "2025-09-22T15:05:14.165Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 353.46999999999997,
+      "total_money_invested": 360.978040201005
+    },
+    {
+      "timestamp": "2025-09-22T15:10:14.255Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 353.46999999999997,
+      "total_money_invested": 360.978040201005
+    },
+    {
+      "timestamp": "2025-09-22T15:15:14.183Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 353.46999999999997,
+      "total_money_invested": 360.978040201005
+    },
+    {
+      "timestamp": "2025-09-22T15:20:14.089Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 353.46999999999997,
+      "total_money_invested": 360.978040201005
+    },
+    {
+      "timestamp": "2025-09-22T15:25:14.545Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 353.46999999999997,
+      "total_money_invested": 360.978040201005
+    },
+    {
+      "timestamp": "2025-09-22T15:30:14.315Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 353.46999999999997,
+      "total_money_invested": 360.978040201005
+    },
+    {
+      "timestamp": "2025-09-22T15:35:14.048Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 353.46999999999997,
+      "total_money_invested": 360.978040201005
+    },
+    {
+      "timestamp": "2025-09-22T15:40:14.390Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 353.46999999999997,
+      "total_money_invested": 360.978040201005
+    },
+    {
+      "timestamp": "2025-09-22T15:45:14.030Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 353.46999999999997,
+      "total_money_invested": 360.978040201005
+    },
+    {
+      "timestamp": "2025-09-22T15:50:13.975Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 353.46999999999997,
+      "total_money_invested": 360.978040201005
+    },
+    {
+      "timestamp": "2025-09-22T15:55:14.212Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 353.46999999999997,
+      "total_money_invested": 360.978040201005
+    },
+    {
+      "timestamp": "2025-09-22T16:00:14.028Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 353.46999999999997,
+      "total_money_invested": 360.978040201005
+    },
+    {
+      "timestamp": "2025-09-22T16:05:14.512Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 353.46999999999997,
+      "total_money_invested": 360.978040201005
+    },
+    {
+      "timestamp": "2025-09-22T16:10:14.224Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 353.46999999999997,
+      "total_money_invested": 360.978040201005
+    },
+    {
+      "timestamp": "2025-09-22T16:12:52.811Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 353.46999999999997,
+      "total_money_invested": 360.978040201005
+    },
+    {
+      "timestamp": "2025-09-22T16:15:14.048Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 353.46999999999997,
+      "total_money_invested": 360.978040201005
+    },
+    {
+      "timestamp": "2025-09-22T17:00:13.956Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 353.46999999999997,
+      "total_money_invested": 360.978040201005
+    },
+    {
+      "timestamp": "2025-09-22T18:00:14.575Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 353.46999999999997,
+      "total_money_invested": 360.978040201005
+    },
+    {
+      "timestamp": "2025-09-22T19:00:14.773Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 353.46999999999997,
+      "total_money_invested": 360.978040201005
+    },
+    {
+      "timestamp": "2025-09-22T21:14:16.167Z",
+      "date": "2025-09-22",
+      "total_inventory_value": 407.84,
+      "total_money_invested": 392.978040201005
+    },
+    {
+      "timestamp": "2025-09-23T01:00:15.273Z",
+      "date": "2025-09-23",
+      "total_inventory_value": 392.19000000000005,
+      "total_money_invested": 393.4097225725094
+    },
+    {
+      "timestamp": "2025-09-23T03:17:37.438Z",
+      "date": "2025-09-23",
+      "total_inventory_value": 386.53999999999996,
+      "total_money_invested": 393.4097225725094
+    },
+    {
+      "timestamp": "2025-09-23T05:00:13.626Z",
+      "date": "2025-09-23",
+      "total_inventory_value": 383.65999999999997,
+      "total_money_invested": 385.30127364438835
+    },
+    {
+      "timestamp": "2025-09-23T05:11:14.391Z",
+      "date": "2025-09-23",
+      "total_inventory_value": 365.08,
+      "total_money_invested": 382.7792055485498
+    },
+    {
+      "timestamp": "2025-09-23T06:22:42.487Z",
+      "date": "2025-09-23",
+      "total_inventory_value": 372.61000000000007,
+      "total_money_invested": 404.3292055485498
+    },
+    {
+      "timestamp": "2025-09-23T06:29:39.980Z",
+      "date": "2025-09-23",
+      "total_inventory_value": 366.31000000000006,
+      "total_money_invested": 382.7792055485498
+    },
+    {
+      "timestamp": "2025-09-23T06:44:16.802Z",
+      "date": "2025-09-23",
+      "total_inventory_value": 366.14000000000004,
+      "total_money_invested": 382.7792055485498
+    },
+    {
+      "timestamp": "2025-09-23T06:46:02.630Z",
+      "date": "2025-09-23",
+      "total_inventory_value": 366.14000000000004,
+      "total_money_invested": 382.7792055485498
+    },
+    {
+      "timestamp": "2025-09-23T06:50:34.471Z",
+      "date": "2025-09-23",
+      "total_inventory_value": 366.14000000000004,
+      "total_money_invested": 382.7792055485498
+    }
+  ],
+  "metadata": {
+    "last_capture": "2025-09-23T06:50:31.818Z",
+    "total_captures": 992,
+    "created_at": "2025-09-20T04:05:01.965Z"
+  }
+}

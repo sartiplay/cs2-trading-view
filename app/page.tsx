@@ -1,3 +1,6 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import { ItemForm } from "@/components/item-form";
 import { ItemsTable } from "@/components/items-table";
 import { CaptureStats } from "@/components/capture-stats";
@@ -21,7 +24,28 @@ import { SchedulerStatus } from "@/components/scheduler-status";
 import { SoldItemsDisplay } from "@/components/sold-items-display";
 import { SchedulerAccordionTrigger } from "@/components/scheduer-accordion-trigger";
 
+interface AppSettings {
+  workerStatusVisible: boolean;
+}
+
 export default function Dashboard() {
+  const [settings, setSettings] = useState<AppSettings>({ workerStatusVisible: true });
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const response = await fetch("/api/settings");
+        if (response.ok) {
+          const data = await response.json();
+          setSettings(data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch settings:", error);
+      }
+    };
+
+    fetchSettings();
+  }, []);
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="mx-auto max-w-7xl space-y-8">
@@ -43,18 +67,20 @@ export default function Dashboard() {
           <CaptureStats />
 
           {/* Worker Status - Mobile/Tablet: In accordion */}
-          <div className="xl:hidden">
-            <Accordion type="multiple" className="w-full">
-              <AccordionItem value="worker-status">
-                <AccordionTrigger className="text-lg font-semibold">
-                  Worker Status
-                </AccordionTrigger>
-                <AccordionContent>
-                  <WorkerStatus />
-                </AccordionContent>
-              </AccordionItem>
-            </Accordion>
-          </div>
+          {settings.workerStatusVisible && (
+            <div className="xl:hidden">
+              <Accordion type="multiple" className="w-full">
+                <AccordionItem value="worker-status">
+                  <AccordionTrigger className="text-lg font-semibold">
+                    Worker Status
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <WorkerStatus />
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            </div>
+          )}
 
           <Accordion type="multiple" className="w-full">
             <AccordionItem value="add-item">
@@ -87,9 +113,11 @@ export default function Dashboard() {
         </div>
 
         {/* Worker Status - Desktop: Floating sidebar */}
-        <div className="hidden xl:block fixed top-24 right-6 w-80 z-10">
-          <WorkerStatus />
-        </div>
+        {settings.workerStatusVisible && (
+          <div className="hidden xl:block fixed top-24 right-6 w-80 z-10">
+            <WorkerStatus />
+          </div>
+        )}
 
         <Card>
           <CardHeader>

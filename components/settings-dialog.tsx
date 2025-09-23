@@ -8,6 +8,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
@@ -35,7 +45,8 @@ import {
   Download,
   Check,
   X,
-  RefreshCw
+  RefreshCw,
+  Database
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { DEFAULT_PINNED_PROVIDERS } from "@/lib/trade-providers";
@@ -92,6 +103,7 @@ export interface AppSettings {
     allowCustomCategories: boolean;
     maxCategories: number;
   };
+  workerStatusVisible: boolean;
 }
 
 const defaultSettings: AppSettings = {
@@ -115,6 +127,7 @@ const defaultSettings: AppSettings = {
     allowCustomCategories: true,
     maxCategories: 20,
   },
+  workerStatusVisible: true,
 };
 
 interface CategoryConfig {
@@ -184,6 +197,9 @@ export function SettingsDialog() {
   const [importLoading, setImportLoading] = useState(false);
   const [importStep, setImportStep] = useState<"url" | "select" | "importing">("url");
   const [isReloadingImages, setIsReloadingImages] = useState(false);
+  const [isBackingUp, setIsBackingUp] = useState(false);
+  const [isLoadingBackup, setIsLoadingBackup] = useState(false);
+  const [showLoadBackupConfirm, setShowLoadBackupConfirm] = useState(false);
   
   const { toast } = useToast();
 
@@ -743,6 +759,76 @@ export function SettingsDialog() {
       });
     } finally {
       setIsReloadingImages(false);
+    }
+  };
+
+  const backupData = async () => {
+    setIsBackingUp(true);
+    try {
+      const response = await fetch("/api/backup-data", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      
+      if (response.ok) {
+        const result = await response.json();
+        toast({
+          title: "Backup Complete",
+          description: `Data backup created successfully as ${result.backupFile}`,
+        });
+      } else {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to create backup");
+      }
+    } catch (error) {
+      console.error("Error creating backup:", error);
+      toast({
+        title: "Error",
+        description: `Failed to create backup: ${error instanceof Error ? error.message : "Unknown error"}`,
+        variant: "destructive",
+      });
+    } finally {
+      setIsBackingUp(false);
+    }
+  };
+
+  const loadBackupData = async () => {
+    setIsLoadingBackup(true);
+    try {
+      const response = await fetch("/api/load-backup-data", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      
+      if (response.ok) {
+        const result = await response.json();
+        toast({
+          title: "Backup Loaded",
+          description: `Data restored successfully from ${result.backupFile}. ${result.hadExistingData ? 'Previous data was replaced.' : ''}`,
+        });
+        setShowLoadBackupConfirm(false);
+        // Optionally reload the page to reflect changes
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
+      } else {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to load backup");
+      }
+    } catch (error) {
+      console.error("Error loading backup:", error);
+      toast({
+        title: "Error",
+        description: `Failed to load backup: ${error instanceof Error ? error.message : "Unknown error"}`,
+        variant: "destructive",
+      });
+      setShowLoadBackupConfirm(false);
+    } finally {
+      setIsLoadingBackup(false);
     }
   };
 
@@ -1393,6 +1479,20 @@ export function SettingsDialog() {
                 </p>
               </div>
 
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="worker-status-visible"
+                  checked={settings.workerStatusVisible}
+                  onCheckedChange={(checked) =>
+                    setSettings({ ...settings, workerStatusVisible: checked })
+                  }
+                />
+                <Label htmlFor="worker-status-visible">Show Worker Status</Label>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Display the worker status panel to monitor background operations like price captures and image loading
+              </p>
+
               <div className="space-y-4 pt-4 border-t">
                 <h4 className="font-medium">Item Images</h4>
                 <div className="space-y-2">
@@ -1419,6 +1519,57 @@ export function SettingsDialog() {
                   </p>
                 </div>
               </div>
+
+              <div className="space-y-4 pt-4 border-t">
+                <h4 className="font-medium">Data Management</h4>
+                <div className="space-y-2">
+                  <Button
+                    variant="outline"
+                    onClick={backupData}
+                    disabled={isBackingUp}
+                    className="w-full"
+                  >
+                    {isBackingUp ? (
+                      <>
+                        <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                        Creating Backup...
+                      </>
+                    ) : (
+                      <>
+                        <Database className="h-4 w-4 mr-2" />
+                        Backup Data
+                      </>
+                    )}
+                  </Button>
+                  <p className="text-sm text-muted-foreground">
+                    Create a backup copy of your data.json file as backup.data.json. This will replace any existing backup.
+                  </p>
+                </div>
+                
+                <div className="space-y-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowLoadBackupConfirm(true)}
+                    disabled={isLoadingBackup}
+                    className="w-full"
+                  >
+                    {isLoadingBackup ? (
+                      <>
+                        <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                        Loading Backup...
+                      </>
+                    ) : (
+                      <>
+                        <Database className="h-4 w-4 mr-2" />
+                        Load Backup Data
+                      </>
+                    )}
+                  </Button>
+                  <p className="text-sm text-muted-foreground">
+                    Replace current data.json with backup.data.json. This action cannot be undone and will replace all current data.
+                  </p>
+                </div>
+              </div>
             </div>
           </TabsContent>
         </Tabs>
@@ -1430,6 +1581,48 @@ export function SettingsDialog() {
           </Button>
         </div>
       </DialogContent>
+
+      {/* 2-Step Verification Dialog for Load Backup */}
+      <AlertDialog open={showLoadBackupConfirm} onOpenChange={setShowLoadBackupConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>⚠️ Confirm Data Replacement</AlertDialogTitle>
+            <AlertDialogDescription className="space-y-2">
+              <p>
+                <strong>This action will permanently replace all your current data!</strong>
+              </p>
+              <p>
+                You are about to replace your current <code>data.json</code> file with the contents of <code>backup.data.json</code>.
+              </p>
+              <p className="text-red-600 dark:text-red-400 font-medium">
+                ⚠️ This action cannot be undone and will permanently delete all your current items, categories, and settings.
+              </p>
+              <p>
+                Are you absolutely sure you want to proceed?
+              </p>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isLoadingBackup}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={loadBackupData}
+              disabled={isLoadingBackup}
+              className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
+            >
+              {isLoadingBackup ? (
+                <>
+                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                  Loading...
+                </>
+              ) : (
+                "Yes, Replace All Data"
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Dialog>
   );
 }

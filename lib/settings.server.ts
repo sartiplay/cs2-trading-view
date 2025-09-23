@@ -34,6 +34,7 @@ export async function getSettings() {
       allowCustomCategories: true,
       maxCategories: 20,
     },
+    workerStatusVisible: true, // Show worker status by default
   };
 }
 
