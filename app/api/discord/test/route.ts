@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getItem } from "@/lib/data-storage.server";
+import { getItemByMarketHashName } from "@/lib/data-storage.server";
 import {
   getDiscordSettings,
   sendDevelopmentTestNotification,
@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const item = await getItem(marketHashName);
+    const item = await getItemByMarketHashName(marketHashName);
     if (!item) {
       return NextResponse.json(
         { error: "Item not found." },

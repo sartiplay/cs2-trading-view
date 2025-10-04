@@ -578,12 +578,28 @@ export async function sendDevelopmentTestNotification(
       });
     }
 
+    const payloadBody: { embeds: DiscordEmbed[]; content?: string } = {
+      embeds: [embed],
+    };
+
+    // Add mentions if configured
+    const mentions = settings.alertMentions && settings.alertMentions.length > 0
+      ? settings.alertMentions.filter((value) => value.trim().length > 0).map((value) => value.trim())
+      : [];
+
+    if (mentions.length > 0) {
+      const mentionText = mentions.map((value) => "<@" + value + ">").join(" ");
+      if (mentionText.length > 0) {
+        payloadBody.content = mentionText;
+      }
+    }
+
     const response = await fetch(settings.webhookUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ embeds: [embed] }),
+      body: JSON.stringify(payloadBody),
     });
 
     if (!response.ok) {
