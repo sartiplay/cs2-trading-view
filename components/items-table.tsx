@@ -254,7 +254,7 @@ export function ItemsTable() {
   const [sortField, setSortField] = useState<SortField>("label");
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
   const [showFilters, setShowFilters] = useState(false);
-  const [priceSource, setPriceSource] = useState<"steam" | "csgoskins">("steam");
+  const [priceSource, setPriceSource] = useState<"steam" | "csgoskins.gg" | "skinsmonkey">("steam");
   const [externalPrices, setExternalPrices] = useState<Record<string, any>>({});
   const [isUpdatingPrices, setIsUpdatingPrices] = useState(false);
 
@@ -308,11 +308,11 @@ export function ItemsTable() {
     }
   };
 
-  const handlePriceSourceChange = (newSource: "steam" | "csgoskins") => {
+  const handlePriceSourceChange = (newSource: "steam" | "csgoskins.gg" | "skinsmonkey") => {
     setPriceSource(newSource);
     
-    // If switching to CSGOSKINS.GG, fetch external prices if we don't have them
-    if (newSource === "csgoskins" && Object.keys(externalPrices).length === 0) {
+    // If switching to external sources, fetch external prices if we don't have them
+    if ((newSource === "csgoskins.gg" || newSource === "skinsmonkey") && Object.keys(externalPrices).length === 0) {
       fetchExternalPrices();
     }
     
@@ -323,10 +323,10 @@ export function ItemsTable() {
   };
 
   const updateExternalPrices = async () => {
-    if (priceSource !== "csgoskins") {
+    if (priceSource === "steam") {
       toast({
         title: "Error",
-        description: "External prices can only be updated when CSGOSKINS.GG is selected as the price source.",
+        description: "External prices can only be updated when CSGOSKINS.GG or SkinsMonkey is selected as the price source.",
         variant: "destructive",
       });
       return;
@@ -343,6 +343,7 @@ export function ItemsTable() {
         },
         body: JSON.stringify({
           market_hash_names: marketHashNames,
+          source: priceSource,
         }),
       });
 
@@ -352,9 +353,10 @@ export function ItemsTable() {
         // Refresh external prices from the API
         await fetchExternalPrices();
         
+        const sourceName = priceSource === "skinsmonkey" ? "SkinsMonkey" : "CSGOSKINS.GG";
         toast({
           title: "Prices Updated",
-          description: `Successfully updated prices for ${result.scraped_count}/${result.total_count} items from CSGOSKINS.GG`,
+          description: `Successfully updated prices for ${result.scraped_count}/${result.total_count} items from ${sourceName}`,
         });
       } else {
         const error = await response.json();
@@ -690,7 +692,7 @@ export function ItemsTable() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <PriceSourceToggle onSourceChange={handlePriceSourceChange} />
-            {priceSource === "csgoskins" && (
+            {(priceSource === "csgoskins.gg" || priceSource === "skinsmonkey") && (
               <Button
                 variant="outline"
                 size="sm"
@@ -982,9 +984,14 @@ export function ItemsTable() {
                         {(() => {
                           // Determine which URL to use based on price source
                           const externalPrice = externalPrices[item.market_hash_name];
-                          const shouldUseExternalUrl = priceSource === "csgoskins" && externalPrice?.url;
-                          const linkUrl = shouldUseExternalUrl ? externalPrice.url : item.steam_url;
-                          const linkText = shouldUseExternalUrl ? "CSGOSKINS.GG" : "Steam Market";
+                          const shouldUseExternalUrl = (priceSource === "csgoskins.gg" || priceSource === "skinsmonkey") && externalPrice?.url;
+                          let linkUrl = item.steam_url;
+                          let linkText = "Steam Market";
+                          
+                          if (shouldUseExternalUrl) {
+                            linkUrl = externalPrice.url;
+                            linkText = priceSource === "skinsmonkey" ? "SkinsMonkey" : "CSGOSKINS.GG";
+                          }
                           
                           return linkUrl && (
                             <a
@@ -1048,12 +1055,18 @@ export function ItemsTable() {
                     <TableCell className="w-[12%] min-w-[100px] text-right">
                       {(() => {
                         const externalPrice = externalPrices[item.market_hash_name];
-                        const currentPrice = priceSource === "csgoskins" && externalPrice 
-                          ? externalPrice.current_price 
-                          : item.latest_price;
-                        const lastUpdated = priceSource === "csgoskins" && externalPrice 
-                          ? externalPrice.last_updated 
-                          : item.last_updated;
+                        let currentPrice = item.latest_price;
+                        let lastUpdated = item.last_updated;
+                        
+                        if (externalPrice) {
+                          if (priceSource === "csgoskins.gg" && externalPrice.current_price) {
+                            currentPrice = externalPrice.current_price;
+                            lastUpdated = externalPrice.last_updated;
+                          } else if (priceSource === "skinsmonkey" && externalPrice.trade_value) {
+                            currentPrice = externalPrice.trade_value;
+                            lastUpdated = externalPrice.last_updated;
+                          }
+                        }
 
                         if (currentPrice) {
                           return (
@@ -1061,9 +1074,9 @@ export function ItemsTable() {
                               <div className="font-medium">
                                 {currencySymbol}{currentPrice.toFixed(2)}
                               </div>
-                              {priceSource === "csgoskins" && externalPrice && (
+                              {externalPrice && priceSource !== "steam" && (
                                 <div className="text-xs text-muted-foreground">
-                                  CSGOSKINS.GG
+                                  {priceSource === "skinsmonkey" ? "SkinsMonkey" : "CSGOSKINS.GG"}
                                 </div>
                               )}
                               {lastUpdated && (
@@ -1071,6 +1084,13 @@ export function ItemsTable() {
                                   {new Date(lastUpdated).toLocaleDateString()}
                                 </div>
                               )}
+                            </div>
+                          );
+                        } else if (priceSource === "skinsmonkey") {
+                          return (
+                            <div className="text-sm text-muted-foreground">
+                              <div>SkinsMonkey</div>
+                              <div className="text-xs">Integration coming soon</div>
                             </div>
                           );
                         } else {
@@ -1082,9 +1102,15 @@ export function ItemsTable() {
                     <TableCell className="w-[12%] min-w-[100px] text-right">
                       {(() => {
                         const externalPrice = externalPrices[item.market_hash_name];
-                        const currentPrice = priceSource === "csgoskins" && externalPrice 
-                          ? externalPrice.current_price 
-                          : item.latest_price;
+                        let currentPrice = item.latest_price;
+                        
+                        if (externalPrice) {
+                          if (priceSource === "csgoskins.gg" && externalPrice.current_price) {
+                            currentPrice = externalPrice.current_price;
+                          } else if (priceSource === "skinsmonkey" && externalPrice.trade_value) {
+                            currentPrice = externalPrice.trade_value;
+                          }
+                        }
 
                         if (currentPrice) {
                           return (
@@ -1101,17 +1127,30 @@ export function ItemsTable() {
                     <TableCell className="w-[15%] min-w-[120px] text-right">
                       {(() => {
                         const externalPrice = externalPrices[item.market_hash_name];
-                        const currentPrice = priceSource === "csgoskins" && externalPrice 
-                          ? externalPrice.current_price 
-                          : item.latest_price;
+                        let currentPrice = item.latest_price;
+                        
+                        if (externalPrice) {
+                          if (priceSource === "csgoskins.gg" && externalPrice.current_price) {
+                            currentPrice = externalPrice.current_price;
+                          } else if (priceSource === "skinsmonkey" && externalPrice.trade_value) {
+                            currentPrice = externalPrice.trade_value;
+                          }
+                        }
 
                         if (currentPrice) {
                           const totalPurchaseValue = item.purchase_price_usd * item.quantity;
                           const totalCurrentValue = currentPrice * item.quantity;
                           const profitLoss = totalCurrentValue - totalPurchaseValue;
-                          const profitLossPercentage = totalPurchaseValue > 0 
-                            ? (profitLoss / totalPurchaseValue) * 100 
-                            : 0;
+                          
+                          // Use backend-calculated percentage for Steam prices, calculate for external prices
+                          let profitLossPercentage;
+                          if (priceSource === "steam" && item.profit_loss_percentage !== null && item.profit_loss_percentage !== undefined) {
+                            profitLossPercentage = item.profit_loss_percentage;
+                          } else {
+                            profitLossPercentage = totalPurchaseValue > 0 
+                              ? (profitLoss / totalPurchaseValue) * 100 
+                              : 0;
+                          }
 
                           return (
                             <div>

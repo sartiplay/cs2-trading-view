@@ -19,7 +19,7 @@ export interface Settings {
   marketListingsFetchLimit: number;
   schedulerEnabled: boolean;
   schedulerRunning: boolean;
-  priceSource: "steam" | "csgoskins";
+  priceSource: "steam" | "csgoskins.gg" | "skinsmonkey";
   workerStatusVisible: boolean;
   imageLoadingDelayMs: number;
   categorySettings: {
@@ -211,11 +211,11 @@ export async function POST(request: NextRequest) {
 
     if (
       newSettings.priceSource !== undefined &&
-      !["steam", "csgoskins"].includes(newSettings.priceSource)
+      !["steam", "csgoskins.gg", "skinsmonkey"].includes(newSettings.priceSource)
     ) {
       return NextResponse.json(
         {
-          error: "Price source must be either 'steam' or 'csgoskins'.",
+          error: "Price source must be either 'steam', 'csgoskins.gg', or 'skinsmonkey'.",
         },
         { status: 400 }
       );
@@ -259,11 +259,11 @@ export async function PUT(request: NextRequest) {
     // Validate priceSource if provided
     if (
       partialSettings.priceSource !== undefined &&
-      !["steam", "csgoskins"].includes(partialSettings.priceSource)
+      !["steam", "csgoskins.gg", "skinsmonkey"].includes(partialSettings.priceSource)
     ) {
       return NextResponse.json(
         {
-          error: "Price source must be either 'steam' or 'csgoskins'.",
+          error: "Price source must be either 'steam', 'csgoskins.gg', or 'skinsmonkey'.",
         },
         { status: 400 }
       );

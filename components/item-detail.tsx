@@ -176,6 +176,8 @@ export function ItemDetail({ hash }: ItemDetailProps) {
   const settings = useSettings();
   const [effectiveSettings, setEffectiveSettings] = useState(settings);
   const { displayCurrency } = useCurrency();
+  
+  console.log(`[ItemDetail] Component initialized with hash: ${hash}`);
 
   useEffect(() => {
     setEffectiveSettings(settings);
@@ -257,6 +259,8 @@ export function ItemDetail({ hash }: ItemDetailProps) {
   const [categorySaving, setCategorySaving] = useState(false);
   const [categories, setCategories] = useState<Array<{id: string; name: string; color?: string}>>([]);
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
+  const [externalPrice, setExternalPrice] = useState<any>(null);
+  const [isFetchingExternalPrice, setIsFetchingExternalPrice] = useState(false);
 
   const resetAlertInputs = useCallback(() => {
     const config = item?.price_alert_config;
@@ -1218,6 +1222,26 @@ export function ItemDetail({ hash }: ItemDetailProps) {
     setEditingCategoryId(undefined);
   };
 
+  const loadItemData = async () => {
+    try {
+      setIsLoading(true);
+      const response = await fetch(`/api/items/${encodeURIComponent(hash)}?display_currency=${displayCurrency}`);
+      if (response.ok) {
+        const data = await response.json();
+        console.log(`[ItemDetail] Item data loaded:`, { marketHashName: data.market_hash_name, itemId: data.id });
+        setItem(data);
+      } else {
+        console.error("Failed to fetch item:", response.statusText);
+        setItem(null);
+      }
+    } catch (error) {
+      console.error("Error fetching item:", error);
+      setItem(null);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const fetchCategories = async () => {
     try {
       const response = await fetch("/api/categories");
@@ -1229,6 +1253,109 @@ export function ItemDetail({ hash }: ItemDetailProps) {
       console.error("Error fetching categories:", error);
     }
   };
+
+  const loadExistingExternalPrice = async () => {
+    if (!item?.market_hash_name) return;
+    
+    try {
+      console.log(`[ItemDetail] Loading existing external price data for: ${item.market_hash_name}`);
+      // Load the most recent data (could be from any source)
+      const response = await fetch(`/api/external-prices?market_hash_name=${encodeURIComponent(item.market_hash_name)}`);
+      if (response.ok) {
+        const data = await response.json();
+        if (data) {
+          console.log(`[ItemDetail] Loaded existing data:`, data);
+          setExternalPrice(data);
+        }
+      }
+    } catch (error) {
+      console.error("Error loading existing external price:", error);
+    }
+  };
+
+  const fetchExternalPriceForSource = async (source: "csgoskins.gg" | "skinsmonkey") => {
+    if (!item?.market_hash_name) return;
+    
+    console.log(`[ItemDetail] fetchExternalPriceForSource called with:`, { source, itemName: item.market_hash_name });
+    setIsFetchingExternalPrice(true);
+    try {
+      // Only load from existing data - no scraping
+      const apiUrl = `/api/external-prices?market_hash_name=${encodeURIComponent(item.market_hash_name)}&source=${source}`;
+      console.log(`[ItemDetail] Making API call to: ${apiUrl}`);
+      
+      const existingResponse = await fetch(apiUrl);
+      console.log(`[ItemDetail] API response status: ${existingResponse.status}`);
+      
+      if (existingResponse.ok) {
+        const existingData = await existingResponse.json();
+        console.log(`[ItemDetail] API response data:`, existingData);
+        
+        if (existingData) {
+          console.log(`[ItemDetail] Setting external price data:`, existingData);
+          setExternalPrice(existingData);
+        } else {
+          console.log(`[ItemDetail] No existing ${source} data found for: ${item.market_hash_name}`);
+          setExternalPrice(null);
+        }
+      } else {
+        console.log(`[ItemDetail] API error - status: ${existingResponse.status}`);
+        setExternalPrice(null);
+      }
+    } catch (error) {
+      console.error("Error loading external price from storage:", error);
+      setExternalPrice(null);
+    } finally {
+      setIsFetchingExternalPrice(false);
+    }
+  };
+
+  const fetchExternalPrice = async () => {
+    if (!item?.market_hash_name) return;
+    
+    const source = externalPrice?.source || "csgoskins.gg";
+    setIsFetchingExternalPrice(true);
+    try {
+      // This function is for manual scraping only (Update Price button)
+      console.log(`[ItemDetail] Manually scraping ${source} data for: ${item.market_hash_name}`);
+      const response = await fetch("/api/external-prices", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          market_hash_name: item.market_hash_name,
+          source: source
+        }),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success && result.data) {
+          setExternalPrice(result.data);
+          const priceText = source === "skinsmonkey" 
+            ? (result.data.trade_value ? `${getClientCurrencySymbol(displayCurrency)}${result.data.trade_value}` : "Trade value")
+            : `${getClientCurrencySymbol(displayCurrency)}${result.data.current_price}`;
+          
+          toast({
+            title: "Price Updated",
+            description: `Updated ${source === "skinsmonkey" ? "SkinsMonkey" : "CSGOSKINS.GG"} price: ${priceText}`,
+          });
+        } else {
+          throw new Error(result.error || "Failed to fetch external price");
+        }
+      } else {
+        throw new Error("Failed to fetch external price");
+      }
+    } catch (error) {
+      console.error("Error fetching external price:", error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch external price data",
+        variant: "destructive",
+      });
+    } finally {
+      setIsFetchingExternalPrice(false);
+    }
+  };
+
 
   const getCategoryInfo = (categoryId: string) => {
     return categories.find(cat => cat.id === categoryId);
@@ -1270,7 +1397,7 @@ export function ItemDetail({ hash }: ItemDetailProps) {
   };
 
   useEffect(() => {
-    fetchItem();
+    loadItemData();
     fetchCategories();
 
     const handleCategoryCreated = () => {
@@ -1283,6 +1410,15 @@ export function ItemDetail({ hash }: ItemDetailProps) {
       window.removeEventListener("categoryCreated", handleCategoryCreated);
     };
   }, [hash, displayCurrency]);
+
+  // Load CSGOSKINS.GG data when item loads (since it's the default selection)
+  useEffect(() => {
+    if (item?.market_hash_name) {
+      console.log(`[ItemDetail] Item loaded, automatically loading CSGOSKINS.GG data for: ${item.market_hash_name}`);
+      fetchExternalPriceForSource("csgoskins.gg");
+    }
+  }, [item?.market_hash_name]);
+
 
   useEffect(() => {
     setMarketListings([]);
@@ -1526,6 +1662,9 @@ export function ItemDetail({ hash }: ItemDetailProps) {
                     </span>
                   )}
                 </div>
+                <div className="text-xs text-muted-foreground mt-1">
+                  Steam Market (Tracked)
+                </div>
               </div>
             ) : (
               <div className="text-muted-foreground">
@@ -1602,6 +1741,210 @@ export function ItemDetail({ hash }: ItemDetailProps) {
           </CardContent>
         </Card>
       </div>
+
+      {/* Steam Market Chart Section */}
+      <Card className="bg-card/50 backdrop-blur-sm border-border/50">
+        <CardHeader>
+          <CardTitle className="text-card-foreground">
+            Price Timeline - Steam Market
+          </CardTitle>
+          <CardDescription>
+            Historical price data from Steam Market with {totalDataPoints} data points
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {priceHistory.length > 0 ? (
+            <div className="space-y-4">
+              {priceChartElement}
+            </div>
+          ) : (
+            <div className="text-center py-8 text-muted-foreground">
+              No price history available
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* External Price Section */}
+      <Card className="bg-card/50 backdrop-blur-sm border-border/50">
+        <CardHeader>
+          <CardTitle className="text-card-foreground">
+            Current Price - {externalPrice?.source === "skinsmonkey" ? "SkinsMonkey" : "CSGOSKINS.GG"}
+          </CardTitle>
+          <CardDescription>
+            Real-time price data from {externalPrice?.source === "skinsmonkey" ? "SkinsMonkey trading platform" : "CSGOSKINS.GG"}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <select
+                value={externalPrice?.source || "csgoskins.gg"}
+                onChange={(e) => {
+                  const newSource = e.target.value as "csgoskins.gg" | "skinsmonkey";
+                  console.log(`[ItemDetail] Dropdown changed to source: ${newSource}`);
+                  console.log(`[ItemDetail] Item market hash name: ${item?.market_hash_name}`);
+                  // Clear current price data when switching sources
+                  setExternalPrice(null);
+                  // Fetch data for the new source
+                  fetchExternalPriceForSource(newSource);
+                }}
+                className="px-3 py-1 text-sm border border-border rounded-md bg-background text-foreground"
+              >
+                <option value="csgoskins.gg">CSGOSKINS.GG</option>
+                <option value="skinsmonkey">SkinsMonkey</option>
+              </select>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={fetchExternalPrice}
+                disabled={isFetchingExternalPrice}
+                className="gap-2"
+              >
+                <RefreshCw className={`h-4 w-4 ${isFetchingExternalPrice ? "animate-spin" : ""}`} />
+                {isFetchingExternalPrice ? "Fetching..." : "Update Price"}
+              </Button>
+              {externalPrice && (
+                <span className="text-xs text-muted-foreground">
+                  Last updated: {new Date(externalPrice.last_updated).toLocaleString()}
+                </span>
+              )}
+            </div>
+          </div>
+
+          {externalPrice ? (
+            <div className="space-y-4">
+              <div className="h-64 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-lg border border-border/50 flex items-center justify-center">
+                <div className="text-center space-y-4">
+                  {externalPrice.source === "skinsmonkey" ? (
+                    <>
+                      <div className="text-3xl font-bold text-card-foreground">
+                        {externalPrice.trade_value ? `${getClientCurrencySymbol(displayCurrency)}${externalPrice.trade_value.toFixed(2)}` : "Integration coming soon"}
+                      </div>
+                      <div className="text-lg text-muted-foreground">
+                        Current SkinsMonkey Trade Value
+                      </div>
+                      {externalPrice.offers_count !== undefined && (
+                        <div className="text-lg font-semibold text-blue-400">
+                          {externalPrice.offers_count} Active Offers
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <div className="text-3xl font-bold text-card-foreground">
+                        {getClientCurrencySymbol(displayCurrency)}{externalPrice.current_price?.toFixed(2) || "N/A"}
+                      </div>
+                      <div className="text-lg text-muted-foreground">
+                        Current CSGOSKINS.GG Price
+                      </div>
+                      {externalPrice.price_change_24h_percent !== undefined && (
+                        <div className={`text-lg font-semibold ${
+                          externalPrice.price_change_24h_percent > 0 ? "text-green-400" : 
+                          externalPrice.price_change_24h_percent < 0 ? "text-red-400" : "text-muted-foreground"
+                        }`}>
+                          {externalPrice.price_change_24h_percent > 0 ? "+" : ""}{externalPrice.price_change_24h_percent.toFixed(1)}% (24h)
+                        </div>
+                      )}
+                    </>
+                  )}
+                  <div className="text-sm text-muted-foreground">
+                    Last updated: {new Date(externalPrice.last_updated).toLocaleString()}
+                  </div>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                {externalPrice.source === "skinsmonkey" ? (
+                  <>
+                    {externalPrice.offers_count !== undefined && (
+                      <div className="text-center p-3 bg-blue-500/10 rounded-lg border border-blue-500/20">
+                        <div className="text-muted-foreground mb-1">Active Offers</div>
+                        <div className="font-semibold text-blue-400">
+                          {externalPrice.offers_count}
+                        </div>
+                      </div>
+                    )}
+                    <div className="text-center p-3 bg-green-500/10 rounded-lg border border-green-500/20">
+                      <div className="text-muted-foreground mb-1">Platform</div>
+                      <div className="font-semibold text-green-400">
+                        SkinsMonkey
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    {externalPrice.week_low && (
+                      <div className="text-center p-3 bg-red-500/10 rounded-lg border border-red-500/20">
+                        <div className="text-muted-foreground mb-1">Week Low</div>
+                        <div className="font-semibold text-red-400">
+                          {getClientCurrencySymbol(displayCurrency)}{externalPrice.week_low.toFixed(2)}
+                        </div>
+                      </div>
+                    )}
+                    {externalPrice.week_high && (
+                      <div className="text-center p-3 bg-green-500/10 rounded-lg border border-green-500/20">
+                        <div className="text-muted-foreground mb-1">Week High</div>
+                        <div className="font-semibold text-green-400">
+                          {getClientCurrencySymbol(displayCurrency)}{externalPrice.week_high.toFixed(2)}
+                        </div>
+                      </div>
+                    )}
+                    {externalPrice.all_time_low && (
+                      <div className="text-center p-3 bg-red-500/10 rounded-lg border border-red-500/20">
+                        <div className="text-muted-foreground mb-1">All-Time Low</div>
+                        <div className="font-semibold text-red-400">
+                          {getClientCurrencySymbol(displayCurrency)}{externalPrice.all_time_low.toFixed(2)}
+                        </div>
+                      </div>
+                    )}
+                    {externalPrice.all_time_high && (
+                      <div className="text-center p-3 bg-green-500/10 rounded-lg border border-green-500/20">
+                        <div className="text-muted-foreground mb-1">All-Time High</div>
+                        <div className="font-semibold text-green-400">
+                          {getClientCurrencySymbol(displayCurrency)}{externalPrice.all_time_high.toFixed(2)}
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+
+              <div className="flex flex-wrap gap-4 justify-center text-sm text-muted-foreground">
+                {externalPrice.trading_volume_24h && (
+                  <span>24h Volume: {externalPrice.trading_volume_24h.toLocaleString()}</span>
+                )}
+                {externalPrice.popularity && (
+                  <span>Popularity: {externalPrice.popularity}</span>
+                )}
+                {externalPrice.community_rating && (
+                  <span>Rating: {externalPrice.community_rating.toFixed(1)}/5</span>
+                )}
+              </div>
+
+              {externalPrice.url && (
+                <div className="text-center">
+                  <Button variant="outline" size="sm" asChild>
+                    <a
+                      href={externalPrice.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="gap-2"
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                      View on {externalPrice.source === "skinsmonkey" ? "SkinsMonkey" : "CSGOSKINS.GG"}
+                    </a>
+                  </Button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="text-center py-8 text-muted-foreground">
+              No external price data available. Click "Update Price" to fetch current data.
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {showDevWebhookTools && (
         <Card className="bg-card/50 backdrop-blur-sm border-border/50">
@@ -1740,18 +2083,7 @@ export function ItemDetail({ hash }: ItemDetailProps) {
         </Card>
       )}
 
-      <Card className="bg-card/50 backdrop-blur-sm border-border/50">
-        <CardHeader>
-          <CardTitle className="text-card-foreground">Price History</CardTitle>
-          <CardDescription>
-            Price trend with {totalDataPoints} data points across {uniqueDays}{" "}
-            days
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="bg-background/20 rounded-lg p-4">
-          {priceChartElement}
-        </CardContent>
-      </Card>
+      
 
       <Card className="bg-card/50 backdrop-blur-sm border-border/50">
         <CardHeader>

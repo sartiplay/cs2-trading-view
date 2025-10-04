@@ -28,7 +28,7 @@ interface InventoryData {
 }
 
 interface CaptureStatsProps {
-  priceSource?: "steam" | "csgoskins";
+  priceSource?: "steam" | "csgoskins.gg";
 }
 
 export function CaptureStats({ priceSource = "steam" }: CaptureStatsProps) {

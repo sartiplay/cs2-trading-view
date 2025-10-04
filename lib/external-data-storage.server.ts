@@ -11,12 +11,13 @@ const EXTERNAL_DATA_FILE = path.join(process.cwd(), "external.data.json");
 export interface ExternalPriceData {
   id: string; // Unique identifier for this external price entry
   market_hash_name: string;
-  current_price: number;
+  current_price?: number; // Optional for SkinsMonkey (trade value)
   currency: string;
-  source: "csgoskins.gg";
+  source: "csgoskins.gg" | "skinsmonkey";
   last_updated: string;
   url: string;
-  // Additional data from CSGOSKINS.GG
+  
+  // CSGOSKINS.GG specific data
   price_change_24h?: number;
   price_change_24h_percent?: number;
   trading_volume_24h?: number;
@@ -32,6 +33,10 @@ export interface ExternalPriceData {
   popularity?: number;
   community_rating?: number;
   votes?: number;
+  
+  // SkinsMonkey specific data
+  trade_value?: number;
+  offers_count?: number;
 }
 
 export interface ExternalDataStore {
@@ -84,12 +89,10 @@ async function updateExternalData(
 }
 
 export async function addExternalPriceData(priceData: ExternalPriceData): Promise<string> {
-  let priceId: string;
+  // Generate unique ID if not provided
+  const priceId = priceData.id || generateExternalPriceId();
   
   await updateExternalData((data) => {
-    // Generate unique ID if not provided
-    priceId = priceData.id || generateExternalPriceId();
-    
     // Create the price data with the unique ID
     const priceDataWithId = {
       ...priceData,
@@ -102,13 +105,24 @@ export async function addExternalPriceData(priceData: ExternalPriceData): Promis
   });
   
   console.log(`[External Data Storage] Added price data for ${priceData.market_hash_name}: $${priceData.current_price} (ID: ${priceId})`);
-  return priceId!;
+  return priceId;
 }
 
-export async function getExternalPriceData(marketHashName: string): Promise<ExternalPriceData | null> {
+export async function getExternalPriceData(marketHashName: string, source?: "csgoskins.gg" | "skinsmonkey"): Promise<ExternalPriceData | null> {
   const data = await readExternalData();
-  // Find the first entry with this market_hash_name
-  return Object.values(data.price_data).find(price => price.market_hash_name === marketHashName) || null;
+  // Find entries with this market_hash_name, optionally filtered by source
+  let entries = Object.values(data.price_data).filter(price => price.market_hash_name === marketHashName);
+  
+  if (source) {
+    entries = entries.filter(price => price.source === source);
+  }
+  
+  if (entries.length === 0) return null;
+  
+  // Return the most recent entry (latest last_updated timestamp)
+  return entries.reduce((latest, current) => {
+    return new Date(current.last_updated) > new Date(latest.last_updated) ? current : latest;
+  });
 }
 
 export async function getAllExternalPriceData(): Promise<ExternalPriceData[]> {

@@ -82,7 +82,7 @@ export interface AppSettings {
     maxCategories: number;
   };
   workerStatusVisible: boolean;
-  priceSource: "steam" | "csgoskins";
+  priceSource: "steam" | "csgoskins.gg" | "skinsmonkey";
 }
 
 const defaultSettings: AppSettings = {
@@ -958,7 +958,7 @@ export function SettingsDialog() {
                 <Label htmlFor="price-source">Price Source</Label>
                 <Select
                   value={settings.priceSource}
-                  onValueChange={(value: "steam" | "csgoskins") =>
+                  onValueChange={(value: "steam" | "csgoskins.gg" | "skinsmonkey") =>
                     setSettings({ ...settings, priceSource: value })
                   }
                 >
@@ -967,11 +967,12 @@ export function SettingsDialog() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="steam">Steam Market</SelectItem>
-                    <SelectItem value="csgoskins">CSGOSKINS.GG</SelectItem>
+                    <SelectItem value="csgoskins.gg">CSGOSKINS.GG</SelectItem>
+                    <SelectItem value="skinsmonkey">SkinsMonkey</SelectItem>
                   </SelectContent>
                 </Select>
                 <p className="text-sm text-muted-foreground">
-                  Choose where to fetch current prices from. Steam Market prices are tracked with the scheduler, while CSGOSKINS.GG prices are real-time only.
+                  Choose where to fetch current prices from. Steam Market prices are tracked with the scheduler, while CSGOSKINS.GG and SkinsMonkey prices are real-time only.
                 </p>
               </div>
             </div>

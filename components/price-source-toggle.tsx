@@ -12,11 +12,11 @@ import { Badge } from "@/components/ui/badge";
 import { ChevronDown, DollarSign, Globe } from "lucide-react";
 
 interface PriceSourceToggleProps {
-  onSourceChange?: (source: "steam" | "csgoskins") => void;
+  onSourceChange?: (source: "steam" | "csgoskins.gg" | "skinsmonkey") => void;
 }
 
 export function PriceSourceToggle({ onSourceChange }: PriceSourceToggleProps) {
-  const [priceSource, setPriceSource] = useState<"steam" | "csgoskins">("steam");
+  const [priceSource, setPriceSource] = useState<"steam" | "csgoskins.gg" | "skinsmonkey">("steam");
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -34,7 +34,7 @@ export function PriceSourceToggle({ onSourceChange }: PriceSourceToggleProps) {
     fetchSettings();
   }, []);
 
-  const handleSourceChange = async (newSource: "steam" | "csgoskins") => {
+  const handleSourceChange = async (newSource: "steam" | "csgoskins.gg" | "skinsmonkey") => {
     try {
       const response = await fetch("/api/settings", {
         method: "PUT",
@@ -57,20 +57,27 @@ export function PriceSourceToggle({ onSourceChange }: PriceSourceToggleProps) {
     }
   };
 
-  const getSourceIcon = (source: "steam" | "csgoskins") => {
-    return source === "steam" ? <DollarSign className="h-4 w-4" /> : <Globe className="h-4 w-4" />;
+  const getSourceIcon = (source: "steam" | "csgoskins.gg" | "skinsmonkey") => {
+    if (source === "steam") return <DollarSign className="h-4 w-4" />;
+    if (source === "skinsmonkey") return <Globe className="h-4 w-4" />;
+    return <Globe className="h-4 w-4" />;
   };
 
-  const getSourceLabel = (source: "steam" | "csgoskins") => {
-    return source === "steam" ? "Steam Market" : "CSGOSKINS.GG";
+  const getSourceLabel = (source: "steam" | "csgoskins.gg" | "skinsmonkey") => {
+    if (source === "steam") return "Steam Market";
+    if (source === "skinsmonkey") return "SkinsMonkey";
+    return "CSGOSKINS.GG";
   };
 
-  const getSourceBadge = (source: "steam" | "csgoskins") => {
-    return source === "steam" ? (
-      <Badge variant="secondary" className="text-xs">
-        Tracked
-      </Badge>
-    ) : (
+  const getSourceBadge = (source: "steam" | "csgoskins.gg" | "skinsmonkey") => {
+    if (source === "steam") {
+      return (
+        <Badge variant="secondary" className="text-xs">
+          Tracked
+        </Badge>
+      );
+    }
+    return (
       <Badge variant="outline" className="text-xs">
         Real-time
       </Badge>
@@ -101,12 +108,24 @@ export function PriceSourceToggle({ onSourceChange }: PriceSourceToggleProps) {
           </Badge>
         </DropdownMenuItem>
         <DropdownMenuItem
-          onClick={() => handleSourceChange("csgoskins")}
+          onClick={() => handleSourceChange("csgoskins.gg")}
           className="flex items-center justify-between"
         >
           <div className="flex items-center">
             <Globe className="h-4 w-4 mr-2" />
             CSGOSKINS.GG
+          </div>
+          <Badge variant="outline" className="text-xs">
+            Real-time
+          </Badge>
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => handleSourceChange("skinsmonkey")}
+          className="flex items-center justify-between"
+        >
+          <div className="flex items-center">
+            <Globe className="h-4 w-4 mr-2" />
+            SkinsMonkey
           </div>
           <Badge variant="outline" className="text-xs">
             Real-time

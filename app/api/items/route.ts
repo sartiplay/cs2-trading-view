@@ -96,6 +96,21 @@ export async function GET(request: NextRequest) {
             100
           : null;
 
+        // Debug logging for profit calculation
+        if (item.market_hash_name === "Austin 2025 Challengers Sticker Capsule") {
+          console.log(`[DEBUG] ${item.market_hash_name}:`, {
+            purchasePrice: item.purchase_price,
+            purchaseCurrency: item.purchase_currency,
+            purchasePriceUSD,
+            currentPrice,
+            totalPurchaseCostUSD,
+            totalCurrentValueUSD,
+            profitLoss,
+            profitLossPercentage,
+            quantity: item.quantity
+          });
+        }
+
         // Convert all USD values to display currency if needed
         let convertedPurchasePriceUSD = totalPurchaseCostUSD;
         let convertedLatestPrice = totalCurrentValueUSD;
